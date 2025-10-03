@@ -25,7 +25,7 @@ const rows: Row[] = [
 
     // Scanning Tools
     ["webpageScan", "Webpage Scan", "Run instant ad-hoc scans on any webpage for accessibility, readability, SEO, and GEO compliance.", "NEXT_PUBLIC_WEBSCAN_URL", "/scan/ad-hoc", "/scan/ad-hoc"],
-    ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "https://apps.example.gov/pdf-scan", "/pdf-scan"],
+    ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "/scan/pdf", "/scan/pdf"],
     ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "https://apps.example.gov/sitemap", "/sitemap"],
     ["scanMonitor", "Scans Monitor", "Track scan status: In-progress, Scheduled, Completed, Failed. Shows progress bars, logs, and badge counters.", "NEXT_PUBLIC_SCANMON_URL", "https://apps.example.gov/scans", "/scans"],
     ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "https://apps.example.gov/scans/scheduler", "/scans/scheduler"],
