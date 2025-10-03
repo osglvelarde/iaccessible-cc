@@ -5,6 +5,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { HelpCircle, User, MoreHorizontal } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import HelpDrawer from "./HelpDrawer";
+import ActivityDropdown from "./ActivityDropdown";
+import RecentModulesDropdown from "./RecentModulesDropdown";
 
 export default function Header() {
   return (
@@ -16,7 +18,9 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden sm:flex items-center space-x-4">
+        <div className="hidden sm:flex items-center space-x-2">
+          <ActivityDropdown />
+          <RecentModulesDropdown />
           <HelpDrawer />
           <Button variant="ghost" size="icon" asChild>
             <Link href="/profile" aria-label="Profile and account">
@@ -28,6 +32,8 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         <div className="flex sm:hidden items-center space-x-2">
+          <ActivityDropdown />
+          <RecentModulesDropdown />
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
