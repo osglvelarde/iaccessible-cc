@@ -172,7 +172,7 @@ export default function PdfScanHistoryTable({ history, className }: PdfScanHisto
                           setSortOrder(sortBy === "score" && sortOrder === "desc" ? "asc" : "desc");
                         }}
                       >
-                        Accessibility Score
+                        Automated Accessibility Score
                         {sortBy === "score" && (sortOrder === "desc" ? "↓" : "↑")}
                       </button>
                     </TooltipTrigger>
@@ -334,7 +334,7 @@ export default function PdfScanHistoryTable({ history, className }: PdfScanHisto
                   <div className="pt-2 border-t">
                     <div className="flex justify-between items-center">
                       <div>
-                        <span className="text-muted-foreground text-sm">Accessibility Score: </span>
+                        <span className="text-muted-foreground text-sm">Automated Accessibility Score: </span>
                         <span className={cn(
                           "text-sm font-medium",
                           scan.accessibilityScore >= 90 ? "text-green-600" :

@@ -1,0 +1,47 @@
+# IBM accessibility-checker configuration
+ruleArchive: latest
+
+# Specify policies to scan
+policies:
+  - IBM_Accessibility
+  - WCAG_2_1
+
+# Violation levels that should fail the test
+failLevels:
+  - violation
+  - potentialviolation
+
+# Violation levels that should be reported
+reportLevels:
+  - violation
+  - potentialviolation
+  - recommendation
+  - potentialrecommendation
+  - manual
+
+# Output format
+outputFormat:
+  - json
+
+# Labels for scan identification
+label:
+  - scanner-service
+
+# Output folder for results
+outputFolder: scanner-results
+
+# Include timestamp in filename
+outputFilenameTimestamp: true
+
+# Baseline folder
+baselineFolder: baselines
+
+# Cache folder for ace-node.js and archive.json
+cacheFolder: /tmp/accessibility-checker
+
+# Puppeteer arguments for Docker environment
+puppeteerArgs:
+  - --no-sandbox
+  - --disable-setuid-sandbox
+  - --disable-dev-shm-usage
+  - --disable-gpu

@@ -12,18 +12,21 @@ import {
   Search, 
   Filter,
   Calendar,
-  ExternalLink
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ScanHistoryItem {
-  id: number;
+  id: string | number;
   url: string;
   date: string;
   status: "completed" | "failed" | "running";
-  accessibilityScore?: number;
-  seoScore?: number;
-  readabilityScore?: number;
+  accessibilityScore?: number | null;
+  seoScore?: number | null;
+  readabilityScore?: number | null;
+  totalIssues?: number;
 }
 
 interface ScanHistoryTableProps {
@@ -31,22 +34,28 @@ interface ScanHistoryTableProps {
   className?: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ScanHistoryTable({ history, className }: ScanHistoryTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "score">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredHistory = history
     .filter(item => {
+      // Add null/undefined checks
+      if (!item || !item.url || !item.status) return false;
+      
       const matchesSearch = item.url.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === "all" || item.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       if (sortBy === "date") {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
+        const dateA = new Date(a.date || 0).getTime();
+        const dateB = new Date(b.date || 0).getTime();
         return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       } else {
         const scoreA = a.accessibilityScore || 0;
@@ -54,6 +63,34 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
         return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
       }
     });
+
+  // Pagination logic
+  const totalItems = filteredHistory.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedHistory = filteredHistory.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  const handleFilterChange = (newFilter: string) => {
+    setStatusFilter(newFilter);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (newSortBy: "date" | "score") => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder("desc");
+    }
+    setCurrentPage(1);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,9 +104,9 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
   return (
     <Card className={cn("shadow-sm", className)}>
       <CardHeader>
-        <CardTitle>Scan History</CardTitle>
+        <CardTitle>Automated Scan History</CardTitle>
         <CardDescription>
-          View and manage your previous scans
+          View and manage your previous automated scans
         </CardDescription>
       </CardHeader>
       <div className="p-6 pt-0">
@@ -80,7 +117,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
             <Input
               placeholder="Search by URL..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -91,7 +128,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
                 <Button
                   variant={statusFilter === "all" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter("all")}
+                  onClick={() => handleFilterChange("all")}
                 >
                   All
                 </Button>
@@ -106,7 +143,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
                 <Button
                   variant={statusFilter === "completed" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter("completed")}
+                  onClick={() => handleFilterChange("completed")}
                 >
                   Completed
                 </Button>
@@ -121,7 +158,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
                 <Button
                   variant={statusFilter === "failed" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter("failed")}
+                  onClick={() => handleFilterChange("failed")}
                 >
                   Failed
                 </Button>
@@ -143,10 +180,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
                     <TooltipTrigger asChild>
                       <button 
                         className="flex items-center gap-1 cursor-pointer hover:text-primary"
-                        onClick={() => {
-                          setSortBy("date");
-                          setSortOrder(sortBy === "date" && sortOrder === "desc" ? "asc" : "desc");
-                        }}
+                        onClick={() => handleSortChange("date")}
                       >
                         <Calendar className="h-4 w-4" />
                         Date
@@ -165,10 +199,7 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
                     <TooltipTrigger asChild>
                       <button 
                         className="flex items-center gap-1 cursor-pointer hover:text-primary"
-                        onClick={() => {
-                          setSortBy("score");
-                          setSortOrder(sortBy === "score" && sortOrder === "desc" ? "asc" : "desc");
-                        }}
+                        onClick={() => handleSortChange("score")}
                       >
                         Scores
                         {sortBy === "score" && (sortOrder === "desc" ? "↓" : "↑")}
@@ -183,18 +214,18 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
               </tr>
             </thead>
             <tbody>
-              {filteredHistory.map((scan) => (
+              {paginatedHistory.map((scan) => (
                 <tr key={scan.id} className="border-b hover:bg-muted/50 transition-colors">
                   <td className="py-3 px-4">
                     <div className="text-sm">
-                      {new Date(scan.date).toLocaleDateString()}
+                      {scan.date ? new Date(scan.date).toLocaleDateString() : 'N/A'}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(scan.date).toLocaleTimeString()}
+                      {scan.date ? new Date(scan.date).toLocaleTimeString() : 'N/A'}
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    <div className="max-w-xs truncate text-sm">{scan.url}</div>
+                    <div className="max-w-xs truncate text-sm">{scan.url || 'N/A'}</div>
                   </td>
                   <td className="py-3 px-4">
                     <Badge variant="outline" className={getStatusColor(scan.status)}>
@@ -256,17 +287,17 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
-          {filteredHistory.map((scan) => (
+          {paginatedHistory.map((scan) => (
             <Card key={scan.id} className="shadow-sm">
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{scan.url}</div>
+                    <div className="text-sm font-medium truncate">{scan.url || 'N/A'}</div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(scan.date).toLocaleDateString()} at {new Date(scan.date).toLocaleTimeString()}
+                      {scan.date ? `${new Date(scan.date).toLocaleDateString()} at ${new Date(scan.date).toLocaleTimeString()}` : 'N/A'}
                     </div>
                     <Badge variant="outline" className={cn("text-xs", getStatusColor(scan.status))}>
-                      {scan.status}
+                      {scan.status || 'unknown'}
                     </Badge>
                   </div>
                   <div className="flex gap-1">
@@ -327,6 +358,63 @@ export default function ScanHistoryTable({ history, className }: ScanHistoryTabl
             </Card>
           ))}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} scans
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className="w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
 
         {filteredHistory.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">

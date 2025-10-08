@@ -240,9 +240,9 @@ export default function PdfScanPage() {
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold">PDF Scan</h1>
+            <h1 className="text-2xl font-bold">Automated PDF Scan</h1>
             <Badge variant="outline" className="text-sm">
-              Single Document
+              Automated Analysis
             </Badge>
           </div>
           <div className="flex items-center space-x-2">
@@ -340,7 +340,7 @@ export default function PdfScanPage() {
                     ) : (
                       <>
                         <FileText className="h-4 w-4 mr-2" />
-                        Start PDF Scan
+                        Start Automated PDF Scan
                       </>
                     )}
                   </Button>

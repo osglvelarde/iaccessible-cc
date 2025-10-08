@@ -72,9 +72,9 @@ export default function ScanResultsTable({ issues, className }: ScanResultsTable
   return (
     <Card className={cn("shadow-sm", className)}>
       <CardHeader>
-        <CardTitle>Scan Results</CardTitle>
+        <CardTitle>Automated Scan Results</CardTitle>
         <CardDescription>
-          Detailed breakdown of accessibility, SEO, and readability issues
+          Detailed breakdown of automated accessibility, SEO, and readability analysis
         </CardDescription>
       </CardHeader>
       <div className="p-6 pt-0">

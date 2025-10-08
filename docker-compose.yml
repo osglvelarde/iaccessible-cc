@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  scanner:
+    build: ./scanner-service
+    container_name: accessibility-scanner
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./scanner-results:/app/scanner-results
+    environment:
+      - NODE_ENV=development
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

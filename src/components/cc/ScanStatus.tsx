@@ -22,6 +22,14 @@ export default function ScanStatus({
 }: ScanStatusProps) {
   if (!isScanning) return null;
 
+  // Get progress bar color based on progress
+  const getProgressColor = () => {
+    if (progress < 30) return "from-blue-500 to-blue-400";
+    if (progress < 60) return "from-yellow-500 to-yellow-400";
+    if (progress < 90) return "from-orange-500 to-orange-400";
+    return "from-green-500 to-green-400";
+  };
+
   return (
     <Card className={cn("shadow-sm animate-in fade-in-0 slide-in-from-top-2", className)}>
       <CardHeader>
@@ -31,10 +39,10 @@ export default function ScanStatus({
               <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Scan is running, please wait...</p>
+              <p>Automated scan is running, please wait...</p>
             </TooltipContent>
           </Tooltip>
-          <span>Scan in Progress</span>
+          <span>Automated Scan in Progress</span>
         </CardTitle>
       </CardHeader>
       <div className="p-6 pt-0">
@@ -47,14 +55,17 @@ export default function ScanStatus({
             </div>
             <div className="relative bg-muted rounded-full h-2 overflow-hidden">
               <div 
-                className="bg-primary h-full rounded-full transition-all duration-300 ease-out"
+                className={`bg-gradient-to-r ${getProgressColor()} h-full rounded-full transition-all duration-500 ease-out relative`}
                 style={{ width: `${progress}%` }}
                 role="progressbar"
                 aria-valuenow={progress}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label={`Scan progress: ${Math.round(progress)}%`}
-              />
+              >
+                {/* Animated shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+              </div>
             </div>
           </div>
 
@@ -84,7 +95,7 @@ export default function ScanStatus({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Stop the current scan</p>
+                  <p>Stop the current automated scan</p>
                 </TooltipContent>
               </Tooltip>
             </div>

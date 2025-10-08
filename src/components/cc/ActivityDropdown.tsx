@@ -33,6 +33,17 @@ interface ActivityItem {
   actionLabel?: string;
 }
 
+interface ScanHistoryItem {
+  id: string | number;
+  url: string;
+  date: string;
+  status: "completed" | "failed" | "running";
+  accessibilityScore?: number | null;
+  seoScore?: number | null;
+  readabilityScore?: number | null;
+  totalIssues?: number;
+}
+
 // Mock data for demonstration
 const mockActivities: ActivityItem[] = [
   {
@@ -87,15 +98,79 @@ const mockActivities: ActivityItem[] = [
   }
 ];
 
-export default function ActivityDropdown() {
+// Transform scan history into activity items
+const transformScanHistoryToActivities = (scanHistory: ScanHistoryItem[]): ActivityItem[] => {
+  return scanHistory
+    .filter(scan => scan && scan.url && scan.date) // Filter out invalid entries
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Sort by date descending
+    .map(scan => {
+      const isCompleted = scan.status === "completed";
+      const isFailed = scan.status === "failed";
+      const isRunning = scan.status === "running";
+      
+      let title = "";
+      let description = "";
+      let type: ActivityItem["type"] = "scan_completed";
+      let status: ActivityItem["status"] = "success";
+      
+      if (isRunning) {
+        title = "Automated Scan in Progress";
+        description = `Scanning ${scan.url}`;
+        type = "notification";
+        status = "info";
+      } else if (isFailed) {
+        title = "Automated Scan Failed";
+        description = `Scan failed for ${scan.url}`;
+        type = "scan_failed";
+        status = "error";
+      } else if (isCompleted) {
+        const accessibilityScore = scan.accessibilityScore || 0;
+        const seoScore = scan.seoScore || 0;
+        const readabilityScore = scan.readabilityScore || 0;
+        const totalIssues = scan.totalIssues || 0;
+        
+        title = "Automated Scan Completed";
+        description = `${scan.url} - Accessibility: ${accessibilityScore}%, SEO: ${seoScore}%, Readability: ${readabilityScore}% (${totalIssues} issues)`;
+        type = "scan_completed";
+        
+        // Determine status based on scores
+        if (accessibilityScore >= 80) {
+          status = "success";
+        } else if (accessibilityScore >= 60) {
+          status = "warning";
+        } else {
+          status = "error";
+        }
+      }
+      
+      return {
+        id: `scan-${scan.id}`,
+        type,
+        title,
+        description,
+        timestamp: scan.date,
+        status,
+        actionUrl: "/scan/ad-hoc",
+        actionLabel: isRunning ? "View Progress" : "View Results"
+      };
+    });
+};
+
+interface ActivityDropdownProps {
+  scanHistory?: ScanHistoryItem[];
+}
+
+export default function ActivityDropdown({ scanHistory = [] }: ActivityDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const unreadCount = activities.filter(a => a.status === "error" || a.status === "warning").length;
 
   // Load activities on client side to prevent hydration mismatch
   useEffect(() => {
-    setActivities(mockActivities.slice(0, 5));
-  }, []);
+    // Use real scan history if available, otherwise fall back to mock data
+    const realActivities = scanHistory.length > 0 ? transformScanHistoryToActivities(scanHistory) : mockActivities;
+    setActivities(realActivities.slice(0, 5));
+  }, [scanHistory]);
 
   const getActivityIcon = (type: string, status?: string) => {
     switch (type) {

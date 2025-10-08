@@ -21,24 +21,24 @@ interface PdfSummaryCardsProps {
 export default function PdfSummaryCards({ summary, className }: PdfSummaryCardsProps) {
   const cards = [
     {
-      title: "Accessibility Score",
+      title: "Automated Accessibility Score",
       value: summary.accessibilityScore,
       subtitle: "WCAG 2.2 & PDF/UA Compliance",
       icon: Accessibility,
       color: "text-blue-600",
       bgColor: "bg-blue-50 dark:bg-blue-950/20",
       borderColor: "border-blue-200 dark:border-blue-800",
-      tooltip: "Overall accessibility compliance score based on WCAG 2.2 and PDF/UA standards"
+      tooltip: "Automated accessibility compliance score based on WCAG 2.2 and PDF/UA standards"
     },
     {
       title: "Total Issues",
       value: summary.totalIssues,
-      subtitle: "Issues Found",
+      subtitle: "Automated Issues Found",
       icon: AlertTriangle,
       color: "text-red-600",
       bgColor: "bg-red-50 dark:bg-red-950/20",
       borderColor: "border-red-200 dark:border-red-800",
-      tooltip: "Total number of accessibility issues found in the PDF document"
+      tooltip: "Total number of automated accessibility issues found in the PDF document"
     },
     {
       title: "Critical Issues",
@@ -97,14 +97,14 @@ export default function PdfSummaryCards({ summary, className }: PdfSummaryCardsP
                 </CardHeader>
                 <div className="px-6 pb-6">
                   <div className={cn("text-3xl font-bold", card.color)}>
-                    {card.title === "Accessibility Score" ? `${card.value}%` : card.value}
+                    {card.title === "Automated Accessibility Score" ? `${card.value}%` : card.value}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {card.subtitle}
                   </div>
                   
                   {/* Score Badge for Accessibility Score */}
-                  {card.title === "Accessibility Score" && (
+                  {card.title === "Automated Accessibility Score" && (
                     <div className="mt-2">
                       <Badge 
                         variant="outline" 
@@ -121,7 +121,7 @@ export default function PdfSummaryCards({ summary, className }: PdfSummaryCardsP
                   )}
                   
                   {/* Issue Type Badge */}
-                  {card.title !== "Accessibility Score" && (
+                  {card.title !== "Automated Accessibility Score" && (
                     <div className="mt-2">
                       <Badge 
                         variant="outline" 

@@ -13,6 +13,7 @@ import LoadingSkeleton, { QuickActionsSkeleton, ActivityFeedSkeleton } from "@/c
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { getFavorites, toggleFavorite } from "@/lib/favorites";
+import { getScanHistory, type ScanHistoryItem } from "@/lib/scanner-api";
 
 // Debounce utility for performance
 const useDebounce = (value: any, delay: number) => {
@@ -41,8 +42,9 @@ export default function Home() {
   const [showSearchFilter, setShowSearchFilter] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
 
-  // Load favorites on mount with loading state
+  // Load favorites and scan history on mount with loading state
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -52,6 +54,23 @@ export default function Home() {
       
       const favoriteModules = getFavorites();
       setFavorites(favoriteModules.map(f => f.moduleKey));
+      
+      // Load scan history for activity feed
+      try {
+        const history = await getScanHistory();
+        // Filter out any invalid entries
+        const validHistory = history.filter(item =>
+          item &&
+          typeof item === 'object' &&
+          item.url &&
+          item.status &&
+          item.id
+        );
+        setScanHistory(validHistory);
+      } catch (error) {
+        console.error('Failed to load scan history:', error);
+        // Continue without scan history
+      }
       
       setIsLoading(false);
       setIsInitialized(true);
@@ -195,6 +214,7 @@ export default function Home() {
           {showSearchFilter ? "Hide" : "Show"} Search & Filter
         </Button>
       </div>
+
 
       {/* Module Groups */}
       {MODULE_GROUPS.map((group, groupIndex) => {
