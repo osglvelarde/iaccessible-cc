@@ -26,15 +26,15 @@ const rows: Row[] = [
     // Scanning Tools
     ["webpageScan", "Webpage Scan", "Run instant ad-hoc scans on any webpage for accessibility, readability, SEO, and GEO compliance.", "NEXT_PUBLIC_WEBSCAN_URL", "/scan/ad-hoc", "/scan/ad-hoc"],
     ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "/scan/pdf", "/scan/pdf"],
-    ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/sitemap", "/sitemap"],
+    ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/scan/sitemap", "/scan/sitemap"],
     ["scanMonitor", "Scans Monitor", "Track scan status: In-progress, Scheduled, Completed, Failed. Shows progress bars, logs, and badge counters.", "NEXT_PUBLIC_SCANMON_URL", "https://apps.example.gov/scans", "/scans"],
     ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "https://apps.example.gov/scans/scheduler", "/scans/scheduler"],
 
     // Workflows
     ["intake", "Intake Form", "Collect accessibility requirements, department URLs, authentication details, and points of contact.", "NEXT_PUBLIC_INTAKE_URL", "https://apps.example.gov/intake", "/intake"],
+    ["manualTesting", "Manual Testing Tool", "Conduct structured manual tests (screen readers, keyboard navigation, color contrast). Upload evidence and apply scoring.", "NEXT_PUBLIC_MANUALTEST_URL", "/manual-testing", "/manual-testing"],
 
     // Knowledge & Guides
-    ["manualTesting", "Manual Testing Tool", "Conduct structured manual tests (screen readers, keyboard navigation, color contrast). Upload evidence and apply scoring.", "NEXT_PUBLIC_MANUALTEST_URL", "https://apps.example.gov/manual-testing", "/manual-testing"],
     ["pdfRemediation", "PDF Remediation Module", "Guided remediation workflows for fixing PDF accessibility issues flagged by scans.", "NEXT_PUBLIC_PDFREM_URL", "https://apps.example.gov/pdf-remediation", "/pdf-remediation"],
     ["guidelines", "Guidelines & Resources", "Browse WCAG 2.2, Section 508, ADA Title II, remediation playbooks, and best-practice templates.", "NEXT_PUBLIC_GUIDES_URL", "https://apps.example.gov/guidelines", "/guidelines"],
     ["supportBot", "Training & Customer Service Chatbot", "Interactive chatbot for training, FAQs, and customer support on accessibility compliance.", "NEXT_PUBLIC_SUPPORT_URL", "https://apps.example.gov/support-bot", "/support-bot"],
@@ -59,11 +59,11 @@ export const MODULE_GROUPS: ModuleGroup[] = [
     },
     {
         title: "Workflows",
-        modules: allModules.filter(m => ["intake"].includes(m.key))
+        modules: allModules.filter(m => ["intake", "manualTesting", "pdfRemediation"].includes(m.key))
     },
     {
         title: "Knowledge & Guides",
-        modules: allModules.filter(m => ["manualTesting", "pdfRemediation", "guidelines", "supportBot"].includes(m.key))
+        modules: allModules.filter(m => ["guidelines", "supportBot"].includes(m.key))
     },
     {
         title: "Admin",

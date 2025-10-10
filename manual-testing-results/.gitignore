@@ -1,0 +1,3 @@
+# Manual testing results storage
+manual-testing-results/*.json
+manual-testing-results/evidence/*
