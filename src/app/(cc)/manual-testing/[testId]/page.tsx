@@ -9,10 +9,10 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { 
-  TestSession, 
-  createTestSession, 
-  updateCriterionResult, 
+import {
+  TestSession,
+  createTestSession,
+  updateCriterionResult,
   addEvidenceToCriterion,
   updateCriterionNote,
   getCriterionResult,
@@ -28,16 +28,25 @@ import WCAGManualChecklist from '@/components/cc/WCAGManualChecklist';
 import PageContentViewer from '@/components/cc/PageContentViewer';
 
 interface ManualTestingWorkspaceProps {
-  params: {
+  params: Promise<{
     testId: string;
-  };
+  }>;
 }
 
 export default function ManualTestingWorkspace({ params }: ManualTestingWorkspaceProps) {
+  const [testId, setTestId] = useState<string>('');
   const searchParams = useSearchParams();
   const router = useRouter();
   const pageUrl = searchParams.get('url') || '';
-  
+
+  useEffect(() => {
+    async function unwrapParams() {
+      const unwrapped = await params;
+      setTestId(unwrapped.testId);
+    }
+    unwrapParams();
+  }, [params]);
+
   const [session, setSession] = useState<TestSession | null>(null);
   const [pageData, setPageData] = useState<CrawledPage | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,8 +54,10 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    initializeSession();
-  }, [params.testId, pageUrl]);
+    if (testId) {
+      initializeSession();
+    }
+  }, [testId, pageUrl]);
 
   const initializeSession = async () => {
     try {
@@ -58,7 +69,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
       const foundPage = pages.find(p => p.webpage === pageUrl);
       setPageData(foundPage || null);
 
-      if (params.testId === 'new') {
+      if (testId === 'new') {
         // Create new session
         if (!pageUrl) {
           throw new Error('Page URL is required');
@@ -74,12 +85,12 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
         saveSessionToLocalStorage(newSession);
       } else {
         // Load existing session
-        const existingSession = loadSessionFromLocalStorage(params.testId);
+        const existingSession = loadSessionFromLocalStorage(testId);
         if (existingSession) {
           setSession(existingSession);
         } else {
           // Try to load from API
-          const response = await fetch(`/api/manual-testing/sessions?testId=${params.testId}`);
+          const response = await fetch(`/api/manual-testing/sessions?testId=${testId}`);
           if (response.ok) {
             const loadedSession = await response.json();
             setSession(loadedSession);

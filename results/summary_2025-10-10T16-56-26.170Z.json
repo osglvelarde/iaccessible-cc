@@ -1,0 +1,46 @@
+{
+    "counts": {
+        "ignored": 0,
+        "violation": 4,
+        "recommendation": 0,
+        "pass": 1648,
+        "potentialviolation": 17,
+        "potentialrecommendation": 0,
+        "manual": 4,
+        "elements": 25,
+        "elementsViolation": 4,
+        "elementsViolationReview": 25
+    },
+    "startReport": 1760115386170,
+    "endReport": 1760115389382,
+    "toolID": "accessibility-checker-v4.0.9",
+    "policies": [
+        "IBM_Accessibility"
+    ],
+    "reportLevels": [
+        "violation",
+        "potentialviolation"
+    ],
+    "failLevels": [
+        "violation",
+        "potentialviolation"
+    ],
+    "scanID": "fdd0415b-d193-4ad5-99bc-23570f6cd36a",
+    "pageScanSummary": [
+        {
+            "label": "www.usa.gov/benefits",
+            "counts": {
+                "ignored": 0,
+                "elements": 25,
+                "elementsViolation": 4,
+                "elementsViolationReview": 25,
+                "violation": 4,
+                "potentialviolation": 17,
+                "recommendation": 0,
+                "potentialrecommendation": 0,
+                "manual": 4,
+                "pass": 1648
+            }
+        }
+    ]
+}
