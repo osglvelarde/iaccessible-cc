@@ -96,7 +96,7 @@ export default function HelpPage() {
               <div>
                 <h3 className="font-medium mb-2">How long does my session last?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your session will timeout after 25 minutes of inactivity. You'll receive a warning 2 minutes before expiration.
+                  Your session will timeout after 25 minutes of inactivity. You&apos;ll receive a warning 2 minutes before expiration.
                 </p>
               </div>
             </CardContent>

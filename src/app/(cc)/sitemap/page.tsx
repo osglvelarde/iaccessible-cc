@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -181,7 +181,7 @@ const mockSummary: SitemapSummary = {
   maxDepth: 2
 };
 
-export default function SitemapGeneratorPage() {
+function SitemapGeneratorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -223,7 +223,7 @@ export default function SitemapGeneratorPage() {
 
   // Filter and sort data
   const filteredData = useMemo(() => {
-    let filtered = mockSitemapData.filter(page => {
+    const filtered = mockSitemapData.filter(page => {
       // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
@@ -272,8 +272,10 @@ export default function SitemapGeneratorPage() {
         const aVal = a[sortConfig.key];
         const bVal = b[sortConfig.key];
         
-        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        if (aVal != null && bVal != null) {
+          if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        }
         return 0;
       });
     }
@@ -392,7 +394,7 @@ export default function SitemapGeneratorPage() {
     // In real implementation, this would queue the jobs
   };
 
-  const handleFilterChange = (key: keyof FilterState, value: any) => {
+  const handleFilterChange = (key: keyof FilterState, value: string | number | string[]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
@@ -665,7 +667,7 @@ export default function SitemapGeneratorPage() {
                     <Label>Depth: {filters.depth[0]} - {filters.depth[1]}</Label>
                     <Slider
                       value={filters.depth}
-                      onValueChange={(value) => handleFilterChange('depth', value)}
+                      onValueChange={(value) => handleFilterChange('depth', value[0])}
                       max={summary.maxDepth}
                       step={1}
                       className="w-full"
@@ -678,7 +680,7 @@ export default function SitemapGeneratorPage() {
                       <Checkbox
                         id="orphanCandidates"
                         checked={filters.orphanCandidates}
-                        onCheckedChange={(checked) => handleFilterChange('orphanCandidates', checked)}
+                        onCheckedChange={(checked) => handleFilterChange('orphanCandidates', checked.toString())}
                       />
                       <Label htmlFor="orphanCandidates" className="text-sm">
                         Orphan candidates
@@ -917,5 +919,13 @@ export default function SitemapGeneratorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SitemapGeneratorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SitemapGeneratorPageContent />
+    </Suspense>
   );
 }

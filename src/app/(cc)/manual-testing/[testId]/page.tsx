@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
   TestSession,
+  TestEvidence,
   createTestSession,
   updateCriterionResult,
   addEvidenceToCriterion,
@@ -108,7 +109,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
     }
   };
 
-  const handleCriterionStatusChange = async (wcagId: string, status: any) => {
+  const handleCriterionStatusChange = async (wcagId: string, status: 'Pass' | 'Fail' | 'N/A' | 'Needs Senior Review') => {
     if (!session) return;
 
     const updatedSession = updateCriterionResult(session, wcagId, status);
@@ -133,10 +134,18 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
     });
   };
 
-  const handleEvidenceUpload = async (wcagId: string, evidence: any) => {
+  const handleEvidenceUpload = async (wcagId: string, evidence: { file: File; description: string }) => {
     if (!session) return;
 
-    const updatedSession = addEvidenceToCriterion(session, wcagId, evidence);
+    const testEvidence: TestEvidence = {
+      id: crypto.randomUUID(),
+      type: 'Photo', // Default type, could be determined from file type
+      filename: evidence.file.name,
+      uploadedAt: new Date().toISOString(),
+      caption: evidence.description
+    };
+
+    const updatedSession = addEvidenceToCriterion(session, wcagId, testEvidence);
     setSession(updatedSession);
     
     // Auto-save

@@ -83,7 +83,7 @@ const loadWidgetLayout = (defaultWidgets: Widget[]): Widget[] => {
         const layoutData = JSON.parse(saved);
         // Merge saved layout with default widgets
         return defaultWidgets.map(widget => {
-          const savedWidget = layoutData.find((w: any) => w.id === widget.id);
+          const savedWidget = layoutData.find((w: { id: string; enabled: boolean; position: { x: number; y: number } }) => w.id === widget.id);
           return savedWidget ? {
             ...widget,
             enabled: savedWidget.enabled,

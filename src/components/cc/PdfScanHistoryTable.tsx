@@ -209,21 +209,21 @@ export default function PdfScanHistoryTable({ history, className }: PdfScanHisto
                       <div className="flex items-center gap-2">
                         <span className={cn(
                           "text-sm font-medium",
-                          scan.accessibilityScore >= 90 ? "text-green-600" :
-                          scan.accessibilityScore >= 70 ? "text-amber-600" : "text-red-600"
+                          scan.accessibilityScore ?? 0 >= 90 ? "text-green-600" :
+                          scan.accessibilityScore ?? 0 >= 70 ? "text-amber-600" : "text-red-600"
                         )}>
-                          {scan.accessibilityScore}%
+                          {scan.accessibilityScore ?? 0}%
                         </span>
                         <Badge 
                           variant="outline" 
                           className={cn(
                             "text-xs",
-                            scan.accessibilityScore >= 90 ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700" :
-                            scan.accessibilityScore >= 70 ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-700" :
+                            scan.accessibilityScore ?? 0 >= 90 ? "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700" :
+                            scan.accessibilityScore ?? 0 >= 70 ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-700" :
                             "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700"
                           )}
                         >
-                          {scan.accessibilityScore >= 90 ? "Excellent" : scan.accessibilityScore >= 70 ? "Good" : "Needs Work"}
+                          {scan.accessibilityScore ?? 0 >= 90 ? "Excellent" : scan.accessibilityScore ?? 0 >= 70 ? "Good" : "Needs Work"}
                         </Badge>
                       </div>
                     ) : (
@@ -337,10 +337,10 @@ export default function PdfScanHistoryTable({ history, className }: PdfScanHisto
                         <span className="text-muted-foreground text-sm">Automated Accessibility Score: </span>
                         <span className={cn(
                           "text-sm font-medium",
-                          scan.accessibilityScore >= 90 ? "text-green-600" :
-                          scan.accessibilityScore >= 70 ? "text-amber-600" : "text-red-600"
+                          scan.accessibilityScore ?? 0 >= 90 ? "text-green-600" :
+                          scan.accessibilityScore ?? 0 >= 70 ? "text-amber-600" : "text-red-600"
                         )}>
-                          {scan.accessibilityScore}%
+                          {scan.accessibilityScore ?? 0}%
                         </span>
                       </div>
                       <div>

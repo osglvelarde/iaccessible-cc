@@ -16,9 +16,10 @@ import {
   BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Module } from "@/lib/constants";
 
 // Debounce hook for performance
-const useDebounce = (value: any, delay: number) => {
+const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
@@ -34,20 +35,16 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue;
 };
 
-interface Module {
-  key: string;
-  title: string;
-  desc: string;
-  href: string;
+interface EnhancedModule extends Module {
   group: string;
-  isFavorite?: boolean;
-  lastUsed?: string;
-  usageCount?: number;
+  isFavorite: boolean;
+  lastUsed: string | undefined;
+  usageCount: number;
 }
 
 interface ModuleSearchFilterProps {
-  modules: Module[];
-  onFilteredModules: (filteredModules: Module[]) => void;
+  modules: EnhancedModule[];
+  onFilteredModules: (filteredModules: EnhancedModule[]) => void;
   className?: string;
 }
 

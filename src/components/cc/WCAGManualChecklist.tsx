@@ -10,8 +10,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { TestSession, TestStatus, WCAGCriterion, getCriterionResult, getStatusBadgeVariant } from '@/lib/manual-testing';
-import { WCAG_PRINCIPLES, groupCriteriaByPrinciple } from '@/lib/wcag-complete';
+import { TestSession, TestStatus, getCriterionResult, getStatusBadgeVariant } from '@/lib/manual-testing';
+import { WCAG_PRINCIPLES, WCAGCriterion, groupCriteriaByPrinciple } from '@/lib/wcag-complete';
 import EvidenceUploadDialog from './EvidenceUploadDialog';
 import TestNoteDialog from './TestNoteDialog';
 
@@ -19,7 +19,7 @@ interface WCAGManualChecklistProps {
   session: TestSession;
   criteria: WCAGCriterion[];
   onStatusChange: (wcagId: string, status: TestStatus) => void;
-  onEvidenceUpload: (wcagId: string, evidence: any) => void;
+  onEvidenceUpload: (wcagId: string, evidence: { file: File; description: string }) => void;
   onNoteUpdate: (wcagId: string, note: string) => void;
 }
 
@@ -65,10 +65,8 @@ export default function WCAGManualChecklist({
     if (uploadModalOpen) {
       files.forEach(fileData => {
         const evidence = {
-          id: `${uploadModalOpen}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          type: fileData.type,
-          filename: fileData.file.name,
-          uploadedAt: new Date().toISOString()
+          file: fileData.file,
+          description: `Uploaded evidence for ${fileData.file.name}`
         };
         onEvidenceUpload(uploadModalOpen, evidence);
       });

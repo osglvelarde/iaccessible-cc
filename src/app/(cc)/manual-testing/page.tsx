@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { parseCrawledPages, getUniqueDepartments, getUniqueOrganizations, filterPages, CrawledPage } from '@/lib/csv-parser';
-import { TestSessionSummary, getTestStatusFromSession, formatDate } from '@/lib/manual-testing';
+import { TestSessionSummary, getTestStatusFromSession, getTestStatusFromSessionSummary, formatDate } from '@/lib/manual-testing';
 import Link from 'next/link';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ManualTestingDashboardProps {}
 
 export default function ManualTestingDashboard({}: ManualTestingDashboardProps) {
@@ -92,7 +93,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
       return <Badge variant="outline">Not Started</Badge>;
     }
     
-    const status = getTestStatusFromSession(session);
+    const status = getTestStatusFromSessionSummary(session);
     switch (status) {
       case 'In Progress':
         return <Badge variant="secondary">In Progress</Badge>;
@@ -172,7 +173,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
               <div>
                 <p className="text-sm text-muted-foreground">Tests In Progress</p>
                 <p className="text-2xl font-bold">
-                  {testSessions.filter(s => getTestStatusFromSession(s) === 'In Progress').length}
+                  {testSessions.filter(s => getTestStatusFromSessionSummary(s) === 'In Progress').length}
                 </p>
               </div>
             </div>
@@ -185,7 +186,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
               <div>
                 <p className="text-sm text-muted-foreground">Completed Tests</p>
                 <p className="text-2xl font-bold">
-                  {testSessions.filter(s => getTestStatusFromSession(s) === 'Completed').length}
+                  {testSessions.filter(s => getTestStatusFromSessionSummary(s) === 'Completed').length}
                 </p>
               </div>
             </div>
@@ -252,7 +253,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
             {/* Internal/External */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Type</label>
-              <Select value={internalExternal} onValueChange={(value) => setInternalExternal(value as any)}>
+              <Select value={internalExternal} onValueChange={(value) => setInternalExternal(value as 'All' | 'Internal' | 'External')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

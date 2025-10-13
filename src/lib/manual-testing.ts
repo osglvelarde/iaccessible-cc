@@ -308,3 +308,13 @@ export function getTestStatusFromSession(session: TestSession): 'Not Started' | 
   
   return hasUnfinishedCriteria ? 'In Progress' : 'Completed';
 }
+
+export function getTestStatusFromSessionSummary(session: TestSessionSummary): 'Not Started' | 'In Progress' | 'Completed' {
+  if (session.totalCriteria === 0) {
+    return 'Not Started';
+  }
+  
+  // Consider completed if all criteria have been evaluated
+  const totalEvaluated = session.passCount + session.failCount + session.naCount;
+  return totalEvaluated === session.totalCriteria ? 'Completed' : 'In Progress';
+}

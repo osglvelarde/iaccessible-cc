@@ -29,8 +29,79 @@ import PdfFontGraphicsAnalysis from "@/components/cc/PdfFontGraphicsAnalysis";
 import PdfScanHistoryTable from "@/components/cc/PdfScanHistoryTable";
 import { cn } from "@/lib/utils";
 
+interface PdfScanResults {
+  fileName: string;
+  fileSize: string;
+  uploadDate: string;
+  status: string;
+  summary: {
+    totalIssues: number;
+    accessibilityScore: number;
+    criticalIssues: number;
+    warningIssues: number;
+    passedChecks: number;
+  };
+  documentMetrics: {
+    pageCount: number;
+    pdfVersion: string;
+    producer: string;
+    creator: string;
+    author: string;
+    title: string;
+    subject: string;
+    keywords: string;
+    creationDate: string;
+    modDate: string;
+    language: string;
+    linearized: boolean;
+    hasDigitalSignature: boolean;
+  };
+  pageMetrics: Array<{
+    pageNumber: number;
+    mediaBox: string;
+    textCount: number;
+    wordCount: number;
+    imageCount: number;
+    annotationCount: number;
+    hasAltText: boolean;
+    headings: string[];
+    lists: number;
+    tables: number;
+  }>;
+  fontGraphics: {
+    fonts: Array<{
+      name: string;
+      type: string;
+      embedded: boolean;
+      subset: boolean;
+      unicodeCoverage: number;
+    }>;
+    images: Array<{
+      page: number;
+      dimensions: string;
+      dpi: number;
+      colorSpace: string;
+      hasAltText: boolean;
+    }>;
+    iccProfiles: number;
+    transparencyUsage: boolean;
+  };
+  issues: Array<{
+    id: number;
+    type: string;
+    code: string;
+    severity: "Error" | "Warning" | "Need Check Manual";
+    message: string;
+    iso32000Clause: string;
+    iso14289Clause: string;
+    pageNumber: number;
+    objectId: string;
+    details: string;
+  }>;
+}
+
 // Mock data for demonstration
-const mockPdfScanResults = {
+const mockPdfScanResults: PdfScanResults = {
   fileName: "accessibility-report.pdf",
   fileSize: "2.4 MB",
   uploadDate: new Date().toISOString(),
@@ -100,7 +171,7 @@ const mockPdfScanResults = {
       id: 1,
       type: "Text",
       code: "7.1:1.1",
-      severity: "Error",
+      severity: "Error" as const,
       message: "Missing alternative text for image",
       iso32000Clause: "14.9.2",
       iso14289Clause: "7.1",
@@ -112,7 +183,7 @@ const mockPdfScanResults = {
       id: 2,
       type: "Headings",
       code: "7.2:1.2",
-      severity: "Warning",
+      severity: "Warning" as const,
       message: "Heading structure not properly nested",
       iso32000Clause: "14.8.4",
       iso14289Clause: "7.2",
@@ -124,7 +195,7 @@ const mockPdfScanResults = {
       id: 3,
       type: "Tables",
       code: "7.3:1.3",
-      severity: "Error",
+      severity: "Error" as const,
       message: "Table missing header cells",
       iso32000Clause: "14.8.3",
       iso14289Clause: "7.3",
@@ -136,7 +207,7 @@ const mockPdfScanResults = {
       id: 4,
       type: "Forms",
       code: "7.4:1.4",
-      severity: "Need Check Manual",
+      severity: "Need Check Manual" as const,
       message: "Form field lacks accessible name",
       iso32000Clause: "12.7.4",
       iso14289Clause: "7.4",
@@ -152,7 +223,7 @@ const mockPdfHistory = [
     id: 1,
     fileName: "accessibility-report.pdf",
     uploadDate: "2024-01-15T10:30:00Z",
-    status: "completed",
+    status: "completed" as const,
     accessibilityScore: 78,
     totalIssues: 15
   },
@@ -160,7 +231,7 @@ const mockPdfHistory = [
     id: 2,
     fileName: "user-manual.pdf",
     uploadDate: "2024-01-14T14:20:00Z",
-    status: "completed", 
+    status: "completed" as const, 
     accessibilityScore: 92,
     totalIssues: 5
   },
@@ -168,16 +239,16 @@ const mockPdfHistory = [
     id: 3,
     fileName: "corrupted-file.pdf",
     uploadDate: "2024-01-13T09:15:00Z",
-    status: "failed",
-    accessibilityScore: null,
-    totalIssues: null
+    status: "failed" as const,
+    accessibilityScore: undefined,
+    totalIssues: undefined
   }
 ];
 
 export default function PdfScanPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResults, setScanResults] = useState(null);
+  const [scanResults, setScanResults] = useState<PdfScanResults | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [scanScope, setScanScope] = useState("entire");
   const [includeForms, setIncludeForms] = useState(true);

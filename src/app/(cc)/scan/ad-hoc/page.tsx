@@ -320,7 +320,7 @@ export default function WebpageScanPage() {
               </h3>
               <div className="mt-1 text-sm text-blue-700">
                 <p>
-                  This automated scan provides instant results using IBM's accessibility-checker. 
+                  This automated scan provides instant results using IBM&apos;s accessibility-checker. 
                   For comprehensive testing including user experience evaluation, keyboard navigation testing, 
                   and screen reader compatibility, consider our 
                   <Link href="/services/manual-audit" className="font-medium underline hover:text-blue-600">

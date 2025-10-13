@@ -61,7 +61,7 @@ export default function RecentModules({ className="" }:{ className?:string }) {
                     {item.title}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatTimeAgo(item.timestamp)}
+                    {formatTimeAgo(item.ts.toString())}
                   </div>
                 </div>
                 <div className="flex-shrink-0 ml-2">

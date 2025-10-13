@@ -98,7 +98,7 @@ export default function LegalPage() {
                   
                   <h3>Liability</h3>
                   <p>
-                    The Command Center is provided "as is" without warranty. Users are responsible 
+                    The Command Center is provided &quot;as is&quot; without warranty. Users are responsible 
                     for ensuring the accuracy of their accessibility testing results.
                   </p>
                 </div>

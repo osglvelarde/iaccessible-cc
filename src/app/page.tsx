@@ -16,7 +16,7 @@ import { getFavorites, toggleFavorite } from "@/lib/favorites";
 import { getScanHistory, type ScanHistoryItem } from "@/lib/scanner-api";
 
 // Debounce utility for performance
-const useDebounce = (value: any, delay: number) => {
+const useDebounce = (value: string, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function Home() {
   
   // State for enhanced functionality
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [filteredModules, setFilteredModules] = useState<typeof MODULES>([]);
+  const [filteredModules, setFilteredModules] = useState<typeof enhancedModules>([]);
   const [showSearchFilter, setShowSearchFilter] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -103,8 +103,8 @@ export default function Home() {
 
   // Memoize the favorite toggle handler with optimistic updates
   const handleToggleFavorite = useCallback((moduleKey: string, isFavorite: boolean) => {
-    const module = MODULES.find(m => m.key === moduleKey);
-    if (module) {
+    const moduleItem = MODULES.find(m => m.key === moduleKey);
+    if (moduleItem) {
       // Optimistic update - update UI immediately
       setFavorites(prev => 
         isFavorite 
@@ -114,7 +114,7 @@ export default function Home() {
       
       // Then update localStorage (non-blocking)
       setTimeout(() => {
-        toggleFavorite(moduleKey, module.title);
+        toggleFavorite(moduleKey, moduleItem.title);
       }, 0);
     }
   }, []);

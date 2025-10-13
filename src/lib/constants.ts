@@ -45,7 +45,7 @@ const rows: Row[] = [
 ];
 
 const allModules: Module[] = rows.map(([key, title, desc, env, def, route]) => ({
-    key, title, desc, href: (process.env as any)[env] ?? def, route
+    key, title, desc, href: (process.env as Record<string, string>)[env] ?? def, route
 }));
 
 export const MODULE_GROUPS: ModuleGroup[] = [

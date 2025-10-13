@@ -52,7 +52,7 @@ export default function PdfPageMetrics({ metrics, className }: PdfPageMetricsPro
           Page-Level Metrics
         </CardTitle>
         <CardDescription>
-          Detailed analysis of each page's content and accessibility features
+          Detailed analysis of each page&apos;s content and accessibility features
         </CardDescription>
       </CardHeader>
       <div className="p-6 pt-0">

@@ -54,7 +54,8 @@ export default function ThumbnailSiteMap({
         "not-scanned": "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-700"
       }
     };
-    return baseColors[type][status as keyof typeof baseColors[type]] || baseColors[type]["not-scanned"];
+    const typeColors = baseColors[type];
+    return typeColors[status as keyof typeof typeColors] || typeColors["not-scanned"];
   };
 
   const getStatusIcon = (status: string) => {
