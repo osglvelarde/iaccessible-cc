@@ -9,68 +9,72 @@ export default function HelpDrawer() {
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Open help" aria-controls="help-drawer" aria-expanded="false">
-          <HelpCircle className="h-4 w-4" aria-hidden />
+          <HelpCircle className="h-4 w-4" aria-hidden="true" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-80 sm:w-96" id="help-drawer">
+      <SheetContent side="right" className="w-80 sm:w-96 p-6" id="help-drawer">
         <SheetHeader>
           <SheetTitle>Help & Support</SheetTitle>
-          <SheetDescription>
+          <SheetDescription className="mb-4">
             Get help with the iAccessible Command Center
           </SheetDescription>
         </SheetHeader>
-        
-        <div className="mt-6 space-y-6">
-          <div className="space-y-3">
-            <h3 className="font-medium">Support</h3>
-            <div className="space-y-2">
+
+        <div className="mt-6 space-y-8">
+          <section aria-labelledby="support-title" className="space-y-4">
+            <h3 id="support-title" className="font-semibold text-lg">
+              Support
+            </h3>
+            <div className="space-y-3">
               <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="mailto:helpdesk@example.gov" target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="mailto:helpdesk@example.gov" target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <MessageCircle className="mr-3 h-5 w-5" aria-hidden="true" />
                   Contact Helpdesk
-                  <ExternalLink className="ml-auto h-3 w-3" aria-hidden />
-                </a>
+                  <ExternalLink className="ml-auto h-4 w-4" aria-hidden="true" />
+                </Link>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="https://status.example.gov" target="_blank" rel="noopener noreferrer">
-                  <Activity className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="https://status.example.gov" target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <Activity className="mr-3 h-5 w-5" aria-hidden="true" />
                   System status
-                  <ExternalLink className="ml-auto h-3 w-3" aria-hidden />
-                </a>
+                  <ExternalLink className="ml-auto h-4 w-4" aria-hidden="true" />
+                </Link>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="/legal" target="_blank" rel="noopener noreferrer">
-                  <Shield className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="/legal" target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <Shield className="mr-3 h-5 w-5" aria-hidden="true" />
                   Accessibility statement
-                  <ExternalLink className="ml-auto h-3 w-3" aria-hidden />
-                </a>
+                  <ExternalLink className="ml-auto h-4 w-4" aria-hidden="true" />
+                </Link>
               </Button>
             </div>
-          </div>
-          
-          <div className="space-y-3">
-            <h3 className="font-medium">Knowledge Base</h3>
-            <div className="space-y-2">
+          </section>
+
+          <section aria-labelledby="knowledge-base-title" className="space-y-4">
+            <h3 id="knowledge-base-title" className="font-semibold text-lg">
+              Knowledge Base
+            </h3>
+            <div className="space-y-3">
               <Button variant="ghost" className="w-full justify-start text-left" asChild>
-                <a href="#" className="flex items-center">
-                  <FileText className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="#" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
                   Getting started guide
-                </a>
+                </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start text-left" asChild>
-                <a href="#" className="flex items-center">
-                  <FileText className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="#" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
                   Module permissions
-                </a>
+                </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start text-left" asChild>
-                <a href="#" className="flex items-center">
-                  <FileText className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="#" className="flex items-center w-full px-4 py-2 rounded-md">
+                  <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
                   Troubleshooting
-                </a>
+                </Link>
               </Button>
             </div>
-          </div>
+          </section>
         </div>
       </SheetContent>
     </Sheet>
