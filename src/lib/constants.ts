@@ -28,7 +28,7 @@ const rows: Row[] = [
     ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "/scan/pdf", "/scan/pdf"],
     ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/scan/sitemap", "/scan/sitemap"],
     ["scanMonitor", "Scans Monitor", "Track scan status: In-progress, Scheduled, Completed, Failed. Shows progress bars, logs, and badge counters.", "NEXT_PUBLIC_SCANMON_URL", "https://apps.example.gov/scans", "/scans"],
-    ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "https://apps.example.gov/scans/scheduler", "/scans/scheduler"],
+    ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "/scans/scheduler", "/scans/scheduler"],
 
     // Workflows
     ["intake", "Intake Form", "Collect accessibility requirements, department URLs, authentication details, and points of contact.", "NEXT_PUBLIC_INTAKE_URL", "https://apps.example.gov/intake", "/intake"],
