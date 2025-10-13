@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "node -e \"console.log('Run: ./scripts/setup-env.sh (Linux/Mac) or scripts/setup-env.bat (Windows)')\"",
+    "setup:scanner": "cd scanner-service && npm install"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",

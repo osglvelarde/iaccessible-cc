@@ -36,9 +36,11 @@ export interface ScanResponse {
   error?: string;
 }
 
+const SCANNER_API_URL = process.env.NEXT_PUBLIC_SCANNER_API_URL || 'http://localhost:4000';
+
 export async function scanUrl(url: string, options: ScanOptions = {}): Promise<ScanResponse> {
   try {
-    const response = await fetch('http://localhost:4000/scan', {
+    const response = await fetch(`${SCANNER_API_URL}/scan`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ export interface ScanHistoryItem {
 
 export async function getScanHistory(): Promise<ScanHistoryItem[]> {
   try {
-    const response = await fetch('http://localhost:4000/scans');
+    const response = await fetch(`${SCANNER_API_URL}/scans`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -88,7 +90,7 @@ export async function getScanHistory(): Promise<ScanHistoryItem[]> {
 
 export async function getScanResult(scanId: string): Promise<ScanResponse> {
   try {
-    const response = await fetch(`http://localhost:4000/scans/${scanId}`);
+    const response = await fetch(`${SCANNER_API_URL}/scans/${scanId}`);
     
     if (!response.ok) {
       if (response.status === 404) {

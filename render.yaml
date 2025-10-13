@@ -1,0 +1,28 @@
+services:
+  # Main Next.js Application
+  - type: web
+    name: iaccessible-cc-app
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SCANNER_API_URL
+        fromService:
+          type: web
+          name: iaccessible-cc-scanner
+          property: host
+    healthCheckPath: /
+    
+  # Scanner Service (Docker)
+  - type: web
+    name: iaccessible-cc-scanner
+    env: docker
+    dockerfilePath: ./scanner-service/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+    healthCheckPath: /health
