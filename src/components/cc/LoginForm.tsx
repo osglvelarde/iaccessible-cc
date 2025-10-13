@@ -54,7 +54,7 @@ export default function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="sso" className="w-full">
+        <Tabs defaultValue="email" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="sso" className="flex items-center gap-2">
               <Shield className="h-4 w-4" aria-hidden />
@@ -70,14 +70,12 @@ export default function LoginForm() {
             <div className="space-y-2">
               <Label htmlFor="organization">Organization</Label>
               <Select>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select your organization" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dhs">Department of Homeland Security</SelectItem>
-                  <SelectItem value="va">Department of Veterans Affairs</SelectItem>
-                  <SelectItem value="hhs">Department of Health and Human Services</SelectItem>
-                  <SelectItem value="other">Other Federal Agency</SelectItem>
+                  <SelectItem value="ed">Department of Education</SelectItem>
+                  <SelectItem value="doc">Department of Commerce</SelectItem>
                 </SelectContent>
               </Select>
             </div>
