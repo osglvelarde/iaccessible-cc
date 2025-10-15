@@ -11,8 +11,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, Shield, Mail } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/components/cc/AuthProvider";
 
 export default function LoginForm() {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,30 +23,39 @@ export default function LoginForm() {
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [tabValue, setTabValue] = useState("email");
 
+  // Mock users for demo
+  const mockUsers = [
+    { email: "admin@example.gov", password: "admin123", role: "Global Administrator" },
+    { email: "manager@example.gov", password: "manager123", role: "Operating Unit Administrator" },
+    { email: "tester@example.gov", password: "tester123", role: "Remediator/Tester" },
+    { email: "viewer@example.gov", password: "viewer123", role: "Viewer" },
+    { email: "test.user@example.gov", password: "Test1234", role: "Administrator" }
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Mock credentials
-    const MOCK_EMAIL = "test.user@example.gov";
-    const MOCK_PASSWORD = "Test1234";
-
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      if (email === MOCK_EMAIL && password === MOCK_PASSWORD) {
+      const success = await login(email, password);
+      if (success) {
         // Success: redirect to Command Center
-        setError(""); // No error
         window.location.href = "/";
       } else {
         setError("Invalid credentials. Please try again.");
       }
-      console.log("Login attempt:", { email, password, keepSignedIn });
     } catch (err) {
       setError("Invalid credentials. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDemoUserClick = (userEmail: string, userPassword: string) => {
+    setEmail(userEmail);
+    setPassword(userPassword);
+    setTabValue("email");
   };
 
   return (
@@ -54,6 +65,31 @@ export default function LoginForm() {
         <CardDescription className="text-center">
           Enter your credentials to access the Command Center
         </CardDescription>
+        
+        {/* Demo Users */}
+        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <p className="text-sm font-semibold mb-3 text-blue-900 dark:text-blue-100">🧪 Demo Users for Testing</p>
+          <div className="space-y-2 text-xs">
+            {mockUsers.map((user, index) => (
+              <div 
+                key={index} 
+                className="flex justify-between items-center p-2 bg-white dark:bg-gray-800 rounded border cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                onClick={() => handleDemoUserClick(user.email, user.password)}
+              >
+                <div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">{user.email}</div>
+                  <div className="text-gray-600 dark:text-gray-400">{user.role}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono text-green-600 dark:text-green-400">{user.password}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+            💡 Click any email above to auto-fill the form
+          </p>
+        </div>
       </CardHeader>
       <CardContent>
         <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">

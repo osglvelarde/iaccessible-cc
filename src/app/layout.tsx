@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Lora, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/components/cc/AuthProvider";
 import Header from "@/components/cc/Header";
 import TimeoutModal from "@/components/cc/TimeoutModal";
 
@@ -42,9 +43,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <TimeoutModal />
-          <div className="container mx-auto px-4 py-6">{children}</div>
+          <AuthProvider>
+            <Header />
+            <TimeoutModal />
+            <div className="container mx-auto px-4 py-6">{children}</div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

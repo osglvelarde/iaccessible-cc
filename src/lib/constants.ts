@@ -41,7 +41,7 @@ const rows: Row[] = [
 
     // Admin
     ["settings", "Settings", "Manage org details, domains, scheduling, branding, and integrations.", "NEXT_PUBLIC_SETTINGS_URL", "https://apps.example.gov/settings", "/settings"],
-    ["usersRoles", "Users & Roles", "Invite/manage users, assign permissions, and track readiness.", "NEXT_PUBLIC_USERS_URL", "https://apps.example.gov/admin/users", "/admin/users"],
+    ["usersRoles", "Users & Roles", "Invite/manage users, assign permissions, and track readiness.", "NEXT_PUBLIC_USERS_URL", "/admin/users", "/admin/users"],
 ];
 
 const allModules: Module[] = rows.map(([key, title, desc, env, def, route]) => ({

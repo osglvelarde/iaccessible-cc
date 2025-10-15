@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { getFavorites, toggleFavorite } from "@/lib/favorites";
 import { getScanHistory, type ScanHistoryItem } from "@/lib/scanner-api";
+import { useAuth } from "@/components/cc/AuthProvider";
 
 // Debounce utility for performance
 const useDebounce = (value: string, delay: number) => {
@@ -33,8 +34,15 @@ const useDebounce = (value: string, delay: number) => {
 };
 
 export default function Home() {
-  // TODO inject real RBAC; for now enable all as example
-  const access: Record<string, boolean> = Object.fromEntries(MODULES.map(m => [m.key, true]));
+  const { user, hasPermission, isLoading: authLoading } = useAuth();
+  
+  // Get user permissions for each module
+  const access: Record<string, boolean> = useMemo(() => {
+    if (!user) {
+      return Object.fromEntries(MODULES.map(m => [m.key, false]));
+    }
+    return Object.fromEntries(MODULES.map(m => [m.key, hasPermission(m.key)]));
+  }, [user, hasPermission]);
   
   // State for enhanced functionality
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -174,7 +182,7 @@ export default function Home() {
   const modulesToDisplay = filteredModules.length > 0 ? filteredModules : enhancedModules;
 
   // Show loading skeleton while initializing
-  if (isLoading || !isInitialized) {
+  if (isLoading || !isInitialized || authLoading) {
     return (
       <main>
         <div className="space-y-6">
@@ -191,8 +199,56 @@ export default function Home() {
     );
   }
 
+  // Show login prompt if not authenticated
+  if (!user) {
+    return (
+      <main>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <h1 className="text-2xl font-semibold">Welcome to iAccessible Command Center</h1>
+          <p className="text-muted-foreground text-center max-w-md">
+            Please log in to access the accessibility testing and compliance management tools.
+          </p>
+          <Button asChild>
+            <a href="/login">Log In</a>
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
+      {/* User Role Indicator */}
+      {user && (
+        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-sm font-bold text-primary">
+                  {user.firstName[0]}{user.lastName[0]}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                  Welcome back, {user.firstName}!
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {user.groups[0]?.name} • {user.operatingUnit.name}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {Object.keys(access).filter(key => access[key]).length} modules accessible
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                {modulesToDisplay.filter(m => !access[m.key]).length} restricted
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions - Always visible */}
       <div className="mb-6">
         <QuickActionsBar />
@@ -222,48 +278,90 @@ export default function Home() {
       </div> */}
 
 
-      {/* Module Groups */}
-      {MODULE_GROUPS.map((group, groupIndex) => {
-        const groupModules = modulesToDisplay.filter(m => 
-          group.modules.some(gm => gm.key === m.key)
-        );
-
-        if (groupModules.length === 0) return null;
+      {/* Module Groups - Reordered by Access */}
+      {(() => {
+        // Separate modules into accessible and inaccessible
+        const accessibleModules = modulesToDisplay.filter(m => access[m.key]);
+        const inaccessibleModules = modulesToDisplay.filter(m => !access[m.key]);
+        
+        // Group accessible modules by their original groups
+        const accessibleGroups = MODULE_GROUPS.map(group => ({
+          ...group,
+          modules: group.modules.filter(m => 
+            accessibleModules.some(am => am.key === m.key)
+          )
+        })).filter(group => group.modules.length > 0);
+        
+        // Group inaccessible modules by their original groups
+        const inaccessibleGroups = MODULE_GROUPS.map(group => ({
+          ...group,
+          modules: group.modules.filter(m => 
+            inaccessibleModules.some(im => im.key === m.key)
+          )
+        })).filter(group => group.modules.length > 0);
 
         return (
-          <section key={group.title} className={groupIndex > 0 ? "mt-8" : ""}>
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">{group.title}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {groupModules.map(m => {
-                if (!access[m.key]) {
-                  return <DisabledModuleCard key={m.key} title={m.title} desc={m.desc} />;
-                }
-                
-                // Use ScanMonitorCard for scan monitor module
-                if (m.key === 'scanMonitor') {
-                  return <ScanMonitorCard key={m.key} title={m.title} desc={m.desc} href={m.href} />;
-                }
-                
-                // Use enhanced ModuleCard for all other modules
-                return (
-                  <EnhancedModuleCard 
-                    key={m.key} 
-                    title={m.title} 
-                    desc={m.desc} 
-                    href={m.href}
-                    moduleKey={m.key}
-                    lastUsed={m.lastUsed}
-                    usageCount={m.usageCount}
-                    isFavorite={m.isFavorite}
-                    onToggleFavorite={handleToggleFavorite}
-                    onModuleOpen={trackModuleUsage}
-                  />
-                );
-              })}
-            </div>
-          </section>
+          <>
+            {/* Accessible Modules First */}
+            {accessibleGroups.map((group, groupIndex) => (
+              <section key={`accessible-${group.title}`} className={groupIndex > 0 ? "mt-8" : ""}>
+                <h2 className="text-2xl font-semibold tracking-tight mb-4">
+                  {group.title}
+                  <span className="ml-2 text-sm font-normal text-green-600 dark:text-green-400">
+                    ✓ Accessible
+                  </span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {group.modules.map(m => {
+                    const module = modulesToDisplay.find(am => am.key === m.key);
+                    if (!module) return null;
+                    
+                    // Use ScanMonitorCard for scan monitor module
+                    if (m.key === 'scanMonitor') {
+                      return <ScanMonitorCard key={m.key} title={m.title} desc={m.desc} href={m.href} />;
+                    }
+                    
+                    // Use enhanced ModuleCard for all other modules
+                    return (
+                      <EnhancedModuleCard 
+                        key={m.key} 
+                        title={m.title} 
+                        desc={m.desc} 
+                        href={m.href}
+                        moduleKey={m.key}
+                        lastUsed={module.lastUsed}
+                        usageCount={module.usageCount}
+                        isFavorite={module.isFavorite}
+                        onToggleFavorite={handleToggleFavorite}
+                        onModuleOpen={trackModuleUsage}
+                      />
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+
+            {/* Inaccessible Modules After */}
+            {inaccessibleGroups.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-2xl font-semibold tracking-tight mb-4 text-muted-foreground">
+                  Restricted Access
+                  <span className="ml-2 text-sm font-normal text-red-600 dark:text-red-400">
+                    🔒 Requires Permission
+                  </span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {inaccessibleGroups.flatMap(group => 
+                    group.modules.map(m => (
+                      <DisabledModuleCard key={m.key} title={m.title} desc={m.desc} />
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+          </>
         );
-      })}
+      })()}
     </main>
   );
 }
