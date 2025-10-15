@@ -28,8 +28,16 @@ interface QuickAction {
 
 const quickActions: QuickAction[] = [
   {
+    id: "view-reports",
+    title: "View Reports",
+    description: "Access all scan reports",
+    icon: BarChart3,
+    href: "/dashboard",
+    variant: "secondary"
+  },
+  {
     id: "webpage-scan",
-    title: "Start Webpage Scan",
+    title: "Webpage Assessment",
     description: "Run instant accessibility scan",
     icon: Scan,
     href: "/scan/ad-hoc",
@@ -44,16 +52,8 @@ const quickActions: QuickAction[] = [
     variant: "outline"
   },
   {
-    id: "view-reports",
-    title: "View Reports",
-    description: "Access all scan reports",
-    icon: BarChart3,
-    href: "/dashboard",
-    variant: "secondary"
-  },
-  {
     id: "schedule-scan",
-    title: "Schedule Scan",
+    title: "Schedule Assessment",
     description: "Set up recurring scans",
     icon: Calendar,
     href: "/scans/scheduler",

@@ -143,7 +143,7 @@ export default function Home() {
       id: "intro",
       title: "Welcome",
       component: <IntroCard />,
-      enabled: true,
+      enabled: false, // Hide intro card by default
       order: 0,
       size: "large" as const
     },
@@ -151,7 +151,7 @@ export default function Home() {
       id: "quick-actions",
       title: "Quick Actions",
       component: <QuickActionsBar />,
-      enabled: true,
+      enabled: true, // Keep Quick Actions visible
       order: 1,
       size: "large" as const
     },
@@ -193,18 +193,24 @@ export default function Home() {
 
   return (
     <main>
-      {/* Customizable Layout */}
-      <CustomizableLayout 
+      {/* Quick Actions - Always visible */}
+      <div className="mb-6">
+        <QuickActionsBar />
+      </div>
+
+      {/* Customizable Layout - Hidden */}
+      {/* <CustomizableLayout 
         widgets={widgets}
         onLayoutChange={(updatedWidgets) => {
           // Handle layout changes if needed
         }}
         isCollapsible={true}
         defaultCollapsed={false}
-      />
+        defaultDismissed={true}
+      /> */}
 
-      {/* Search/Filter Toggle */}
-      <div className="mt-6 mb-4">
+      {/* Search/Filter Toggle - Hidden */}
+      {/* <div className="mt-6 mb-4">
         <Button
           variant="ghost"
           size="sm"
@@ -213,7 +219,7 @@ export default function Home() {
         >
           {showSearchFilter ? "Hide" : "Show"} Search & Filter
         </Button>
-      </div>
+      </div> */}
 
 
       {/* Module Groups */}

@@ -38,7 +38,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="w-full flex h-16 items-center justify-between px-4 lg:px-2">
         {/* Brand */}
         <Link href="/" className="flex items-center space-x-2">
           {/* Logo icon with "iA" */}
@@ -50,39 +50,41 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden sm:flex items-center space-x-2">
-          <ActivityDropdown scanHistory={scanHistory} />
-          <RecentModulesDropdown />
-          <HelpDrawer />
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/profile" aria-label="Profile and account">
-              <User className="h-4 w-4" aria-hidden />
-            </Link>
-          </Button>
-          <ThemeToggle />
+        <div className="hidden sm:flex flex-1 justify-end" aria-label="Desktop navigation wrapper">
+          <div className="flex items-center justify-end space-x-4 w-full" aria-label="Desktop navigation icons">
+            <ActivityDropdown scanHistory={scanHistory} />
+            <RecentModulesDropdown />
+            <HelpDrawer />
+            <Button variant="ghost" size="icon" asChild aria-label="Profile and account">
+              <Link href="/profile" tabIndex={-1}>
+                <User className="h-5 w-5" aria-hidden="true" />
+              </Link>
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Mobile Navigation */}
-        <div className="flex sm:hidden items-center space-x-2">
+        <div className="flex sm:hidden items-center space-x-3" aria-label="Mobile navigation icons">
           <ActivityDropdown scanHistory={scanHistory} />
           <RecentModulesDropdown />
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Open menu">
-                <MoreHorizontal className="h-4 w-4" aria-hidden />
+                <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href="/help" className="flex items-center">
-                  <HelpCircle className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="/help" className="flex items-center" tabIndex={0}>
+                  <HelpCircle className="mr-2 h-5 w-5" aria-hidden="true" />
                   Help
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center">
-                  <User className="mr-2 h-4 w-4" aria-hidden />
+                <Link href="/profile" className="flex items-center" tabIndex={0}>
+                  <User className="mr-2 h-5 w-5" aria-hidden="true" />
                   Profile
                 </Link>
               </DropdownMenuItem>

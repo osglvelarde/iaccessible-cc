@@ -105,6 +105,7 @@ interface CustomizableLayoutProps {
   className?: string;
   isCollapsible?: boolean;
   defaultCollapsed?: boolean;
+  defaultDismissed?: boolean;
 }
 
 export default function CustomizableLayout({ 
@@ -112,21 +113,22 @@ export default function CustomizableLayout({
   onLayoutChange,
   className,
   isCollapsible = true,
-  defaultCollapsed = false
+  defaultCollapsed = false,
+  defaultDismissed = false
 }: CustomizableLayoutProps) {
   // Load initial state from localStorage (client-side only)
   const [layoutState, setLayoutState] = useState<LayoutState>(() => {
     if (typeof window === "undefined") {
       return {
         isCollapsed: defaultCollapsed,
-        isDismissed: false,
+        isDismissed: defaultDismissed,
         isEditMode: false
       };
     }
     const savedState = loadLayoutState();
     return {
       isCollapsed: defaultCollapsed || savedState.isCollapsed,
-      isDismissed: savedState.isDismissed,
+      isDismissed: defaultDismissed || savedState.isDismissed,
       isEditMode: false // Always start in non-edit mode
     };
   });

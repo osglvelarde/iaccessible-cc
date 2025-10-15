@@ -78,8 +78,8 @@ const EnhancedModuleCard = memo(function EnhancedModuleCard({
             isFavorited && "ring-2 ring-yellow-200 dark:ring-yellow-800"
           )}
         >
-          <CardHeader className="flex-1 flex flex-col gap-3 p-6">
-            <div className="flex-1 space-y-2">
+          <CardHeader className="flex-1 flex flex-col gap-2 p-4">
+            <div className="flex-1 space-y-1.5">
               <div className="flex items-start justify-between">
                 <CardTitle className="tracking-tight text-lg leading-tight flex-1">
                   {title}
@@ -93,11 +93,11 @@ const EnhancedModuleCard = memo(function EnhancedModuleCard({
                   )}
                   onClick={toggleFavorite}
                 >
-                  <Heart 
+                  <Heart
                     className={cn(
                       "h-4 w-4",
                       isFavorited ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
-                    )} 
+                    )}
                   />
                 </Button>
               </div>
