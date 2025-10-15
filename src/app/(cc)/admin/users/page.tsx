@@ -78,7 +78,7 @@ export default function UsersRolesAdminPage() {
             <Shield className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
             <p className="text-muted-foreground text-center mb-4">
-              You don't have permission to access the Users & Roles administration.
+              You don&apos;t have permission to access the Users & Roles administration.
             </p>
             <Button asChild>
               <Link href="/">Return to Command Center</Link>

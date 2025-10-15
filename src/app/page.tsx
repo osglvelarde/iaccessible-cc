@@ -313,8 +313,8 @@ export default function Home() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {group.modules.map(m => {
-                    const module = modulesToDisplay.find(am => am.key === m.key);
-                    if (!module) return null;
+                    const moduleData = modulesToDisplay.find(am => am.key === m.key);
+                    if (!moduleData) return null;
                     
                     // Use ScanMonitorCard for scan monitor module
                     if (m.key === 'scanMonitor') {
@@ -329,9 +329,9 @@ export default function Home() {
                         desc={m.desc} 
                         href={m.href}
                         moduleKey={m.key}
-                        lastUsed={module.lastUsed}
-                        usageCount={module.usageCount}
-                        isFavorite={module.isFavorite}
+                        lastUsed={moduleData.lastUsed}
+                        usageCount={moduleData.usageCount}
+                        isFavorite={moduleData.isFavorite}
                         onToggleFavorite={handleToggleFavorite}
                         onModuleOpen={trackModuleUsage}
                       />

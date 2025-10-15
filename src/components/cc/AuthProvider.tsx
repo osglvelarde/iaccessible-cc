@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { UserWithDetails, User, OperatingUnit, UserGroup } from '@/lib/types/users-roles';
+import { UserWithDetails, User, OperatingUnit, UserGroup, RoleType } from '@/lib/types/users-roles';
 import { MOCK_USERS, DEFAULT_OPERATING_UNITS, PREDEFINED_ROLES } from '@/lib/users-roles-defaults';
 import { checkModuleAccess, checkFeatureAccess, getEffectiveModulePermissions } from '@/lib/users-roles-api';
 
@@ -45,7 +45,7 @@ function createMockUserWithDetails(mockUser: Omit<User, 'id' | 'createdAt' | 'up
     id: `group-${roleType}`,
     name: roleTemplate.name,
     type: 'predefined',
-    roleType: roleType as any,
+    roleType: roleType as RoleType,
     operatingUnitId: mockUser.operatingUnitId,
     permissions: roleTemplate.permissions,
     description: roleTemplate.description,

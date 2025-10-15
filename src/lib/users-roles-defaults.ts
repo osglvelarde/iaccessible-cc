@@ -141,12 +141,12 @@ function createModulePermission(
   accessLevel: 'none' | 'read' | 'write' | 'execute',
   featureAccess: Record<string, 'none' | 'read' | 'write' | 'execute'> = {}
 ): ModulePermission {
-  const module = MODULE_FEATURES[moduleKey];
-  if (!module) {
+  const moduleFeatures = MODULE_FEATURES[moduleKey];
+  if (!moduleFeatures) {
     throw new Error(`Module ${moduleKey} not found in MODULE_FEATURES`);
   }
 
-  const features: FeaturePermission[] = Object.entries(module.features).map(([featureKey, feature]) => ({
+  const features: FeaturePermission[] = Object.entries(moduleFeatures.features).map(([featureKey, feature]) => ({
     featureKey,
     featureName: feature.name,
     accessLevel: featureAccess[featureKey] || accessLevel,
@@ -155,7 +155,7 @@ function createModulePermission(
 
   return {
     moduleKey,
-    moduleName: module.moduleName,
+    moduleName: moduleFeatures.moduleName,
     accessLevel,
     features
   };
@@ -344,6 +344,6 @@ export function getAllModules(): string[] {
 
 // Helper function to get features for a specific module
 export function getModuleFeatures(moduleKey: string): string[] {
-  const module = MODULE_FEATURES[moduleKey];
-  return module ? Object.keys(module.features) : [];
+  const moduleFeatures = MODULE_FEATURES[moduleKey];
+  return moduleFeatures ? Object.keys(moduleFeatures.features) : [];
 }

@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const operatingUnitId = searchParams.get('operatingUnitId');
-    const status = searchParams.get('status') as any;
+    const status = searchParams.get('status') as string | null;
     const groupId = searchParams.get('groupId');
     const search = searchParams.get('search');
 

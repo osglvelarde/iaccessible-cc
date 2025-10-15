@@ -189,7 +189,7 @@ export interface AuditLogEntry {
   resourceId: string;
   actorId: string;
   actorEmail: string;
-  changes?: Record<string, { from: any; to: any }>;
+  changes?: Record<string, { from: unknown; to: unknown }>;
   timestamp: string;
   ipAddress?: string;
   userAgent?: string;

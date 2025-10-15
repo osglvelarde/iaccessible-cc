@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const operatingUnitId = searchParams.get('operatingUnitId');
-    const type = searchParams.get('type') as any;
+    const type = searchParams.get('type') as string | null;
     const search = searchParams.get('search');
 
     const allGroups = await loadAllGroups();
