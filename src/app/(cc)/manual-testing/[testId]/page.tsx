@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
   TestSession,
@@ -16,17 +16,15 @@ import {
   updateCriterionResult,
   addEvidenceToCriterion,
   updateCriterionNote,
-  getCriterionResult,
   calculateSessionSummary,
   autoSaveSession,
   saveSessionToLocalStorage,
-  loadSessionFromLocalStorage,
-  formatDate
+  loadSessionFromLocalStorage
 } from '@/lib/manual-testing';
-import { getCriteriaForVersionAndLevel, WCAG_PRINCIPLES } from '@/lib/wcag-complete';
+import { getCriteriaForVersionAndLevel } from '@/lib/wcag-complete';
 import { parseCrawledPages, CrawledPage } from '@/lib/csv-parser';
 import WCAGManualChecklist from '@/components/cc/WCAGManualChecklist';
-import PageContentViewer from '@/components/cc/PageContentViewer';
+import ExternalLaunchPanel from '@/components/cc/ExternalLaunchPanel';
 
 interface ManualTestingWorkspaceProps {
   params: Promise<{
@@ -170,6 +168,69 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
     if (!session) return;
 
     const updatedSession = updateCriterionNote(session, wcagId, note);
+    setSession(updatedSession);
+    
+    // Auto-save
+    autoSaveSession(updatedSession, async (sessionToSave) => {
+      setSaving(true);
+      try {
+        saveSessionToLocalStorage(sessionToSave);
+        await fetch('/api/manual-testing/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionToSave)
+        });
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      } finally {
+        setSaving(false);
+      }
+    });
+  };
+
+  const handleGlobalEvidenceUpload = async (evidence: { file: File; description: string }) => {
+    if (!session) return;
+
+    const testEvidence: TestEvidence = {
+      id: crypto.randomUUID(),
+      type: 'Photo', // Default type, could be determined from file type
+      filename: evidence.file.name,
+      uploadedAt: new Date().toISOString(),
+      caption: evidence.description
+    };
+
+    // Add global evidence to session metadata or a special global evidence array
+    const updatedSession = {
+      ...session,
+      globalEvidence: [...(session.globalEvidence || []), testEvidence]
+    };
+    setSession(updatedSession);
+    
+    // Auto-save
+    autoSaveSession(updatedSession, async (sessionToSave) => {
+      setSaving(true);
+      try {
+        saveSessionToLocalStorage(sessionToSave);
+        await fetch('/api/manual-testing/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionToSave)
+        });
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      } finally {
+        setSaving(false);
+      }
+    });
+  };
+
+  const handleGlobalNoteUpdate = async (note: string) => {
+    if (!session) return;
+
+    const updatedSession = {
+      ...session,
+      globalNotes: note
+    };
     setSession(updatedSession);
     
     // Auto-save
@@ -359,21 +420,14 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
           </div>
         </div>
 
-        {/* Right Panel - Content Viewer */}
+        {/* Right Panel - External Launch Panel */}
         <div className="flex-1 flex flex-col">
-          <div className="p-4 border-b bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Content Viewer</h3>
-                <Badge variant="outline" className="text-xs">
-                  Page
-                </Badge>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1">
-            <PageContentViewer url={session.pageUrl} />
-          </div>
+          <ExternalLaunchPanel 
+            url={session.pageUrl}
+            onEvidenceUpload={handleGlobalEvidenceUpload}
+            onNoteUpdate={handleGlobalNoteUpdate}
+            currentNote={session.globalNotes || ''}
+          />
         </div>
       </div>
     </div>

@@ -29,6 +29,8 @@ export interface TestSession {
   criteria: CriterionResult[];
   testerName?: string;
   testerEmail?: string;
+  globalEvidence?: TestEvidence[];
+  globalNotes?: string;
 }
 
 export interface TestSessionSummary {
