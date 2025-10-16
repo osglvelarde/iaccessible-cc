@@ -307,9 +307,6 @@ export default function Home() {
               <section key={`accessible-${group.title}`} className={groupIndex > 0 ? "mt-8" : ""}>
                 <h2 className="text-2xl font-semibold tracking-tight mb-4">
                   {group.title}
-                  <span className="ml-2 text-sm font-normal text-green-600 dark:text-green-400">
-                    ✓ Accessible
-                  </span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {group.modules.map(m => {
@@ -346,9 +343,6 @@ export default function Home() {
               <section className="mt-12">
                 <h2 className="text-2xl font-semibold tracking-tight mb-4 text-muted-foreground">
                   Restricted Access
-                  <span className="ml-2 text-sm font-normal text-red-600 dark:text-red-400">
-                    🔒 Requires Permission
-                  </span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {inaccessibleGroups.flatMap(group => 
