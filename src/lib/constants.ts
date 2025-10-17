@@ -1,7 +1,8 @@
 export type ModuleKey =
     | "dashboard" | "dataQuery" | "webpageScan" | "pdfScan"
     | "sitemap" | "scanMonitor" | "scansScheduler" | "intake" | "manualTesting"
-    | "pdfRemediation" | "guidelines" | "supportBot" | "settings" | "usersRoles";
+    | "pdfRemediation" | "guidelines" | "supportBot" | "settings" | "usersRoles"
+    | "uptimeMonitoring";
 
 export interface Module {
     key: ModuleKey;
@@ -22,11 +23,12 @@ const rows: Row[] = [
     // Reports & Dashboards
     ["dashboard", "Dashboard", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://apps.example.gov/dashboard", "/dashboard"],
     ["dataQuery", "Data Query Module", "Query scan results and accessibility data using filters, search, and exports.", "NEXT_PUBLIC_DATAQUERY_URL", "https://apps.example.gov/data-query", "/data-query"],
+    ["uptimeMonitoring", "Uptime Monitoring", "Track uptime and latency of selected pages", "NEXT_PUBLIC_UPTIME_URL", "/reports/monitoring", "/reports/monitoring"],
 
     // Scanning Tools
     ["webpageScan", "Webpage Scan", "Run instant ad-hoc scans on any webpage for accessibility, readability, SEO, and GEO compliance.", "NEXT_PUBLIC_WEBSCAN_URL", "/scan/ad-hoc", "/scan/ad-hoc"],
     ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "/scan/pdf", "/scan/pdf"],
-    ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/scan/sitemap", "/scan/sitemap"],
+    ["sitemap", "Sitemap Visualizer", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/scan/sitemap", "/scan/sitemap"],
     ["scanMonitor", "Scans Monitor", "Track scan status: In-progress, Scheduled, Completed, Failed. Shows progress bars, logs, and badge counters.", "NEXT_PUBLIC_SCANMON_URL", "https://apps.example.gov/scans", "/scans"],
     ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "/scans/scheduler", "/scans/scheduler"],
 
@@ -51,11 +53,11 @@ const allModules: Module[] = rows.map(([key, title, desc, env, def, route]) => (
 export const MODULE_GROUPS: ModuleGroup[] = [
     {
         title: "Reports & Dashboards",
-        modules: allModules.filter(m => ["dashboard", "dataQuery"].includes(m.key))
+        modules: allModules.filter(m => ["dashboard", "dataQuery", "sitemap", "uptimeMonitoring"].includes(m.key))
     },
     {
         title: "Scanning Tools",
-        modules: allModules.filter(m => ["webpageScan", "pdfScan", "sitemap", "scanMonitor", "scansScheduler"].includes(m.key))
+        modules: allModules.filter(m => ["webpageScan", "pdfScan", "scanMonitor", "scansScheduler"].includes(m.key))
     },
     {
         title: "Workflows",

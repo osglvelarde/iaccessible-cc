@@ -7,6 +7,7 @@ export type GroupType = 'predefined' | 'custom';
 export type RoleType = 
   | 'viewer'
   | 'administrator' 
+  | 'manager'
   | 'global_admin'
   | 'remediator_tester'
   | 'operating_unit_admin';

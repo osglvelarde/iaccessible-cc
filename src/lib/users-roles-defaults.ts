@@ -132,6 +132,16 @@ export const MODULE_FEATURES: ModuleFeatures = {
       manage_groups: { name: 'Manage Groups', description: 'Manage user groups' },
       view_audit_logs: { name: 'View Audit Logs', description: 'View system audit logs' }
     }
+  },
+  uptimeMonitoring: {
+    moduleName: 'Uptime Monitoring',
+    features: {
+      view_monitors: { name: 'View Monitors', description: 'View all uptime monitors' },
+      create_monitors: { name: 'Create Monitors', description: 'Create new uptime monitors' },
+      edit_monitors: { name: 'Edit Monitors', description: 'Edit monitor settings' },
+      delete_monitors: { name: 'Delete Monitors', description: 'Delete uptime monitors' },
+      view_metrics: { name: 'View Metrics', description: 'View uptime and latency metrics' }
+    }
   }
 };
 
@@ -170,6 +180,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
     permissions: [
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
+      createModulePermission('uptimeMonitoring', 'read'),
       createModulePermission('guidelines', 'read'),
       createModulePermission('supportBot', 'read')
     ],
@@ -188,10 +199,44 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
       createModulePermission('sitemap', 'execute'),
       createModulePermission('scanMonitor', 'read'),
       createModulePermission('scansScheduler', 'execute'),
+      createModulePermission('uptimeMonitoring', 'execute', {
+        view_monitors: 'read',
+        create_monitors: 'write',
+        edit_monitors: 'write',
+        delete_monitors: 'write',
+        view_metrics: 'read'
+      }),
       createModulePermission('guidelines', 'read'),
       createModulePermission('supportBot', 'read')
     ],
     description: 'Can run assessments and view results, but cannot manage users or system settings',
+    isSystemGroup: true
+  },
+  manager: {
+    name: 'Manager',
+    type: 'predefined',
+    roleType: 'manager',
+    permissions: [
+      createModulePermission('dashboard', 'read'),
+      createModulePermission('dataQuery', 'read'),
+      createModulePermission('webpageScan', 'read'),
+      createModulePermission('pdfScan', 'read'),
+      createModulePermission('sitemap', 'read'),
+      createModulePermission('scanMonitor', 'read'),
+      createModulePermission('scansScheduler', 'read'),
+      createModulePermission('intake', 'read'),
+      createModulePermission('manualTesting', 'read'),
+      createModulePermission('uptimeMonitoring', 'execute', {
+        view_monitors: 'read',
+        create_monitors: 'write',
+        edit_monitors: 'write',
+        delete_monitors: 'write',
+        view_metrics: 'read'
+      }),
+      createModulePermission('guidelines', 'read'),
+      createModulePermission('supportBot', 'read')
+    ],
+    description: 'Management-level access to view reports, manage uptime monitoring, and oversee team activities',
     isSystemGroup: true
   },
   operating_unit_admin: {
@@ -207,6 +252,13 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
       createModulePermission('scanMonitor', 'read'),
       createModulePermission('scansScheduler', 'execute'),
       createModulePermission('intake', 'write'),
+      createModulePermission('uptimeMonitoring', 'execute', {
+        view_monitors: 'read',
+        create_monitors: 'write',
+        edit_monitors: 'write',
+        delete_monitors: 'write',
+        view_metrics: 'read'
+      }),
       createModulePermission('settings', 'write', {
         view_settings: 'read',
         edit_domains: 'write',
@@ -233,6 +285,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
       createModulePermission('scansScheduler', 'execute'),
       createModulePermission('manualTesting', 'write'),
       createModulePermission('pdfRemediation', 'write'),
+      createModulePermission('uptimeMonitoring', 'write'),
       createModulePermission('guidelines', 'read'),
       createModulePermission('supportBot', 'read')
     ],
@@ -289,7 +342,7 @@ export const MOCK_USERS: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'createdB
     firstName: 'Manager',
     lastName: 'Smith',
     operatingUnitId: 'ou-1',
-    groupIds: ['group-operating-unit-admin'],
+    groupIds: ['group-manager'],
     status: 'active',
     lastLogin: new Date(Date.now() - 86400000).toISOString() // 1 day ago
   },
