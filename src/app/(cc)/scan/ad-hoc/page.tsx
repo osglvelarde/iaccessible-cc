@@ -9,57 +9,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { 
   ArrowLeft, 
   Play, 
-  Settings, 
-  Download, 
   Eye, 
-  RotateCcw,
   Loader2
 } from "lucide-react";
 import ScanStatus from "@/components/cc/ScanStatus";
 import ScanSummaryCards from "@/components/cc/ScanSummaryCards";
 import ScanResultsTable from "@/components/cc/ScanResultsTable";
 import ScanHistoryTable from "@/components/cc/ScanHistoryTable";
-import { cn } from "@/lib/utils";
 import { scanUrl, getScanHistory, type ScanResponse, type ScanHistoryItem } from "@/lib/scanner-api";
 
 // Mock data for demonstration
-const mockScanResults = {
-  url: "https://example.com",
-  timestamp: new Date().toISOString(),
-  status: "completed",
-  summary: {
-    accessibilityScore: 85,
-    seoScore: 92,
-    readabilityScore: 78,
-    totalIssues: 12
-  },
-  issues: [
-    {
-      id: 1,
-      type: "WCAG",
-      severity: "critical",
-      description: "Missing alt text on images",
-      location: "img.hero-banner",
-      details: "The hero banner image lacks alternative text, making it inaccessible to screen readers."
-    },
-    {
-      id: 2,
-      type: "SEO",
-      severity: "warning", 
-      description: "Missing meta description",
-      location: "head > meta",
-      details: "The page lacks a meta description tag, which affects search engine optimization."
-    },
-    {
-      id: 3,
-      type: "Readability",
-      severity: "warning",
-      description: "Long sentence detected",
-      location: "p.intro-text",
-      details: "Sentence exceeds recommended length for optimal readability."
-    }
-  ]
-};
 
 const mockScanHistory = [
   {
@@ -98,10 +57,8 @@ export default function WebpageScanPage() {
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [scanResults, setScanResults] = useState<ScanResponse | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [scanDepth, setScanDepth] = useState("homepage");
   const [includeExternal, setIncludeExternal] = useState(false);
-  const [rulesScope, setRulesScope] = useState(["WCAG 2.2", "Section 508"]);
   const [error, setError] = useState<string | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
   const [scanProgress, setScanProgress] = useState(0);

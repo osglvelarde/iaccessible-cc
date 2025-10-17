@@ -3,21 +3,14 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   ArrowLeft, 
   Upload, 
   FileText, 
-  Settings, 
-  Download, 
-  Eye, 
-  RotateCcw,
   Loader2,
-  AlertTriangle,
-  CheckCircle,
-  Info,
+  Settings,
   X
 } from "lucide-react";
 import PdfScanStatus from "@/components/cc/PdfScanStatus";

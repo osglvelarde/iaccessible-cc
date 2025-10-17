@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -22,7 +21,6 @@ import {
   Home,
   ExternalLink,
   FileText,
-  Folder,
   FolderOpen,
   ChevronDown,
   ChevronRight,
@@ -40,7 +38,6 @@ import {
   Info,
   Loader2
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import SitemapDetailsDrawer from "@/components/cc/SitemapDetailsDrawer";
 
 // Types
@@ -695,19 +692,6 @@ const mockSitemapData: SitemapPage[] = [
   }
 ];
 
-const mockSummary: SitemapSummary = {
-  totalPages: 7,
-  internalPages: 6,
-  externalPages: 1,
-  pdfCount: 1,
-  pdfPercentage: 14.3,
-  fileTypes: { "HTML": 6, "PDF": 1 },
-  topDomains: [
-    { domain: "example.gov", count: 6 },
-    { domain: "partner.org", count: 1 }
-  ],
-  maxDepth: 2
-};
 
 // Tree building functions
 const buildTreeStructure = (pages: SitemapPage[]): TreeNode[] => {
@@ -824,7 +808,6 @@ const TreeNode = ({ node, level, onNodeClick, expandedNodes, onToggleExpand }: T
 };
 
 function SitemapGeneratorPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   
   // State
@@ -833,7 +816,6 @@ function SitemapGeneratorPageContent() {
   const [sortConfig, setSortConfig] = useState<{ key: keyof SitemapPage; direction: 'asc' | 'desc' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(50);
-  const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedPage, setSelectedPage] = useState<SitemapPage | null>(null);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());

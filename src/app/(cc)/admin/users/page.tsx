@@ -1,9 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Users, UserCheck, Building2, Shield, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/cc/AuthProvider';
@@ -20,8 +19,8 @@ export default function UsersRolesAdminPage() {
   const [users, setUsers] = useState<UserWithDetails[]>([]);
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [operatingUnits, setOperatingUnits] = useState<OperatingUnit[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showUserDialog, setShowUserDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,

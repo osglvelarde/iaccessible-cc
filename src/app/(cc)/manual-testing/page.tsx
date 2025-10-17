@@ -7,10 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
 import { parseCrawledPages, getUniqueDepartments, getUniqueOrganizations, filterPages, CrawledPage } from '@/lib/csv-parser';
-import { TestSessionSummary, getTestStatusFromSession, getTestStatusFromSessionSummary, formatDate } from '@/lib/manual-testing';
+import { TestSessionSummary, getTestStatusFromSessionSummary, formatDate } from '@/lib/manual-testing';
 import Link from 'next/link';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -34,13 +32,17 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
   const departments = getUniqueDepartments(pages);
   const organizations = getUniqueOrganizations(pages);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [pages, searchTerm, selectedDepartment, selectedOrganization, internalExternal, dateFrom, dateTo]);
+  const loadTestSessions = async () => {
+    try {
+      const response = await fetch('/api/manual-testing/sessions', { method: 'PUT' });
+      if (response.ok) {
+        const sessions = await response.json();
+        setTestSessions(sessions);
+      }
+    } catch (error) {
+      console.error('Error loading test sessions:', error);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -58,19 +60,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
       setLoading(false);
     }
   };
-
-  const loadTestSessions = async () => {
-    try {
-      const response = await fetch('/api/manual-testing/sessions', { method: 'PUT' });
-      if (response.ok) {
-        const sessions = await response.json();
-        setTestSessions(sessions);
-      }
-    } catch (error) {
-      console.error('Error loading test sessions:', error);
-    }
-  };
-
+  
   const applyFilters = () => {
     const filtered = filterPages(pages, {
       search: searchTerm,
@@ -82,6 +72,14 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
     });
     setFilteredPages(filtered);
   };
+  
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+  
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters, pages, searchTerm, selectedDepartment, selectedOrganization, internalExternal, dateFrom, dateTo]);
 
   const getTestSessionForPage = (pageUrl: string): TestSessionSummary | null => {
     return testSessions.find(session => session.pageUrl === pageUrl) || null;

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
   TestSession,
@@ -16,14 +16,12 @@ import {
   updateCriterionResult,
   addEvidenceToCriterion,
   updateCriterionNote,
-  getCriterionResult,
   calculateSessionSummary,
   autoSaveSession,
   saveSessionToLocalStorage,
   loadSessionFromLocalStorage,
-  formatDate
 } from '@/lib/manual-testing';
-import { getCriteriaForVersionAndLevel, WCAG_PRINCIPLES } from '@/lib/wcag-complete';
+import { getCriteriaForVersionAndLevel } from '@/lib/wcag-complete';
 import { parseCrawledPages, CrawledPage } from '@/lib/csv-parser';
 import WCAGManualChecklist from '@/components/cc/WCAGManualChecklist';
 import PageContentViewer from '@/components/cc/PageContentViewer';

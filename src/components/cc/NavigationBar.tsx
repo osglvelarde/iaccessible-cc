@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,16 +11,16 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { 
-  BarChart3, 
-  Search, 
-  Workflow, 
-  BookOpen, 
-  Settings, 
+import {
+  BarChart3,
+  Search,
+  Workflow,
+  BookOpen,
+  Settings,
   ChevronDown,
   ExternalLink
 } from "lucide-react";
-import { MODULE_GROUPS } from "@/lib/constants";
+import { MODULE_GROUPS, Module } from "@/lib/constants";
 import { useAuth } from "@/components/cc/AuthProvider";
 
 const categoryIcons = {
@@ -50,12 +51,12 @@ export default function NavigationBar() {
     return group.modules.some(module => hasPermission(module.key));
   });
 
-  const handleModuleClick = (module: any) => {
+  const handleModuleClick = (module: Module) => {
     setOpenCategory(null);
   };
 
   const getModuleIcon = (moduleKey: string) => {
-    const iconMap: Record<string, any> = {
+    const iconMap: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
       dashboard: BarChart3,
       dataQuery: BarChart3,
       uptimeMonitoring: BarChart3,
@@ -91,14 +92,14 @@ export default function NavigationBar() {
             const restrictedModules = group.modules.filter(module => !hasPermission(module.key));
             
             return (
-              <DropdownMenu 
+              <DropdownMenu
                 key={group.title}
                 open={openCategory === group.title}
                 onOpenChange={(open) => setOpenCategory(open ? group.title : null)}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="flex items-center gap-2 px-3 py-2 h-8 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
                     aria-label={`${group.title} menu`}
                   >
@@ -123,8 +124,8 @@ export default function NavigationBar() {
                     
                     return (
                       <DropdownMenuItem key={module.key} asChild>
-                        <Link 
-                          href={module.route || module.href} 
+                        <Link
+                          href={module.route || module.href}
                           className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer"
                           onClick={() => handleModuleClick(module)}
                         >
