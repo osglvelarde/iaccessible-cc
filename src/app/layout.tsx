@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/components/cc/AuthProvider";
 import Header from "@/components/cc/Header";
+import NavigationBar from "@/components/cc/NavigationBar";
 import TimeoutModal from "@/components/cc/TimeoutModal";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -45,6 +46,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             <Header />
+            <NavigationBar />
             <TimeoutModal />
             <div className="container mx-auto px-4 py-6">{children}</div>
           </AuthProvider>

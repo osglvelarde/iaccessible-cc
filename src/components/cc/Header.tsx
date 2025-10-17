@@ -40,7 +40,11 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative overflow-hidden">
+      {/* Background texture */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/30" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.15)_1px,transparent_0)] dark:bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)] bg-[length:20px_20px] opacity-30" />
+      <div className="relative z-10">
       <div className="w-full flex h-16 items-center justify-between px-4 lg:px-2">
         {/* Brand */}
         <Link href="/" className="flex items-center space-x-2">
@@ -185,6 +189,7 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
       </div>
     </header>
   );
