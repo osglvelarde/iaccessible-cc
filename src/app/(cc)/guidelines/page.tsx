@@ -1,5 +1,9 @@
 "use client";
 import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { GlossaryHeader } from '@/components/cc/glossary/GlossaryHeader';
 import { OnboardingTip } from '@/components/cc/glossary/OnboardingTip';
 import { GlobalSearch } from '@/components/cc/glossary/GlobalSearch';
@@ -41,6 +45,27 @@ export default function GuidelinesPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between px-4">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold">Guidelines & Resources</h1>
+            <Badge variant="outline" className="text-sm">
+              <BookOpen className="h-3 w-3 mr-1" />
+              Knowledge Base
+            </Badge>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Command Center
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <GlossaryHeader />
       
       <main className="container mx-auto px-4 py-6">

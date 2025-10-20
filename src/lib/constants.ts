@@ -36,7 +36,7 @@ const rows: Row[] = [
 
     // Knowledge & Guides
     ["pdfRemediation", "PDF Remediation Module", "Guided remediation workflows for fixing PDF accessibility issues flagged by scans.", "NEXT_PUBLIC_PDFREM_URL", "https://apps.example.gov/pdf-remediation", "/pdf-remediation"],
-    ["guidelines", "Guidelines & Resources", "Browse WCAG 2.2, Section 508, ADA Title II, remediation playbooks, and best-practice templates.", "NEXT_PUBLIC_GUIDES_URL", "https://apps.example.gov/guidelines", "/guidelines"],
+    ["guidelines", "Guidelines & Resources", "Browse WCAG 2.2, Section 508, ADA Title II, remediation playbooks, and best-practice templates.", "NEXT_PUBLIC_GUIDES_URL", "/guidelines", "/guidelines"],
     ["supportBot", "Training & Customer Service Chatbot", "Interactive chatbot for training, FAQs, and customer support on accessibility compliance.", "NEXT_PUBLIC_SUPPORT_URL", "https://iaccessible.onrender.com/", "/support-bot"],
 
     // Admin

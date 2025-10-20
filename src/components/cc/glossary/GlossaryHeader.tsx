@@ -6,14 +6,7 @@ export const GlossaryHeader = () => {
     <header className="bg-card border-b border-border">
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold text-foreground">
-              Section 508 & WCAG Accessibility Guidelines
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Comprehensive accessibility guidelines, standards, and remediation guidance across multiple frameworks
-            </p>
-          </div>
+          
           
           <div className="flex flex-wrap gap-3">
             <Button variant="outline" size="sm" asChild>

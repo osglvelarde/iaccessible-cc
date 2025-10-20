@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExpandedRowDetails } from './ExpandedRowDetails';
 import { TableRowComponent } from './TableRowComponent';
 import { TableHeaderRow } from './TableHeaderRow';
@@ -176,7 +176,7 @@ export const GlossaryTable = ({
           </TableHeader>
           <TableBody>
             {paginatedRows.map((row) => (
-              <>
+              <React.Fragment key={row.id}>
                 <TableRowComponent
                   row={row}
                   columns={columns}
@@ -194,7 +194,7 @@ export const GlossaryTable = ({
                     </TableCell>
                   </TableRow>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
