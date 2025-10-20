@@ -130,22 +130,32 @@ export default function NavigationBar() {
                     
                     return (
                       <DropdownMenuItem key={module.key} asChild>
-                        <Link
-                          href={module.route || module.href}
-                          className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer"
-                          onClick={() => handleModuleClick(module)}
-                        >
-                          <ModuleIcon className="h-4 w-4 text-muted-foreground" />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{module.title}</div>
-                            <div className="text-xs text-muted-foreground truncate">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link
+                              href={module.route || module.href}
+                              className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer"
+                              onClick={() => handleModuleClick(module)}
+                            >
+                              <ModuleIcon className="h-4 w-4 text-muted-foreground" />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{module.title}</div>
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {module.desc}
+                                </div>
+                              </div>
+                              {isExternal && (
+                                <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                              )}
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={6} className="max-w-xs">
+                            <div className="font-medium">{module.title}</div>
+                            <div className="text-xs text-gray-300 dark:text-gray-600 mt-1">
                               {module.desc}
                             </div>
-                          </div>
-                          {isExternal && (
-                            <ExternalLink className="h-3 w-3 text-muted-foreground" />
-                          )}
-                        </Link>
+                          </TooltipContent>
+                        </Tooltip>
                       </DropdownMenuItem>
                     );
                   })}
@@ -164,18 +174,31 @@ export default function NavigationBar() {
                         
                         return (
                           <DropdownMenuItem key={module.key} disabled className="opacity-50">
-                            <div className="flex items-center gap-2 px-2 py-1.5 text-sm">
-                              <ModuleIcon className="h-4 w-4 text-muted-foreground" />
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium truncate">{module.title}</div>
-                                <div className="text-xs text-muted-foreground truncate">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 px-2 py-1.5 text-sm w-full">
+                                  <ModuleIcon className="h-4 w-4 text-muted-foreground" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">{module.title}</div>
+                                    <div className="text-xs text-muted-foreground truncate">
+                                      {module.desc}
+                                    </div>
+                                  </div>
+                                  <Badge variant="outline" className="text-xs">
+                                    Restricted
+                                  </Badge>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent sideOffset={6} className="max-w-xs">
+                                <div className="font-medium">{module.title}</div>
+                                <div className="text-xs text-gray-300 dark:text-gray-600 mt-1">
                                   {module.desc}
                                 </div>
-                              </div>
-                              <Badge variant="outline" className="text-xs">
-                                Restricted
-                              </Badge>
-                            </div>
+                                <div className="text-xs text-red-300 dark:text-red-400 mt-1 font-medium">
+                                  Access restricted
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
                           </DropdownMenuItem>
                         );
                       })}
