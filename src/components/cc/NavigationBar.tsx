@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,22 +93,27 @@ export default function NavigationBar() {
             const restrictedModules = group.modules.filter(module => !hasPermission(module.key));
             
             return (
-              <DropdownMenu
+              <DropdownMenu 
                 key={group.title}
                 open={openCategory === group.title}
                 onOpenChange={(open) => setOpenCategory(open ? group.title : null)}
               >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center gap-2 px-3 py-2 h-8 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-                    aria-label={`${group.title} menu`}
-                  >
-                    <IconComponent className="h-4 w-4" />
-                    <span className="hidden sm:inline">{group.title}</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="flex items-center gap-2 px-3 py-2 h-8 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                        aria-label={`${group.title} menu`}
+                      >
+                        <IconComponent className="h-4 w-4" />
+                        <span className="hidden sm:inline">{group.title}</span>
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent sideOffset={6}>{group.title}</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="start" className="w-64">
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium text-foreground">{group.title}</p>

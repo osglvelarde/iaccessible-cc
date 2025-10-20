@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { HelpCircle, User, MoreHorizontal, Settings, LogOut, Shield } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import HelpDrawer from "./HelpDrawer";
@@ -66,11 +67,16 @@ export default function Header() {
             {/* Admin Menu */}
             {(canManageUsers() || canManageGroups()) && (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Admin menu">
-                    <Shield className="h-5 w-5" aria-hidden="true" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" aria-label="Admin menu">
+                        <Shield className="h-5 w-5" aria-hidden="true" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent sideOffset={6}>Admin</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
                     <Link href="/admin/users" className="flex items-center" tabIndex={0}>

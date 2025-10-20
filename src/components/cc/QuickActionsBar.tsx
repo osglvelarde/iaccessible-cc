@@ -1,16 +1,12 @@
 "use client";
 import { useState } from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
-  Play, 
   FileText, 
   BarChart3, 
   Calendar, 
-  HelpCircle, 
-  Settings,
   Zap,
   Scan
 } from "lucide-react";
@@ -57,22 +53,6 @@ const quickActions: QuickAction[] = [
     description: "Set up recurring scans",
     icon: Calendar,
     href: "/scans/scheduler",
-    variant: "outline"
-  },
-  {
-    id: "help-center",
-    title: "Help Center",
-    description: "Get support and guides",
-    icon: HelpCircle,
-    href: "/help",
-    variant: "outline"
-  },
-  {
-    id: "settings",
-    title: "Settings",
-    description: "Configure preferences",
-    icon: Settings,
-    href: "/settings",
     variant: "outline"
   }
 ];
