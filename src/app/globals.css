@@ -183,3 +183,31 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Custom badge variants for WCAG levels */
+.badge-level-a {
+  @apply bg-red-100 text-red-800 border-red-300 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700;
+}
+
+.badge-level-aa {
+  @apply bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-700;
+}
+
+.badge-level-aaa {
+  @apply bg-green-100 text-green-800 border-green-300 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700;
+}
+
+/* Tab color variables */
+:root {
+  --tab-wcag: oklch(0.2828 0.1234 270.8934);
+  --tab-wave: oklch(0.5393 0.2713 286.7462);
+  --tab-readability: oklch(0.7336 0.1758 50.5517);
+  --tab-pdfua: oklch(0.5828 0.1809 259.7276);
+}
+
+.dark {
+  --tab-wcag: oklch(0.4176 0.1894 270.5429);
+  --tab-wave: oklch(0.6132 0.2294 291.7437);
+  --tab-readability: oklch(0.8077 0.1035 19.5706);
+  --tab-pdfua: oklch(0.6691 0.1569 260.1063);
+}
