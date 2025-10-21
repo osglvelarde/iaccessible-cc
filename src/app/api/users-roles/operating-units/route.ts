@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const organization = searchParams.get('organization');
+    const organizationId = searchParams.get('organizationId'); // NEW
     const search = searchParams.get('search');
 
     const allOperatingUnits = await loadAllOperatingUnits();
@@ -66,6 +67,10 @@ export async function GET(request: NextRequest) {
     
     if (organization) {
       filteredOperatingUnits = filteredOperatingUnits.filter(ou => ou.organization === organization);
+    }
+    
+    if (organizationId) {
+      filteredOperatingUnits = filteredOperatingUnits.filter(ou => ou.organizationId === organizationId);
     }
     
     if (search) {
@@ -111,6 +116,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // TODO: Validate organizationId exists (in production, check against organizations table)
+    // For now, we'll assume organizationId is provided and valid
+
     // Check if operating unit already exists
     const existingOperatingUnits = await loadAllOperatingUnits();
     if (existingOperatingUnits.some(ou => ou.name === ouData.name)) {
@@ -122,6 +130,7 @@ export async function POST(request: NextRequest) {
     
     const newOperatingUnit: OperatingUnit = {
       id: ouId,
+      organizationId: ouData.organizationId || 'org-1', // Default to org-1 if not provided
       name: ouData.name,
       organization: ouData.organization,
       domains: ouData.domains,

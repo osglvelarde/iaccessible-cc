@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Users, UserCheck, Building2, Shield, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/components/cc/AuthProvider';
-import { getUsers, getGroups, getOperatingUnits } from '@/lib/users-roles-api';
-import { UserWithDetails, UserGroup, OperatingUnit } from '@/lib/types/users-roles';
+import { getUsers, getGroups, getOperatingUnits, getOrganizations } from '@/lib/users-roles-api';
+import { UserWithDetails, UserGroup, OperatingUnit, Organization } from '@/lib/types/users-roles';
 import UserManagementTable from '@/components/cc/users-roles/UserManagementTable';
 import GroupManagementPanel from '@/components/cc/users-roles/GroupManagementPanel';
 import OperatingUnitManagement from '@/components/cc/users-roles/OperatingUnitManagement';
+import OrganizationManagement from '@/components/cc/users-roles/OrganizationManagement';
 import UserFormDialog from '@/components/cc/users-roles/UserFormDialog';
 
 export default function UsersRolesAdminPage() {
@@ -19,13 +20,16 @@ export default function UsersRolesAdminPage() {
   const [users, setUsers] = useState<UserWithDetails[]>([]);
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [operatingUnits, setOperatingUnits] = useState<OperatingUnit[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
     totalGroups: 0,
-    totalOperatingUnits: 0
+    totalOperatingUnits: 0,
+    totalOrganizations: 0,
+    activeOrganizations: 0
   });
 
   // Load data on mount
@@ -33,21 +37,25 @@ export default function UsersRolesAdminPage() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [usersResponse, groupsResponse, operatingUnitsResponse] = await Promise.all([
+        const [usersResponse, groupsResponse, operatingUnitsResponse, organizationsResponse] = await Promise.all([
           getUsers(),
           getGroups(),
-          getOperatingUnits()
+          getOperatingUnits(),
+          getOrganizations()
         ]);
 
         setUsers(usersResponse.users);
         setGroups(groupsResponse.groups);
         setOperatingUnits(operatingUnitsResponse.operatingUnits);
+        setOrganizations(organizationsResponse.organizations);
 
         setStats({
           totalUsers: usersResponse.total,
           activeUsers: usersResponse.users.filter(u => u.status === 'active').length,
           totalGroups: groupsResponse.total,
-          totalOperatingUnits: operatingUnitsResponse.total
+          totalOperatingUnits: operatingUnitsResponse.total,
+          totalOrganizations: organizationsResponse.total,
+          activeOrganizations: organizationsResponse.organizations.filter(o => o.status === 'active').length
         });
       } catch (error) {
         console.error('Error loading data:', error);
@@ -109,7 +117,7 @@ export default function UsersRolesAdminPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -151,6 +159,19 @@ export default function UsersRolesAdminPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Organizations</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalOrganizations}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.activeOrganizations} active
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Your Role</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -167,7 +188,11 @@ export default function UsersRolesAdminPage() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="organizations" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Organizations
+          </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Users
@@ -181,6 +206,14 @@ export default function UsersRolesAdminPage() {
             Operating Units
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="organizations" className="space-y-4">
+          <OrganizationManagement 
+            organizations={organizations}
+            onOrganizationsChange={setOrganizations}
+            canManage={canManageUsers()}
+          />
+        </TabsContent>
 
         <TabsContent value="users" className="space-y-4">
           <div className="flex items-center justify-between">
@@ -224,6 +257,8 @@ export default function UsersRolesAdminPage() {
             groups={groups}
             onGroupsChange={setGroups}
             canManageGroups={canManageGroups()}
+            organizations={organizations}
+            operatingUnits={operatingUnits}
           />
         </TabsContent>
 
@@ -245,6 +280,7 @@ export default function UsersRolesAdminPage() {
           
           <OperatingUnitManagement 
             operatingUnits={operatingUnits}
+            organizations={organizations}
             onOperatingUnitsChange={setOperatingUnits}
             canManage={canManageUsers()}
           />

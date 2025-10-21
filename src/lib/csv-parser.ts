@@ -21,6 +21,11 @@ export interface CrawledPage {
 export async function parseCrawledPages(): Promise<CrawledPage[]> {
   try {
     const response = await fetch('/df_doc_crawler1.csv');
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV file: ${response.status} ${response.statusText}`);
+    }
+    
     const csvText = await response.text();
     
     const lines = csvText.split('\n').filter(line => line.trim());

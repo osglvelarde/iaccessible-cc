@@ -1,8 +1,8 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { UserWithDetails, User, OperatingUnit, UserGroup, RoleType } from '@/lib/types/users-roles';
-import { MOCK_USERS, DEFAULT_OPERATING_UNITS, PREDEFINED_ROLES } from '@/lib/users-roles-defaults';
-import { checkModuleAccess, checkFeatureAccess, getEffectiveModulePermissions } from '@/lib/users-roles-api';
+import { UserWithDetails, User, OperatingUnit, UserGroup, Organization, RoleType, DataAccessScope } from '@/lib/types/users-roles';
+import { MOCK_USERS, DEFAULT_OPERATING_UNITS, DEFAULT_ORGANIZATIONS, PREDEFINED_ROLES } from '@/lib/users-roles-defaults';
+import { checkModuleAccess, checkFeatureAccess, getEffectiveModulePermissions, getUserDataScope, isOrganizationAdmin, canAccessOrganization } from '@/lib/users-roles-api';
 
 interface AuthContextType {
   user: UserWithDetails | null;
@@ -15,6 +15,12 @@ interface AuthContextType {
   isAdmin: () => boolean;
   canManageUsers: () => boolean;
   canManageGroups: () => boolean;
+  // NEW organization context
+  organization: Organization | null;
+  dataScope: DataAccessScope | null;
+  isOrganizationAdmin: () => boolean;
+  canAccessOrganization: (orgId: string) => boolean;
+  getAccessibleOperatingUnits: () => string[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Mock users with different roles for testing
 const MOCK_USER_CREDENTIALS = [
   { email: 'admin@example.gov', password: 'admin123', role: 'global_admin' },
+  { email: 'orgadmin@example.gov', password: 'orgadmin123', role: 'organization_admin' },
   { email: 'manager@example.gov', password: 'manager123', role: 'operating_unit_admin' },
   { email: 'tester@example.gov', password: 'tester123', role: 'remediator_tester' },
   { email: 'viewer@example.gov', password: 'viewer123', role: 'viewer' },
@@ -30,23 +37,45 @@ const MOCK_USER_CREDENTIALS = [
 
 // Helper function to create mock user with details
 function createMockUserWithDetails(mockUser: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>, roleType: string): UserWithDetails {
-  const operatingUnit: OperatingUnit = {
+  // Find the organization for this user's operating unit
+  const operatingUnit = DEFAULT_OPERATING_UNITS.find(ou => ou.organizationId === 'org-1') || DEFAULT_OPERATING_UNITS[0];
+  const organization = DEFAULT_ORGANIZATIONS.find(org => org.name === 'Federal Agency Alpha') || DEFAULT_ORGANIZATIONS[0];
+  
+  const operatingUnitWithId: OperatingUnit = {
     id: mockUser.operatingUnitId,
-    name: 'Digital Services',
-    organization: 'Department of Technology',
-    domains: ['tech.gov', 'digital.gov'],
+    organizationId: operatingUnit.organizationId,
+    name: operatingUnit.name,
+    organization: operatingUnit.organization,
+    domains: operatingUnit.domains,
+    description: operatingUnit.description,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 
+  const organizationWithId: Organization = {
+    id: 'org-1',
+    name: organization.name,
+    slug: organization.slug,
+    domains: organization.domains,
+    settings: organization.settings,
+    status: organization.status,
+    billingEmail: organization.billingEmail,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system'
+  };
+
   // Create group based on role
   const roleTemplate = PREDEFINED_ROLES[roleType as keyof typeof PREDEFINED_ROLES];
+  const isOrgLevelRole = roleType === 'organization_admin' || roleType === 'global_admin';
   const group: UserGroup = {
     id: `group-${roleType}`,
     name: roleTemplate.name,
     type: 'predefined',
     roleType: roleType as RoleType,
-    operatingUnitId: mockUser.operatingUnitId,
+    organizationId: organizationWithId.id,
+    operatingUnitId: isOrgLevelRole ? null : mockUser.operatingUnitId,
+    scope: isOrgLevelRole ? 'organization' : 'operating_unit',
     permissions: roleTemplate.permissions,
     description: roleTemplate.description,
     isSystemGroup: true,
@@ -79,7 +108,8 @@ function createMockUserWithDetails(mockUser: Omit<User, 'id' | 'createdAt' | 'up
     createdAt: now,
     updatedAt: now,
     createdBy: 'system',
-    operatingUnit,
+    operatingUnit: operatingUnitWithId,
+    organization: organizationWithId,
     groups: [group],
     effectivePermissions
   };
@@ -88,6 +118,8 @@ function createMockUserWithDetails(mockUser: Omit<User, 'id' | 'createdAt' | 'up
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserWithDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [dataScope, setDataScope] = useState<DataAccessScope | null>(null);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -97,6 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (storedUser) {
           const userData = JSON.parse(storedUser);
           setUser(userData);
+          setOrganization(userData.organization || null);
+          setDataScope(getUserDataScope(userData));
         }
       } catch (error) {
         console.error('Error loading user from localStorage:', error);
@@ -142,6 +176,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Store in localStorage
       localStorage.setItem('cc.currentUser', JSON.stringify(userWithDetails));
       setUser(userWithDetails);
+      setOrganization(userWithDetails.organization);
+      setDataScope(getUserDataScope(userWithDetails));
       
       setIsLoading(false);
       return true;
@@ -155,6 +191,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem('cc.currentUser');
     setUser(null);
+    setOrganization(null);
+    setDataScope(null);
   };
 
   const hasPermission = (moduleKey: string, featureKey?: string): boolean => {
@@ -198,6 +236,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return hasPermission('usersRoles', 'manage_groups');
   };
 
+  const isOrganizationAdminUser = (): boolean => {
+    if (!user) return false;
+    return isOrganizationAdmin(user);
+  };
+
+  const canAccessOrganizationUser = (orgId: string): boolean => {
+    if (!user) return false;
+    return canAccessOrganization(user, orgId);
+  };
+
+  const getAccessibleOperatingUnits = (): string[] => {
+    if (!user || !dataScope) return [];
+    return dataScope.operatingUnitIds;
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -208,7 +261,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getModulePermissions,
     isAdmin,
     canManageUsers,
-    canManageGroups
+    canManageGroups,
+    organization,
+    dataScope,
+    isOrganizationAdmin: isOrganizationAdminUser,
+    canAccessOrganization: canAccessOrganizationUser,
+    getAccessibleOperatingUnits
   };
 
   return (

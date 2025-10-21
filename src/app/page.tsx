@@ -34,7 +34,7 @@ const useDebounce = (value: string, delay: number) => {
 };
 
 export default function Home() {
-  const { user, hasPermission, isLoading: authLoading } = useAuth();
+  const { user, hasPermission, isLoading: authLoading, isOrganizationAdmin, organization } = useAuth();
   
   // Get user permissions for each module
   const access: Record<string, boolean> = useMemo(() => {
@@ -234,6 +234,7 @@ export default function Home() {
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {user.groups[0]?.name} • {user.operatingUnit.name}
+                  {isOrganizationAdmin() && organization && ` • ${organization.name}`}
                 </p>
               </div>
             </div>

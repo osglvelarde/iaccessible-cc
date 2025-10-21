@@ -2,20 +2,26 @@ import {
   UserWithDetails, 
   UserGroup, 
   OperatingUnit, 
+  Organization,
   CreateUserRequest, 
   UpdateUserRequest, 
   CreateGroupRequest, 
   UpdateGroupRequest, 
   CreateOperatingUnitRequest, 
   UpdateOperatingUnitRequest,
+  CreateOrganizationRequest,
+  UpdateOrganizationRequest,
   UserFilters,
   GroupFilters,
   OperatingUnitFilters,
+  OrganizationFilters,
   UsersResponse,
   GroupsResponse,
   OperatingUnitsResponse,
+  OrganizationsResponse,
   Permission,
-  AccessLevel
+  AccessLevel,
+  DataAccessScope
 } from './types/users-roles';
 
 // Base API URL
@@ -153,6 +159,46 @@ export async function deleteOperatingUnit(ouId: string): Promise<void> {
   await handleApiResponse<{ success: boolean }>(response);
 }
 
+// Organizations API
+export async function getOrganizations(filters?: OrganizationFilters): Promise<OrganizationsResponse> {
+  const params = new URLSearchParams();
+  if (filters?.status) params.append('status', filters.status);
+  if (filters?.search) params.append('search', filters.search);
+  
+  const response = await fetch(`${API_BASE}/organizations?${params.toString()}`);
+  return handleApiResponse<OrganizationsResponse>(response);
+}
+
+export async function getOrganizationById(orgId: string): Promise<Organization> {
+  const response = await fetch(`${API_BASE}/organizations?orgId=${orgId}`);
+  return handleApiResponse<Organization>(response);
+}
+
+export async function createOrganization(orgData: CreateOrganizationRequest): Promise<Organization> {
+  const response = await fetch(`${API_BASE}/organizations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orgData)
+  });
+  return handleApiResponse<Organization>(response);
+}
+
+export async function updateOrganization(orgId: string, orgData: UpdateOrganizationRequest): Promise<Organization> {
+  const response = await fetch(`${API_BASE}/organizations?orgId=${orgId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orgData)
+  });
+  return handleApiResponse<Organization>(response);
+}
+
+export async function deleteOrganization(orgId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/organizations?orgId=${orgId}`, {
+    method: 'DELETE'
+  });
+  await handleApiResponse<{ success: boolean }>(response);
+}
+
 // Permission checking utilities
 export function getUserPermissions(user: UserWithDetails): Permission[] {
   return user.effectivePermissions || [];
@@ -238,6 +284,14 @@ export function canAccessOperatingUnit(user: UserWithDetails, operatingUnitId: s
     return true;
   }
   
+  // Org admins can access all OUs in their org
+  const isOrgAdmin = user.groups.some(g => g.roleType === 'organization_admin');
+  if (isOrgAdmin) {
+    // For now, assume they can access OUs in their organization
+    // In production, you'd check the OU's organizationId
+    return true;
+  }
+  
   // Other users can only access their own operating unit
   return user.operatingUnitId === operatingUnitId;
 }
@@ -268,3 +322,61 @@ export function clearUserPermissionCache(userId?: string): void {
     permissionCache.clear();
   }
 }
+
+// Data scoping utilities
+export function getUserDataScope(user: UserWithDetails): DataAccessScope {
+  const isGlobalAdmin = user.groups.some(group => group.roleType === 'global_admin');
+  const isOrgAdmin = user.groups.some(group => group.roleType === 'organization_admin');
+  
+  if (isGlobalAdmin) {
+    return {
+      organizationIds: [], // Empty means all organizations
+      operatingUnitIds: [], // Empty means all operating units
+      canViewAllInOrg: true
+    };
+  }
+  
+  if (isOrgAdmin) {
+    return {
+      organizationIds: [user.organization.id],
+      operatingUnitIds: [], // Empty means all OUs in the org
+      canViewAllInOrg: true
+    };
+  }
+  
+  // Regular users can only see their own operating unit
+  return {
+    organizationIds: [user.organization.id],
+    operatingUnitIds: [user.operatingUnitId],
+    canViewAllInOrg: false
+  };
+}
+
+export function canAccessOrganization(user: UserWithDetails, organizationId: string): boolean {
+  const isGlobalAdmin = user.groups.some(group => group.roleType === 'global_admin');
+  return isGlobalAdmin || user.organization.id === organizationId;
+}
+
+export function canAccessOperatingUnitsInOrg(user: UserWithDetails, organizationId: string): string[] {
+  const isGlobalAdmin = user.groups.some(group => group.roleType === 'global_admin');
+  const isOrgAdmin = user.groups.some(group => group.roleType === 'organization_admin');
+  
+  if (isGlobalAdmin) {
+    return []; // Empty means all OUs
+  }
+  
+  if (isOrgAdmin && user.organization.id === organizationId) {
+    return []; // Empty means all OUs in the org
+  }
+  
+  if (user.organization.id === organizationId) {
+    return [user.operatingUnitId];
+  }
+  
+  return [];
+}
+
+export function isOrganizationAdmin(user: UserWithDetails): boolean {
+  return user.groups.some(group => group.roleType === 'organization_admin');
+}
+

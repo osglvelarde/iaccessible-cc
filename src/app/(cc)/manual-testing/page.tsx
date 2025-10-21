@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Filter, Plus, ExternalLink, Calendar, Building2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
   const departments = getUniqueDepartments(pages);
   const organizations = getUniqueOrganizations(pages);
 
-  const loadTestSessions = async () => {
+  const loadTestSessions = useCallback(async () => {
     try {
       const response = await fetch('/api/manual-testing/sessions', { method: 'PUT' });
       if (response.ok) {
@@ -42,15 +42,21 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
     } catch (error) {
       console.error('Error loading test sessions:', error);
     }
-  };
+  }, []);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       
       // Load pages from CSV
-      const crawledPages = await parseCrawledPages();
-      setPages(crawledPages);
+      try {
+        const crawledPages = await parseCrawledPages();
+        setPages(crawledPages);
+      } catch (csvError) {
+        console.error('Error loading CSV data:', csvError);
+        // Set empty pages array if CSV fails to load
+        setPages([]);
+      }
       
       // Load existing test sessions
       await loadTestSessions();
@@ -59,9 +65,9 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadTestSessions]);
   
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     const filtered = filterPages(pages, {
       search: searchTerm,
       department: selectedDepartment || undefined,
@@ -71,7 +77,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
       dateTo: dateTo || undefined
     });
     setFilteredPages(filtered);
-  };
+  }, [pages, searchTerm, selectedDepartment, selectedOrganization, internalExternal, dateFrom, dateTo]);
   
   useEffect(() => {
     loadData();
@@ -79,7 +85,7 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
   
   useEffect(() => {
     applyFilters();
-  }, [applyFilters, pages, searchTerm, selectedDepartment, selectedOrganization, internalExternal, dateFrom, dateTo]);
+  }, [applyFilters]);
 
   const getTestSessionForPage = (pageUrl: string): TestSessionSummary | null => {
     return testSessions.find(session => session.pageUrl === pageUrl) || null;
@@ -362,7 +368,20 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
         })}
       </div>
 
-      {filteredPages.length === 0 && (
+      {filteredPages.length === 0 && pages.length === 0 && (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">
+              No pages available. The CSV file may not be accessible or may be empty.
+            </p>
+            <Button variant="outline" onClick={loadData} className="mt-4">
+              Retry Loading Data
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {filteredPages.length === 0 && pages.length > 0 && (
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground">

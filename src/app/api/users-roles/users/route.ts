@@ -7,7 +7,9 @@ import {
   CreateUserRequest, 
   UpdateUserRequest, 
   UserFilters,
-  UsersResponse 
+  UsersResponse,
+  Organization,
+  OperatingUnit
 } from '@/lib/types/users-roles';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,6 +17,7 @@ const DATA_DIR = path.join(process.cwd(), 'users-roles-data');
 const USERS_DIR = path.join(DATA_DIR, 'users');
 const GROUPS_DIR = path.join(DATA_DIR, 'groups');
 const OPERATING_UNITS_DIR = path.join(DATA_DIR, 'operating-units');
+const ORGANIZATIONS_DIR = path.join(DATA_DIR, 'organizations');
 
 // Ensure directories exist
 async function ensureDirectories() {
@@ -23,6 +26,7 @@ async function ensureDirectories() {
     await fs.mkdir(USERS_DIR, { recursive: true });
     await fs.mkdir(GROUPS_DIR, { recursive: true });
     await fs.mkdir(OPERATING_UNITS_DIR, { recursive: true });
+    await fs.mkdir(ORGANIZATIONS_DIR, { recursive: true });
   } catch (error) {
     console.error('Error creating directories:', error);
   }
@@ -79,17 +83,17 @@ async function loadAllGroups() {
 }
 
 // Helper function to load all operating units
-async function loadAllOperatingUnits() {
+async function loadAllOperatingUnits(): Promise<OperatingUnit[]> {
   try {
     const files = await fs.readdir(OPERATING_UNITS_DIR);
     const ouFiles = files.filter(file => file.endsWith('.json'));
     
-    const operatingUnits = [];
+    const operatingUnits: OperatingUnit[] = [];
     for (const file of ouFiles) {
       try {
         const filePath = path.join(OPERATING_UNITS_DIR, file);
         const fileContent = await fs.readFile(filePath, 'utf-8');
-        const ou = JSON.parse(fileContent);
+        const ou: OperatingUnit = JSON.parse(fileContent);
         operatingUnits.push(ou);
       } catch (error) {
         console.error(`Error reading operating unit file ${file}:`, error);
@@ -103,15 +107,42 @@ async function loadAllOperatingUnits() {
   }
 }
 
+// Helper function to load all organizations
+async function loadAllOrganizations(): Promise<Organization[]> {
+  try {
+    const files = await fs.readdir(ORGANIZATIONS_DIR);
+    const orgFiles = files.filter(file => file.endsWith('.json'));
+    
+    const organizations: Organization[] = [];
+    for (const file of orgFiles) {
+      try {
+        const filePath = path.join(ORGANIZATIONS_DIR, file);
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const org: Organization = JSON.parse(fileContent);
+        organizations.push(org);
+      } catch (error) {
+        console.error(`Error reading organization file ${file}:`, error);
+      }
+    }
+    
+    return organizations;
+  } catch (error) {
+    console.error('Error loading organizations:', error);
+    return [];
+  }
+}
+
 // Helper function to enrich user with details
 async function enrichUserWithDetails(user: User): Promise<UserWithDetails> {
-  const [groups, operatingUnits] = await Promise.all([
+  const [groups, operatingUnits, organizations] = await Promise.all([
     loadAllGroups(),
-    loadAllOperatingUnits()
+    loadAllOperatingUnits(),
+    loadAllOrganizations()
   ]);
 
   const userGroups = groups.filter(group => user.groupIds.includes(group.id));
   const operatingUnit = operatingUnits.find(ou => ou.id === user.operatingUnitId);
+  const organization = operatingUnit ? organizations.find(org => org.id === operatingUnit.organizationId) : null;
 
   // Calculate effective permissions
   const effectivePermissions = [];
@@ -132,7 +163,31 @@ async function enrichUserWithDetails(user: User): Promise<UserWithDetails> {
 
   return {
     ...user,
-    operatingUnit: operatingUnit || { id: user.operatingUnitId, name: 'Unknown', organization: 'Unknown', domains: [], createdAt: '', updatedAt: '' },
+    operatingUnit: operatingUnit || { 
+      id: user.operatingUnitId, 
+      organizationId: 'org-1',
+      name: 'Unknown', 
+      organization: 'Unknown', 
+      domains: [], 
+      createdAt: '', 
+      updatedAt: '' 
+    },
+    organization: organization || {
+      id: 'org-1',
+      name: 'Unknown Organization',
+      slug: 'unknown',
+      domains: [],
+      settings: {
+        allowCustomGroups: true,
+        maxUsers: 100,
+        maxOperatingUnits: 10,
+        features: []
+      },
+      status: 'active',
+      createdAt: '',
+      updatedAt: '',
+      createdBy: 'system'
+    },
     groups: userGroups,
     effectivePermissions
   };
@@ -147,17 +202,34 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const operatingUnitId = searchParams.get('operatingUnitId');
+    const organizationId = searchParams.get('organizationId'); // NEW
     const status = searchParams.get('status') as string | null;
     const groupId = searchParams.get('groupId');
     const search = searchParams.get('search');
 
     const allUsers = await loadAllUsers();
     
+    // Load operating units and organizations for filtering
+    const [operatingUnits, organizations] = await Promise.all([
+      loadAllOperatingUnits(),
+      loadAllOrganizations()
+    ]);
+    
     // Apply filters
     let filteredUsers = allUsers;
     
     if (operatingUnitId) {
       filteredUsers = filteredUsers.filter(user => user.operatingUnitId === operatingUnitId);
+    }
+    
+    if (organizationId) {
+      // Filter users by organization through their operating unit
+      const orgOperatingUnitIds = operatingUnits
+        .filter(ou => ou.organizationId === organizationId)
+        .map(ou => ou.id);
+      filteredUsers = filteredUsers.filter(user => 
+        orgOperatingUnitIds.includes(user.operatingUnitId)
+      );
     }
     
     if (status) {

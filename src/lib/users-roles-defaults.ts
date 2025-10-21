@@ -4,6 +4,7 @@ import {
   ModulePermission, 
   FeaturePermission, 
   OperatingUnit, 
+  Organization,
   ModuleFeatures,
   RoleType 
 } from './types/users-roles';
@@ -162,7 +163,7 @@ function createModulePermission(
 }
 
 // Predefined role templates
-export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatingUnitId' | 'createdAt' | 'updatedAt' | 'createdBy'>> = {
+export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organizationId' | 'operatingUnitId' | 'scope' | 'createdAt' | 'updatedAt' | 'createdBy'>> = {
   viewer: {
     name: 'Viewer',
     type: 'predefined',
@@ -239,6 +240,35 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
     description: 'Access to all modules plus specialized testing and remediation tools',
     isSystemGroup: true
   },
+  organization_admin: {
+    name: 'Organization Administrator',
+    type: 'predefined',
+    roleType: 'organization_admin',
+    permissions: [
+      createModulePermission('dashboard', 'read'),
+      createModulePermission('dataQuery', 'read'),
+      createModulePermission('webpageScan', 'execute'),
+      createModulePermission('pdfScan', 'execute'),
+      createModulePermission('sitemap', 'execute'),
+      createModulePermission('scanMonitor', 'read'),
+      createModulePermission('scansScheduler', 'execute'),
+      createModulePermission('intake', 'write'),
+      createModulePermission('manualTesting', 'write'),
+      createModulePermission('pdfRemediation', 'write'),
+      createModulePermission('settings', 'write'),
+      createModulePermission('usersRoles', 'execute', {
+        view_users: 'read',
+        create_users: 'execute',
+        edit_users: 'execute',
+        manage_groups: 'execute',
+        view_audit_logs: 'read'
+      }),
+      createModulePermission('guidelines', 'read'),
+      createModulePermission('supportBot', 'read')
+    ],
+    description: 'Full access to all modules within their organization, can manage users/groups across all operating units',
+    isSystemGroup: true
+  },
   global_admin: {
     name: 'Global Administrator',
     type: 'predefined',
@@ -251,21 +281,52 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'operatin
   }
 };
 
+// Default organizations
+export const DEFAULT_ORGANIZATIONS: Omit<Organization, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>[] = [
+  {
+    name: 'Federal Agency Alpha',
+    slug: 'federal-agency-alpha',
+    domains: ['alpha.gov'],
+    status: 'active',
+    settings: {
+      allowCustomGroups: true,
+      maxUsers: 1000,
+      maxOperatingUnits: 50,
+      features: ['web_scan', 'pdf_scan', 'manual_testing', 'remediation']
+    }
+  },
+  {
+    name: 'State Department Beta',
+    slug: 'state-dept-beta',
+    domains: ['beta.state.gov'],
+    status: 'active',
+    settings: {
+      allowCustomGroups: true,
+      maxUsers: 500,
+      maxOperatingUnits: 20,
+      features: ['web_scan', 'pdf_scan']
+    }
+  }
+];
+
 // Default operating units
 export const DEFAULT_OPERATING_UNITS: Omit<OperatingUnit, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
+    organizationId: 'org-1',
     name: 'Digital Services',
     organization: 'Department of Technology',
     domains: ['tech.gov', 'digital.gov'],
     description: 'Primary digital services operating unit'
   },
   {
+    organizationId: 'org-1',
     name: 'Public Affairs',
     organization: 'Department of Communications',
     domains: ['public.gov', 'news.gov'],
     description: 'Public affairs and communications unit'
   },
   {
+    organizationId: 'org-2',
     name: 'Accessibility Office',
     organization: 'Department of Civil Rights',
     domains: ['accessibility.gov', 'ada.gov'],
@@ -283,6 +344,15 @@ export const MOCK_USERS: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'createdB
     groupIds: ['group-global-admin'],
     status: 'active',
     lastLogin: new Date().toISOString()
+  },
+  {
+    email: 'orgadmin@example.gov',
+    firstName: 'Org',
+    lastName: 'Admin',
+    operatingUnitId: 'ou-1',
+    groupIds: ['group-organization-admin'],
+    status: 'active',
+    lastLogin: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
   },
   {
     email: 'manager@example.gov',
@@ -326,13 +396,17 @@ export const MOCK_USERS: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'createdB
 // Helper function to create a predefined group for a specific operating unit
 export function createPredefinedGroupForOperatingUnit(
   roleType: RoleType, 
-  operatingUnitId: string, 
+  organizationId: string,
+  operatingUnitId: string | null, 
   createdBy: string
 ): Omit<UserGroup, 'id' | 'createdAt' | 'updatedAt'> {
   const roleTemplate = PREDEFINED_ROLES[roleType];
+  const scope = operatingUnitId ? 'operating_unit' : 'organization';
   return {
     ...roleTemplate,
+    organizationId,
     operatingUnitId,
+    scope,
     createdBy
   };
 }

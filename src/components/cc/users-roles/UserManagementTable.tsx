@@ -50,6 +50,7 @@ export default function UserManagementTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [operatingUnitFilter, setOperatingUnitFilter] = useState<string>('all');
+  const [organizationFilter, setOrganizationFilter] = useState<string>('all');
 
   // Filter users based on search and filters
   const filteredUsers = users.filter(user => {
@@ -60,8 +61,9 @@ export default function UserManagementTable({
     
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     const matchesOperatingUnit = operatingUnitFilter === 'all' || user.operatingUnitId === operatingUnitFilter;
+    const matchesOrganization = organizationFilter === 'all' || user.organization?.id === organizationFilter;
     
-    return matchesSearch && matchesStatus && matchesOperatingUnit;
+    return matchesSearch && matchesStatus && matchesOperatingUnit && matchesOrganization;
   });
 
   const handleStatusChange = async (userId: string, newStatus: UserStatus) => {
@@ -99,6 +101,16 @@ export default function UserManagementTable({
     return units;
   };
 
+  const getOrganizations = () => {
+    const orgs = users.reduce((acc, user) => {
+      if (user.organization && !acc.find(org => org.id === user.organization!.id)) {
+        acc.push(user.organization!);
+      }
+      return acc;
+    }, [] as NonNullable<typeof users[0]['organization']>[]);
+    return orgs;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -125,6 +137,19 @@ export default function UserManagementTable({
               <SelectItem value="suspended">Suspended</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={organizationFilter} onValueChange={setOrganizationFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Organization" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Organizations</SelectItem>
+              {getOrganizations().map(org => (
+                <SelectItem key={org.id} value={org.id}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={operatingUnitFilter} onValueChange={setOperatingUnitFilter}>
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Operating Unit" />
@@ -147,6 +172,7 @@ export default function UserManagementTable({
               <TableRow>
                 <TableHead>User</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Organization</TableHead>
                 <TableHead>Operating Unit</TableHead>
                 <TableHead>Groups</TableHead>
                 <TableHead>Status</TableHead>
@@ -157,7 +183,7 @@ export default function UserManagementTable({
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -185,6 +211,12 @@ export default function UserManagementTable({
                       <div className="flex items-center space-x-2">
                         <Mail className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm">{user.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{user.organization?.name || 'Unknown'}</span>
                       </div>
                     </TableCell>
                     <TableCell>

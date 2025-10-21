@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const operatingUnitId = searchParams.get('operatingUnitId');
+    const organizationId = searchParams.get('organizationId'); // NEW
+    const scope = searchParams.get('scope') as 'organization' | 'operating_unit' | null; // NEW
     const type = searchParams.get('type') as string | null;
     const search = searchParams.get('search');
 
@@ -67,6 +69,14 @@ export async function GET(request: NextRequest) {
     
     if (operatingUnitId) {
       filteredGroups = filteredGroups.filter(group => group.operatingUnitId === operatingUnitId);
+    }
+    
+    if (organizationId) {
+      filteredGroups = filteredGroups.filter(group => group.organizationId === organizationId);
+    }
+    
+    if (scope) {
+      filteredGroups = filteredGroups.filter(group => group.scope === scope);
     }
     
     if (type) {
@@ -111,16 +121,32 @@ export async function POST(request: NextRequest) {
     const groupData: CreateGroupRequest = await request.json();
     
     // Validate required fields
-    if (!groupData.name || !groupData.operatingUnitId || !groupData.permissions) {
+    if (!groupData.name || !groupData.permissions) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Check if group already exists in the same operating unit
+    // Determine scope and validate accordingly
+    const isOrgLevelGroup = groupData.operatingUnitId === null || groupData.operatingUnitId === undefined;
+    const scope = isOrgLevelGroup ? 'organization' : 'operating_unit';
+    
+    if (isOrgLevelGroup && !groupData.organizationId) {
+      return NextResponse.json({ error: 'Organization ID is required for organization-level groups' }, { status: 400 });
+    }
+    
+    if (!isOrgLevelGroup && !groupData.operatingUnitId) {
+      return NextResponse.json({ error: 'Operating Unit ID is required for OU-level groups' }, { status: 400 });
+    }
+
+    // Check if group already exists in the same scope
     const existingGroups = await loadAllGroups();
     if (existingGroups.some(group => 
-      group.name === groupData.name && group.operatingUnitId === groupData.operatingUnitId
+      group.name === groupData.name && 
+      group.organizationId === groupData.organizationId &&
+      group.scope === scope
     )) {
-      return NextResponse.json({ error: 'Group with this name already exists in the operating unit' }, { status: 409 });
+      return NextResponse.json({ 
+        error: `Group with this name already exists in the ${scope === 'organization' ? 'organization' : 'operating unit'}` 
+      }, { status: 409 });
     }
 
     const now = new Date().toISOString();
@@ -130,7 +156,9 @@ export async function POST(request: NextRequest) {
       id: groupId,
       name: groupData.name,
       type: 'custom',
-      operatingUnitId: groupData.operatingUnitId,
+      organizationId: groupData.organizationId || 'org-1', // Default to org-1 if not provided
+      operatingUnitId: isOrgLevelGroup ? null : (groupData.operatingUnitId || null),
+      scope: scope,
       permissions: groupData.permissions,
       description: groupData.description,
       isSystemGroup: false,

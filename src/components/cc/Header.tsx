@@ -14,7 +14,7 @@ import { getScanHistory, type ScanHistoryItem } from "@/lib/scanner-api";
 import { useAuth } from "@/components/cc/AuthProvider";
 
 export default function Header() {
-  const { user, logout, canManageUsers, canManageGroups } = useAuth();
+  const { user, logout, canManageUsers, canManageGroups, organization, isOrganizationAdmin } = useAuth();
   const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
 
   // Load scan history for activity dropdown
@@ -100,7 +100,10 @@ export default function Header() {
                     </div>
                     <div className="hidden md:block text-left">
                       <div className="text-sm font-medium">{user.firstName} {user.lastName}</div>
-                      <div className="text-xs text-muted-foreground">{user.groups[0]?.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {user.groups[0]?.name} • {user.operatingUnit.name}
+                        {isOrganizationAdmin() && organization && ` • ${organization.name}`}
+                      </div>
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
@@ -108,9 +111,16 @@ export default function Header() {
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
-                    <Badge variant="outline" className="mt-1 text-xs">
-                      {user.groups[0]?.name}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {user.groups[0]?.name}
+                      </Badge>
+                      {isOrganizationAdmin() && organization && (
+                        <Badge variant="secondary" className="text-xs">
+                          {organization.name}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

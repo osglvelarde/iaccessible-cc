@@ -9,7 +9,33 @@ export type RoleType =
   | 'administrator' 
   | 'global_admin'
   | 'remediator_tester'
-  | 'operating_unit_admin';
+  | 'operating_unit_admin'
+  | 'organization_admin';
+
+export interface OrganizationSettings {
+  allowCustomGroups: boolean;
+  maxUsers: number;
+  maxOperatingUnits: number;
+  features: string[]; // Feature flags
+  branding?: {
+    logo?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+  };
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string; // URL-friendly identifier
+  domains: string[]; // Primary domains for this org
+  settings: OrganizationSettings;
+  status: 'active' | 'inactive' | 'trial';
+  billingEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
 
 export interface FeaturePermission {
   featureKey: string;
@@ -36,8 +62,9 @@ export interface Permission {
 
 export interface OperatingUnit {
   id: string;
+  organizationId: string; // NEW - reference to parent org
   name: string;
-  organization: string;
+  organization: string; // Keep for backward compatibility, but rename to 'department'
   domains: string[];
   description?: string;
   createdAt: string;
@@ -49,7 +76,9 @@ export interface UserGroup {
   name: string;
   type: GroupType;
   roleType?: RoleType; // Only for predefined groups
-  operatingUnitId: string;
+  organizationId: string; // NEW
+  operatingUnitId: string | null; // Now nullable for org-level groups
+  scope: 'organization' | 'operating_unit'; // NEW - defines permission scope
   permissions: ModulePermission[];
   description?: string;
   isSystemGroup: boolean;
@@ -77,6 +106,7 @@ export interface User {
 
 export interface UserWithDetails extends User {
   operatingUnit: OperatingUnit;
+  organization: Organization; // NEW
   groups: UserGroup[];
   effectivePermissions: Permission[];
 }
@@ -85,6 +115,7 @@ export interface CreateUserRequest {
   email: string;
   firstName: string;
   lastName: string;
+  organizationId?: string;
   operatingUnitId: string;
   groupIds: string[];
   sendInvitation?: boolean;
@@ -100,7 +131,8 @@ export interface UpdateUserRequest {
 
 export interface CreateGroupRequest {
   name: string;
-  operatingUnitId: string;
+  organizationId: string;
+  operatingUnitId?: string | null;
   permissions: ModulePermission[];
   description?: string;
 }
@@ -114,6 +146,7 @@ export interface UpdateGroupRequest {
 export interface CreateOperatingUnitRequest {
   name: string;
   organization: string;
+  organizationId?: string;
   domains: string[];
   description?: string;
 }
@@ -121,11 +154,13 @@ export interface CreateOperatingUnitRequest {
 export interface UpdateOperatingUnitRequest {
   name?: string;
   organization?: string;
+  organizationId?: string;
   domains?: string[];
   description?: string;
 }
 
 export interface UserFilters {
+  organizationId?: string;
   operatingUnitId?: string;
   status?: UserStatus;
   groupId?: string;
@@ -133,6 +168,7 @@ export interface UserFilters {
 }
 
 export interface GroupFilters {
+  organizationId?: string;
   operatingUnitId?: string;
   type?: GroupType;
   search?: string;
@@ -140,7 +176,36 @@ export interface GroupFilters {
 
 export interface OperatingUnitFilters {
   organization?: string;
+  organizationId?: string; // NEW
   search?: string;
+}
+
+export interface CreateOrganizationRequest {
+  name: string;
+  slug: string;
+  domains: string[];
+  settings?: Partial<OrganizationSettings>;
+  billingEmail?: string;
+}
+
+export interface UpdateOrganizationRequest {
+  name?: string;
+  slug?: string;
+  domains?: string[];
+  settings?: Partial<OrganizationSettings>;
+  status?: 'active' | 'inactive' | 'trial';
+  billingEmail?: string;
+}
+
+export interface OrganizationFilters {
+  status?: 'active' | 'inactive' | 'trial';
+  search?: string;
+}
+
+export interface DataAccessScope {
+  organizationIds: string[];
+  operatingUnitIds: string[];
+  canViewAllInOrg: boolean; // True for org admins
 }
 
 export interface UsersResponse {
@@ -167,6 +232,14 @@ export interface OperatingUnitsResponse {
   totalPages: number;
 }
 
+export interface OrganizationsResponse {
+  organizations: Organization[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 // Module feature definitions for granular permissions
 export interface ModuleFeatures {
   [moduleKey: string]: {
@@ -185,8 +258,9 @@ export interface ModuleFeatures {
 export interface AuditLogEntry {
   id: string;
   action: string;
-  resourceType: 'user' | 'group' | 'operating_unit';
+  resourceType: 'user' | 'group' | 'operating_unit' | 'organization';
   resourceId: string;
+  organizationId: string; // NEW
   actorId: string;
   actorEmail: string;
   changes?: Record<string, { from: unknown; to: unknown }>;
@@ -201,4 +275,63 @@ export interface AuditLogResponse {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+// Permission inheritance types
+export interface PermissionInheritanceRule {
+  id: string;
+  organizationId: string;
+  sourceScope: 'organization' | 'operating_unit';
+  targetScope: 'operating_unit';
+  moduleKey: string;
+  inheritLevel: 'full' | 'partial' | 'none';
+  restrictions?: {
+    features?: string[];
+    accessLevel?: AccessLevel;
+  };
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+export interface InheritedPermission {
+  moduleKey: string;
+  moduleName: string;
+  accessLevel: AccessLevel;
+  features: FeaturePermission[];
+  inheritedFrom: 'organization' | 'operating_unit';
+  inheritedFromId: string;
+  inheritanceRule?: PermissionInheritanceRule;
+}
+
+export interface PermissionInheritanceConfig {
+  organizationId: string;
+  enableInheritance: boolean;
+  defaultInheritanceLevel: 'full' | 'partial' | 'none';
+  rules: PermissionInheritanceRule[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInheritanceRuleRequest {
+  organizationId: string;
+  sourceScope: 'organization' | 'operating_unit';
+  targetScope: 'operating_unit';
+  moduleKey: string;
+  inheritLevel: 'full' | 'partial' | 'none';
+  restrictions?: {
+    features?: string[];
+    accessLevel?: AccessLevel;
+  };
+}
+
+export interface UpdateInheritanceRuleRequest {
+  sourceScope?: 'organization' | 'operating_unit';
+  targetScope?: 'operating_unit';
+  moduleKey?: string;
+  inheritLevel?: 'full' | 'partial' | 'none';
+  restrictions?: {
+    features?: string[];
+    accessLevel?: AccessLevel;
+  };
 }
