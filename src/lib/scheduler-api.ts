@@ -94,7 +94,7 @@ export async function createSchedule(config: ScheduleConfig): Promise<{ success:
   }
 }
 
-export async function getOperatingUnits(_organizationId: string): Promise<OperatingUnit[]> {
+export async function getOperatingUnits(): Promise<OperatingUnit[]> {
   try {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));

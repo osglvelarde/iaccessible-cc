@@ -59,7 +59,7 @@ export default function ScansSchedulerPage() {
   // Load operating units on mount
   useEffect(() => {
     const loadOperatingUnits = async () => {
-      const units = await getOperatingUnits('doc');
+      const units = await getOperatingUnits();
       setOperatingUnits(units);
     };
     loadOperatingUnits();

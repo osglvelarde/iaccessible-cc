@@ -28,7 +28,6 @@ import {
 import { 
   MoreHorizontal, 
   Search, 
-  Filter, 
   Edit, 
   Trash2, 
   UserCheck, 
@@ -41,13 +40,11 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface UserManagementTableProps {
   users: UserWithDetails[];
-  onUsersChange: (users: UserWithDetails[]) => void;
   canManageUsers: boolean;
 }
 
 export default function UserManagementTable({ 
   users, 
-  onUsersChange, 
   canManageUsers 
 }: UserManagementTableProps) {
   const [searchTerm, setSearchTerm] = useState('');

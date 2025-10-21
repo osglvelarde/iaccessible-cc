@@ -1,5 +1,4 @@
 import { 
-  User, 
   UserWithDetails, 
   UserGroup, 
   OperatingUnit, 

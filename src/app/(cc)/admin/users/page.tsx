@@ -200,7 +200,6 @@ export default function UsersRolesAdminPage() {
           
           <UserManagementTable 
             users={users}
-            onUsersChange={setUsers}
             canManageUsers={canManageUsers()}
           />
         </TabsContent>

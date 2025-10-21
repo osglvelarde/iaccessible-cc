@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, UserPlus, Mail, User, Building2 } from 'lucide-react';
 import { UserWithDetails, CreateUserRequest, OperatingUnit, UserGroup } from '@/lib/types/users-roles';
-import { createUser, getOperatingUnits, getGroups } from '@/lib/users-roles-api';
+import { createUser } from '@/lib/users-roles-api';
 
 interface UserFormDialogProps {
   open: boolean;
