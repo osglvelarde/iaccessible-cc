@@ -78,8 +78,8 @@ export function ExpandedRowDetails({
                         const handleCopy = () => {
                           navigator.clipboard.writeText(codeString);
                           // Use toast if available
-                          if (typeof window !== 'undefined' && (window as Record<string, unknown>).toast) {
-                            ((window as Record<string, unknown>).toast as (options: { title: string; description: string }) => void)({
+                          if (typeof window !== 'undefined' && (window as unknown as { toast?: (options: { title: string; description: string }) => void }).toast) {
+                            ((window as unknown as { toast?: (options: { title: string; description: string }) => void }).toast as (options: { title: string; description: string }) => void)({
                               title: 'Copied to clipboard',
                               description: 'Code snippet has been copied to your clipboard.',
                             });
@@ -104,7 +104,7 @@ export function ExpandedRowDetails({
                               Copy
                             </button>
                             <SyntaxHighlighter
-                              style={oneDark}
+                              style={oneDark as any}
                               language={match ? match[1] : undefined}
                               PreTag="div"
                               customStyle={{ margin: 0, borderRadius: '0.375rem', fontSize: '0.85em' }}
@@ -156,8 +156,8 @@ export function ExpandedRowDetails({
                         const codeString = String(children).replace(/\n$/, '');
                         const handleCopy = () => {
                           navigator.clipboard.writeText(codeString);
-                          if (typeof window !== 'undefined' && (window as Record<string, unknown>).toast) {
-                            ((window as Record<string, unknown>).toast as (options: { title: string; description: string }) => void)({
+                          if (typeof window !== 'undefined' && (window as any).toast) {
+                            ((window as any).toast)({
                               title: 'Copied to clipboard',
                               description: 'Code snippet has been copied to your clipboard.',
                             });
@@ -182,7 +182,7 @@ export function ExpandedRowDetails({
                               Copy
                             </button>
                             <SyntaxHighlighter
-                              style={oneDark}
+                              style={oneDark as any}
                               language={match ? match[1] : undefined}
                               PreTag="div"
                               customStyle={{ margin: 0, borderRadius: '0.375rem', fontSize: '0.85em' }}
@@ -216,8 +216,8 @@ export function ExpandedRowDetails({
                         const codeString = String(children).replace(/\n$/, '');
                         const handleCopy = () => {
                           navigator.clipboard.writeText(codeString);
-                          if (typeof window !== 'undefined' && (window as Record<string, unknown>).toast) {
-                            ((window as Record<string, unknown>).toast as (options: { title: string; description: string }) => void)({
+                          if (typeof window !== 'undefined' && (window as any).toast) {
+                            ((window as any).toast)({
                               title: 'Copied to clipboard',
                               description: 'Code snippet has been copied to your clipboard.',
                             });
@@ -242,7 +242,7 @@ export function ExpandedRowDetails({
                               Copy
                             </button>
                             <SyntaxHighlighter
-                              style={oneDark}
+                              style={oneDark as any}
                               language={match ? match[1] : undefined}
                               PreTag="div"
                               customStyle={{ margin: 0, borderRadius: '0.375rem', fontSize: '0.85em' }}
@@ -307,8 +307,8 @@ export function ExpandedRowDetails({
                         const handleCopy = () => {
                           navigator.clipboard.writeText(codeString);
                           // Use toast if available
-                          if (typeof window !== 'undefined' && (window as Record<string, unknown>).toast) {
-                            ((window as Record<string, unknown>).toast as (options: { title: string; description: string }) => void)({
+                          if (typeof window !== 'undefined' && (window as any).toast) {
+                            ((window as any).toast)({
                               title: 'Copied to clipboard',
                               description: 'Code snippet has been copied to your clipboard.',
                             });
@@ -333,7 +333,7 @@ export function ExpandedRowDetails({
                               Copy
                             </button>
                             <SyntaxHighlighter
-                              style={oneDark}
+                              style={oneDark as any}
                               language={match ? match[1] : undefined}
                               PreTag="div"
                               customStyle={{ margin: 0, borderRadius: '0.375rem', fontSize: '0.85em' }}

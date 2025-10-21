@@ -179,7 +179,7 @@ function generateRemediationGuidelines(criterion: { wcagId: string; title: strin
 \`\`\``
   };
 
-  return baseGuidelines[criterion.wcagId] || `## ${criterion.title} Remediation
+  return baseGuidelines[criterion.wcagId as keyof typeof baseGuidelines] || `## ${criterion.title} Remediation
 
 This criterion requires attention to ensure accessibility compliance. Please refer to the official WCAG documentation for detailed remediation guidance.
 

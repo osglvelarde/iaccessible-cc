@@ -46,8 +46,8 @@ export const GlossaryTable = ({
   });
 
   const sortedRows = [...filteredRows].sort((a, b) => {
-    const aValue = (a as Record<string, unknown>)[sortField] || '';
-    const bValue = (b as Record<string, unknown>)[sortField] || '';
+    const aValue = (a as any)[sortField] || '';
+    const bValue = (b as any)[sortField] || '';
     const comparison = String(aValue).localeCompare(String(bValue));
     return sortOrder === 'asc' ? comparison : -comparison;
   });

@@ -97,7 +97,7 @@ export function TableRowComponent({
           </>
         )
         : columns.map((column) => {
-          const cellValue = (row as Record<string, unknown>)[column];
+          const cellValue = (row as any)[column];
           return (
             <TableCell
               key={column}

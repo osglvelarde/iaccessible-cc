@@ -39,15 +39,14 @@ export function getSeverityColor(severity?: string): "default" | "destructive" |
   }
 }
 
-// Use 'as any' to allow custom variants for Tailwind badge colors
-export function getLevelBadgeVariant(level?: string): "default" | "destructive" | "secondary" | "outline" | "level-a" | "level-aa" | "level-aaa" {
+export function getLevelBadgeVariant(level?: string): "default" | "destructive" | "secondary" | "outline" {
   switch (level) {
     case 'A':
-      return 'level-a';
+      return 'destructive'; // Red for Level A
     case 'AA':
-      return 'level-aa';
+      return 'secondary'; // Gray for Level AA
     case 'AAA':
-      return 'level-aaa';
+      return 'outline'; // Outline for Level AAA
     default:
       return 'outline';
   }
