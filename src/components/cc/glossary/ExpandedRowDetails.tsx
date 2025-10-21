@@ -5,7 +5,7 @@ import { ExternalLink, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { autoFormatMarkdown, getLevelBadgeVariant, getReadabilityScoreTypeVariant } from './tableUtils';
+import { autoFormatMarkdown, getLevelBadgeVariant, getLevelBadgeClassName, getReadabilityScoreTypeVariant } from './tableUtils';
 import { GlossaryRow } from '@/lib/types/glossary';
 
 interface ExpandedRowDetailsProps {
@@ -356,7 +356,7 @@ export function ExpandedRowDetails({
               {row.wcagLevel && (
                 <Badge 
                   variant={getLevelBadgeVariant(row.wcagLevel)}
-                  className="font-medium"
+                  className={`font-medium ${getLevelBadgeClassName(row.wcagLevel)}`}
                   role="status"
                   aria-label={`WCAG Level: ${row.wcagLevel}`}
                 >

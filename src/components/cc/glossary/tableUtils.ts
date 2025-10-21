@@ -42,13 +42,26 @@ export function getSeverityColor(severity?: string): "default" | "destructive" |
 export function getLevelBadgeVariant(level?: string): "default" | "destructive" | "secondary" | "outline" {
   switch (level) {
     case 'A':
-      return 'destructive'; // Red for Level A
+      return 'default'; // Blue/Primary for Level A (basic accessibility)
     case 'AA':
-      return 'secondary'; // Gray for Level AA
+      return 'secondary'; // Orange/Secondary for Level AA (standard compliance)
     case 'AAA':
-      return 'outline'; // Outline for Level AAA
+      return 'outline'; // Green/Accent for Level AAA (enhanced accessibility)
     default:
       return 'outline';
+  }
+}
+
+export function getLevelBadgeClassName(level?: string): string {
+  switch (level) {
+    case 'A':
+      return 'badge-level-a';
+    case 'AA':
+      return 'badge-level-aa';
+    case 'AAA':
+      return 'badge-level-aaa';
+    default:
+      return '';
   }
 }
 

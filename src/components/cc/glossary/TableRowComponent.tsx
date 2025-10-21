@@ -2,7 +2,7 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { getSeverityColor, getLevelBadgeVariant } from './tableUtils';
+import { getSeverityColor, getLevelBadgeVariant, getLevelBadgeClassName } from './tableUtils';
 import { GlossaryRow } from '@/lib/types/glossary';
 
 interface TableRowComponentProps {
@@ -118,7 +118,10 @@ export function TableRowComponent({
                 )
               ) : column === 'wcagLevel' ? (
                 cellValue && (
-                  <Badge variant={getLevelBadgeVariant(String(cellValue))} className="text-xs">
+                  <Badge 
+                    variant={getLevelBadgeVariant(String(cellValue))} 
+                    className={`text-xs ${getLevelBadgeClassName(String(cellValue))}`}
+                  >
                     {String(cellValue)}
                   </Badge>
                 )
