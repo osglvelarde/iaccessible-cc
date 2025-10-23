@@ -31,8 +31,7 @@ const MOCK_USER_CREDENTIALS = [
   { email: 'orgadmin@example.gov', password: 'orgadmin123', role: 'organization_admin' },
   { email: 'manager@example.gov', password: 'manager123', role: 'operating_unit_admin' },
   { email: 'tester@example.gov', password: 'tester123', role: 'remediator_tester' },
-  { email: 'viewer@example.gov', password: 'viewer123', role: 'viewer' },
-  { email: 'test.user@example.gov', password: 'Test1234', role: 'administrator' }
+  { email: 'viewer@example.gov', password: 'viewer123', role: 'viewer' }
 ];
 
 // Helper function to create mock user with details

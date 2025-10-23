@@ -26,10 +26,10 @@ export default function LoginForm() {
   // Mock users for demo
   const mockUsers = [
     { email: "admin@example.gov", password: "admin123", role: "Global Administrator" },
+    { email: "orgadmin@example.gov", password: "orgadmin123", role: "Organization Administrator" },
     { email: "manager@example.gov", password: "manager123", role: "Operating Unit Administrator" },
     { email: "tester@example.gov", password: "tester123", role: "Remediator/Tester" },
-    { email: "viewer@example.gov", password: "viewer123", role: "Viewer" },
-    { email: "test.user@example.gov", password: "Test1234", role: "Administrator" }
+    { email: "viewer@example.gov", password: "viewer123", role: "Viewer" }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
