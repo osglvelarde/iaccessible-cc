@@ -6,6 +6,21 @@
   "wcagVersion": "2.2",
   "level": "AA",
   "startedAt": "2025-10-10T15:12:07.004Z",
-  "lastUpdatedAt": "2025-10-10T15:12:07.004Z",
-  "criteria": []
+  "lastUpdatedAt": "2025-10-23T16:17:47.796Z",
+  "criteria": [
+    {
+      "wcagId": "1.1.1",
+      "status": "Fail",
+      "evidence": [
+        {
+          "id": "d4a9d9f5-6594-4933-9720-48b457f2c5da",
+          "type": "Photo",
+          "filename": "2025-10-09_08h18_34.png",
+          "uploadedAt": "2025-10-23T16:17:47.796Z",
+          "caption": "Uploaded evidence for 2025-10-09_08h18_34.png"
+        }
+      ],
+      "lastUpdated": "2025-10-23T16:17:47.796Z"
+    }
+  ]
 }

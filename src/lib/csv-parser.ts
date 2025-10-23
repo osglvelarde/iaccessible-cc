@@ -10,7 +10,8 @@ export interface CrawledPage {
   year: number;
   month: number;
   day: number;
-  departmentName: string;
+  departmentName: string; // Keep for backward compatibility
+  operatingUnitName: string; // New field - maps to departmentName
   organizationName: string;
   pocFirstName: string;
   pocLastName: string;
@@ -50,6 +51,7 @@ export async function parseCrawledPages(): Promise<CrawledPage[]> {
           month: parseInt(values[9]) || 0,
           day: parseInt(values[10]) || 0,
           departmentName: values[11] || '',
+          operatingUnitName: values[11] || '', // Map departmentName to operatingUnitName
           organizationName: values[12] || '',
           pocFirstName: values[13] || '',
           pocLastName: values[14] || '',
@@ -97,6 +99,10 @@ export function getUniqueDepartments(pages: CrawledPage[]): string[] {
   return Array.from(new Set(pages.map(p => p.departmentName).filter(Boolean))).sort();
 }
 
+export function getUniqueOperatingUnits(pages: CrawledPage[]): string[] {
+  return Array.from(new Set(pages.map(p => p.operatingUnitName).filter(Boolean))).sort();
+}
+
 export function getUniqueOrganizations(pages: CrawledPage[]): string[] {
   return Array.from(new Set(pages.map(p => p.organizationName).filter(Boolean))).sort();
 }
@@ -106,6 +112,7 @@ export function filterPages(
   filters: {
     search?: string;
     department?: string;
+    operatingUnit?: string;
     organization?: string;
     internalExternal?: 'Internal' | 'External';
     dateFrom?: string;
@@ -118,13 +125,19 @@ export function filterPages(
       const searchLower = filters.search.toLowerCase();
       if (!page.webpage.toLowerCase().includes(searchLower) &&
           !page.departmentName.toLowerCase().includes(searchLower) &&
+          !page.operatingUnitName.toLowerCase().includes(searchLower) &&
           !page.organizationName.toLowerCase().includes(searchLower)) {
         return false;
       }
     }
     
-    // Department filter
+    // Department filter (backward compatibility)
     if (filters.department && page.departmentName !== filters.department) {
+      return false;
+    }
+    
+    // Operating Unit filter
+    if (filters.operatingUnit && page.operatingUnitName !== filters.operatingUnit) {
       return false;
     }
     
