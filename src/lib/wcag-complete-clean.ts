@@ -167,42 +167,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     wcagVersion: '2.0'
   },
   {
-    wcagId: '1.4.6',
-    title: 'Contrast (Enhanced)',
-    level: 'AAA',
-    principle: 'Perceivable',
-    howToTest: 'Verify that the visual presentation of text and images of text has a contrast ratio of at least 7:1 for normal text and 4.5:1 for large text.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '1.4.7',
-    title: 'Low or No Background Audio',
-    level: 'AAA',
-    principle: 'Perceivable',
-    howToTest: 'Check that for prerecorded audio-only content that contains primarily speech in the foreground, the background sounds are at least 20 decibels lower than the foreground speech content.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/low-or-no-background-audio.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '1.4.8',
-    title: 'Visual Presentation',
-    level: 'AAA',
-    principle: 'Perceivable',
-    howToTest: 'Verify that text can be presented without loss of content or functionality, and without requiring scrolling in two dimensions for vertical scrolling content at a width equivalent to 320 CSS pixels and horizontal scrolling content at a height equivalent to 256 CSS pixels.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '1.4.9',
-    title: 'Images of Text (No Exception)',
-    level: 'AAA',
-    principle: 'Perceivable',
-    howToTest: 'Verify that images of text are only used for pure decoration or where a particular presentation of text is essential to the information being conveyed.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception.html',
-    wcagVersion: '2.0'
-  },
-  {
     wcagId: '2.1.1',
     title: 'Keyboard',
     level: 'A',
@@ -239,48 +203,12 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     wcagVersion: '2.0'
   },
   {
-    wcagId: '2.2.3',
-    title: 'No Timing',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that timing is not an essential part of the event or activity presented by the content.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/no-timing.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '2.2.4',
-    title: 'Interruptions',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Verify that interruptions can be postponed or suppressed by the user.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/interruptions.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '2.2.5',
-    title: 'Re-authenticating',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that when an authenticated session expires, the user can continue the activity without loss of data after re-authenticating.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/re-authenticating.html',
-    wcagVersion: '2.0'
-  },
-  {
     wcagId: '2.3.1',
     title: 'Three Flashes or Below Threshold',
     level: 'A',
     principle: 'Operable',
     howToTest: 'Check that web pages do not contain anything that flashes more than three times in any one second period, or the flash is below the general flash and red flash thresholds.',
     understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '2.3.2',
-    title: 'Three Flashes',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that web pages do not contain anything that flashes more than three times in any one second period.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/three-flashes.html',
     wcagVersion: '2.0'
   },
   {
@@ -347,33 +275,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     wcagVersion: '2.0'
   },
   {
-    wcagId: '2.4.8',
-    title: 'Location',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that information about the user\'s location within a set of Web pages is available.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/location.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '2.4.9',
-    title: 'Link Purpose (Link Only)',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Verify that the purpose of each link can be determined from the link text alone or from the link text together with its programmatically determined link context.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-link-only.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '2.4.10',
-    title: 'Section Headings',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that section headings are used to organize the content.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/section-headings.html',
-    wcagVersion: '2.0'
-  },
-  {
     wcagId: '3.1.1',
     title: 'Language of Page',
     level: 'A',
@@ -389,42 +290,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     principle: 'Understandable',
     howToTest: 'Verify that the human language of each passage or phrase in the content can be programmatically determined except for proper names, technical terms, and words of indeterminate language.',
     understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '3.1.3',
-    title: 'Unusual Words',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Check that a mechanism is available for identifying specific definitions of words or phrases used in an unusual or restricted way.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/unusual-words.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '3.1.4',
-    title: 'Abbreviations',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Verify that a mechanism for identifying the expanded form or meaning of abbreviations is available.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/abbreviations.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '3.1.5',
-    title: 'Reading Level',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Check that when text requires reading ability more advanced than the lower secondary education level, supplemental content or a version that does not require such advanced reading ability is available.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/reading-level.html',
-    wcagVersion: '2.0'
-  },
-  {
-    wcagId: '3.1.6',
-    title: 'Pronunciation',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Verify that a mechanism for identifying specific pronunciation of words is available when the meaning of the words, in context, is ambiguous without knowing the pronunciation.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/pronunciation.html',
     wcagVersion: '2.0'
   },
   {
@@ -500,24 +365,14 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     wcagVersion: '2.0'
   },
   {
-    wcagId: '3.3.5',
-    title: 'Help',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Check that context-sensitive help is available.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/help.html',
+    wcagId: '4.1.1',
+    title: 'Parsing',
+    level: 'A',
+    principle: 'Robust',
+    howToTest: 'Check that in content implemented using markup languages, elements have complete start and end tags, elements are nested according to their specifications, and elements do not contain duplicate attributes.',
+    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/parsing.html',
     wcagVersion: '2.0'
   },
-  {
-    wcagId: '3.3.6',
-    title: 'Error Prevention (All)',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Verify that for Web pages that require user input, at least one of the following is true: submissions are reversible, data is checked for input errors, or users can review and correct information.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html',
-    wcagVersion: '2.0'
-  },
-  // 4.1.1 Parsing was removed in WCAG 2.2
   {
     wcagId: '4.1.2',
     title: 'Name, Role, Value',
@@ -691,15 +546,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html',
     wcagVersion: '2.1'
   },
-  {
-    wcagId: '4.1.4',
-    title: 'Status Messages',
-    level: 'AAA',
-    principle: 'Robust',
-    howToTest: 'Verify that status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html',
-    wcagVersion: '2.2'
-  },
 
   // WCAG 2.2 Additional Criteria (9 criteria)
   {
@@ -748,15 +594,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     wcagVersion: '2.2'
   },
   {
-    wcagId: '2.5.9',
-    title: 'Target Size (Enhanced)',
-    level: 'AAA',
-    principle: 'Operable',
-    howToTest: 'Check that target size is at least 44 by 44 CSS pixels except when the target is in a sentence or block of text, the target is available on a page or viewport that provides an equivalent target at least 44 by 44 CSS pixels, or the target is controlled by the user agent and is not modified by the author.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html',
-    wcagVersion: '2.2'
-  },
-  {
     wcagId: '3.2.6',
     title: 'Consistent Help',
     level: 'A',
@@ -790,33 +627,6 @@ export const WCAG_CRITERIA: WCAGCriterion[] = [
     principle: 'Understandable',
     howToTest: 'Verify that a cognitive function test is not required for any step in an authentication process unless that step provides at least one of the following: alternative authentication methods, a mechanism is available to assist the user in completing the cognitive function test, or the cognitive function test is designed to recognize the user\'s identity.',
     understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-enhanced.html',
-    wcagVersion: '2.2'
-  },
-  {
-    wcagId: '3.3.10',
-    title: 'Error Prevention (All)',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Verify that for Web pages that require user input, at least one of the following is true: submissions are reversible, data is checked for input errors, or users can review and correct information.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html',
-    wcagVersion: '2.2'
-  },
-  {
-    wcagId: '3.3.11',
-    title: 'Help',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Check that context-sensitive help is available.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/help.html',
-    wcagVersion: '2.2'
-  },
-  {
-    wcagId: '3.3.12',
-    title: 'Error Prevention (All)',
-    level: 'AAA',
-    principle: 'Understandable',
-    howToTest: 'Verify that for Web pages that require user input, at least one of the following is true: submissions are reversible, data is checked for input errors, or users can review and correct information.',
-    understandingUrl: 'https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html',
     wcagVersion: '2.2'
   }
 ];

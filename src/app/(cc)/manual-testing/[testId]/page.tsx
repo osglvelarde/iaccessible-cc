@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronLeft, Save, AlertCircle, Settings, Eye, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronLeft, Save, AlertCircle, Settings, ExternalLink, Copy, CheckCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -12,9 +12,9 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   TestSession,
   TestEvidence,
@@ -30,7 +30,6 @@ import {
 import { getCriteriaForVersionAndLevel } from '@/lib/wcag-complete';
 import { parseCrawledPages, CrawledPage } from '@/lib/csv-parser';
 import WCAGManualChecklist from '@/components/cc/WCAGManualChecklist';
-import PageContentViewer from '@/components/cc/PageContentViewer';
 
 interface ManualTestingWorkspaceProps {
   params: Promise<{
@@ -57,14 +56,31 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [externalTab, setExternalTab] = useState<Window | null>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
+  const [showTabPanel, setShowTabPanel] = useState(true);
 
   useEffect(() => {
     if (testId) {
       initializeSession();
     }
   }, [testId, pageUrl]);
+
+  // Auto-open page in new tab when session is ready
+  useEffect(() => {
+    if (session && pageUrl) {
+      const hasOpenedTab = sessionStorage.getItem(`tab-opened-${testId}`);
+      if (!hasOpenedTab) {
+        const newTab = window.open(pageUrl, '_blank');
+        if (newTab) {
+          sessionStorage.setItem(`tab-opened-${testId}`, 'true');
+          setExternalTab(newTab);
+        }
+      }
+    }
+  }, [session, pageUrl, testId]);
 
   const initializeSession = async () => {
     try {
@@ -196,6 +212,28 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
     });
   };
 
+  const handleOpenExternalTab = () => {
+    if (!pageUrl) return;
+    
+    const newTab = window.open(pageUrl, '_blank');
+    if (newTab) {
+      setExternalTab(newTab);
+      sessionStorage.setItem(`tab-opened-${testId}`, 'true');
+    }
+  };
+
+  const handleCopyUrl = async () => {
+    if (!pageUrl) return;
+    
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
+  };
+
   const handleWCAGVersionChange = (version: '2.1' | '2.2') => {
     if (!session) return;
 
@@ -317,7 +355,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/80 px-6 py-4">
+      <header className="border-b bg-card px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
@@ -330,7 +368,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
               Back
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">
+              <h1 className="text-lg font-semibold text-foreground">
                 Manual Testing Workspace
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -338,30 +376,26 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {saving && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Save className="h-4 w-4 animate-pulse" />
                 Saving...
               </div>
             )}
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsFullscreen(!isFullscreen)}
-                  >
-                    {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="text-sm">
+              <span className="font-medium">{summary.completedCriteria}</span>
+              <span className="text-muted-foreground"> of {summary.totalCriteria} completed</span>
+            </div>
+            <Progress value={summary.progressPercent} className="w-24 h-2" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenExternalTab}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Re-open Page
+            </Button>
 
             <Sheet open={showSettings} onOpenChange={setShowSettings}>
               <SheetTrigger asChild>
@@ -393,6 +427,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="2.0">WCAG 2.0</SelectItem>
                         <SelectItem value="2.1">WCAG 2.1</SelectItem>
                         <SelectItem value="2.2">WCAG 2.2</SelectItem>
                       </SelectContent>
@@ -418,78 +453,135 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
               </SheetContent>
             </Sheet>
 
-            <Select value={session.wcagVersion} onValueChange={handleWCAGVersionChange}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2.1">2.1</SelectItem>
-                <SelectItem value="2.2">2.2</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-muted-foreground">WCAG Version:</label>
+                <Select value={session.wcagVersion} onValueChange={handleWCAGVersionChange}>
+                  <SelectTrigger className="w-24">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2.0">2.0</SelectItem>
+                    <SelectItem value="2.1">2.1</SelectItem>
+                    <SelectItem value="2.2">2.2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-muted-foreground">Level:</label>
+                <Select value={session.level} onValueChange={(value) => {
+                  const updatedSession = { ...session, level: value as 'A' | 'AA' | 'AAA' };
+                  setSession(updatedSession);
+                }}>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="A">A</SelectItem>
+                    <SelectItem value="AA">AA</SelectItem>
+                    <SelectItem value="AAA">AAA</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Page Info */}
-        <div className="flex items-center gap-2 mt-4 p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm font-medium">Page Under Test:</span>
-          <Badge variant="outline" className="text-xs">{session.pageUrl}</Badge>
-        </div>
+        {/* Compact External Tab Panel */}
+        <Collapsible open={showTabPanel} onOpenChange={setShowTabPanel} className="mt-4">
+          <CollapsibleTrigger asChild>
+            <Card className="bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ExternalLink className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium text-blue-900">Testing: {session.pageUrl}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenExternalTab();
+                    }} className="bg-blue-600 hover:bg-blue-700">
+                      Open Page
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyUrl();
+                      }}
+                    >
+                      {urlCopied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Card className="mt-2 border-blue-200">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">How to Test</h4>
+                    <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                      <li>Click "Open Page" to open the page in a new tab</li>
+                      <li>Use the checklist below to test each WCAG criterion</li>
+                      <li>Test keyboard navigation, screen reader compatibility, and visual accessibility</li>
+                      <li>Mark criteria as "Pass", "Fail", or "Not Applicable" as you test</li>
+                    </ol>
+                  </div>
+                  {pageData && (
+                    <>
+                      <Separator />
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Organization:</span>
+                          <p className="font-medium">{pageData.organizationName}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Operating Unit:</span>
+                          <p className="font-medium">{pageData.operatingUnitName || pageData.departmentName}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Scanned:</span>
+                          <p className="font-medium">{pageData.dateScanned}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
 
-        {/* Metadata */}
-        {pageData && (
-          <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-            <span>Organization: <span className="font-medium text-foreground">{pageData.organizationName}</span></span>
-            <Separator orientation="vertical" className="h-4" />
-            <span>Operating Unit: <span className="font-medium text-foreground">{pageData.operatingUnitName || pageData.departmentName}</span></span>
-            <Separator orientation="vertical" className="h-4" />
-            <span>Scanned: <span className="font-medium text-foreground">{pageData.dateScanned}</span></span>
-          </div>
-        )}
 
-        {/* Progress */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span>Progress: {summary.completedCriteria} of {summary.totalCriteria} criteria tested</span>
-            <span>{summary.progressPercent}%</span>
-          </div>
-          <Progress value={summary.progressPercent} className="h-2" />
-        </div>
       </header>
 
-      {/* Main Workspace */}
-      <div className={`flex-1 flex ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}>
-        {/* Left Panel - WCAG Checklist */}
-        <div className={`${isFullscreen ? 'w-1/2' : 'w-96'} border-r bg-card flex flex-col transition-all duration-300`}>
-          <div className="p-4 border-b">
+      {/* Main Workspace - Full Height Checklist */}
+      <div className="flex-1 flex flex-col">
+        {/* WCAG Checklist - Hero Section */}
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 border-b bg-muted/30">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-foreground">
+                <h2 className="text-lg font-semibold text-foreground">
                   WCAG {session.wcagVersion} Level {session.level} Checklist
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Check each criterion against the current page
+                  Test each criterion against the page opened in the external tab
                 </p>
               </div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsFullscreen(!isFullscreen)}
-                    >
-                      {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {summary.completedCriteria} of {summary.totalCriteria} completed
+                </Badge>
+              </div>
             </div>
           </div>
-          <ScrollArea className="flex-1">
+          <div className="flex-1 overflow-y-auto">
             <div className="p-4">
               <WCAGManualChecklist
                 session={session}
@@ -497,129 +589,10 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
                 onStatusChange={handleCriterionStatusChange}
                 onEvidenceUpload={handleEvidenceUpload}
                 onNoteUpdate={handleNoteUpdate}
+                gridLayout={true}
               />
             </div>
-          </ScrollArea>
-        </div>
-
-        {/* Right Panel - Content Viewer */}
-        <div className="flex-1 flex flex-col">
-          <Tabs defaultValue="page" className="flex-1 flex flex-col">
-            <div className="p-4 border-b bg-muted/50">
-              <div className="flex items-center justify-between">
-                <TabsList>
-                  <TabsTrigger value="page">Page View</TabsTrigger>
-                  <TabsTrigger value="details">Page Details</TabsTrigger>
-                  <TabsTrigger value="evidence">Evidence</TabsTrigger>
-                </TabsList>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {pageData?.internalExternal || 'External'}
-                  </Badge>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setIsFullscreen(!isFullscreen)}
-                        >
-                          {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-            </div>
-            
-            <TabsContent value="page" className="flex-1 m-0">
-              <div className="h-full">
-                <PageContentViewer url={session.pageUrl} />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="details" className="flex-1 m-0">
-              <ScrollArea className="h-full">
-                <div className="p-6 space-y-6">
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-4">Page Information</h3>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">URL</label>
-                          <p className="text-sm break-all">{session.pageUrl}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-muted-foreground">Organization</label>
-                            <p className="text-sm">{pageData?.organizationName || 'Unknown'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-muted-foreground">Operating Unit</label>
-                            <p className="text-sm">{pageData?.operatingUnitName || pageData?.departmentName || 'Unknown'}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-muted-foreground">Type</label>
-                            <Badge variant="outline">{pageData?.internalExternal || 'External'}</Badge>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-muted-foreground">Scanned</label>
-                            <p className="text-sm">{pageData?.dateScanned || 'Unknown'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-4">Test Progress</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Overall Progress</span>
-                          <span className="text-sm font-medium">{summary.progressPercent}%</span>
-                        </div>
-                        <Progress value={summary.progressPercent} className="h-2" />
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                          <div>
-                            <div className="text-2xl font-bold text-green-600">{summary.completedCriteria}</div>
-                            <div className="text-xs text-muted-foreground">Completed</div>
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-blue-600">{summary.totalCriteria - summary.completedCriteria}</div>
-                            <div className="text-xs text-muted-foreground">Remaining</div>
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-muted-foreground">{summary.totalCriteria}</div>
-                            <div className="text-xs text-muted-foreground">Total</div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ScrollArea>
-            </TabsContent>
-            
-            <TabsContent value="evidence" className="flex-1 m-0">
-              <ScrollArea className="h-full">
-                <div className="p-6">
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold mb-4">Test Evidence</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Evidence will be displayed here as you add it to criteria during testing.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ScrollArea>
-            </TabsContent>
-          </Tabs>
+          </div>
         </div>
       </div>
     </div>

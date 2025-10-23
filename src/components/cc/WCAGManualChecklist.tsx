@@ -21,6 +21,7 @@ interface WCAGManualChecklistProps {
   onStatusChange: (wcagId: string, status: TestStatus) => void;
   onEvidenceUpload: (wcagId: string, evidence: { file: File; description: string }) => void;
   onNoteUpdate: (wcagId: string, note: string) => void;
+  gridLayout?: boolean;
 }
 
 export default function WCAGManualChecklist({
@@ -28,10 +29,11 @@ export default function WCAGManualChecklist({
   criteria,
   onStatusChange,
   onEvidenceUpload,
-  onNoteUpdate
+  onNoteUpdate,
+  gridLayout = false
 }: WCAGManualChecklistProps) {
   const [expandedPrinciples, setExpandedPrinciples] = useState<Set<string>>(
-    new Set(['1']) // Expand first principle by default
+    new Set(['1']) // Expand first principle (Perceivable) by default
   );
   const [uploadModalOpen, setUploadModalOpen] = useState<string | null>(null);
   const [noteModalOpen, setNoteModalOpen] = useState<string | null>(null);
@@ -81,6 +83,218 @@ export default function WCAGManualChecklist({
     setNoteModalOpen(null);
   };
 
+  // Render individual criterion card
+  const renderCriterionCard = (criterion: WCAGCriterion, index: number) => {
+    const result = getCriterionResult(session, criterion.wcagId);
+    const currentStatus = result?.status || 'N/A';
+
+    return (
+      <Card key={`${criterion.wcagId}-${criterion.wcagVersion}-${index}`} className="border rounded-lg h-fit">
+        <CardContent className="p-3 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium text-sm">
+                  {criterion.wcagId}
+                </span>
+                <Badge className={getLevelBadgeColor(criterion.level)}>
+                  {criterion.level}
+                </Badge>
+              </div>
+              <h4 className="font-medium text-foreground mb-1">
+                {criterion.title}
+              </h4>
+            </div>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <Info className="h-3 w-3" />
+                    <span className="sr-only">
+                      More information about {criterion.title}
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent 
+                  side="left" 
+                  className="max-w-md bg-background dark:bg-gray-800 border border-border shadow-lg"
+                >
+                  <div className="space-y-3">
+                    <p className="font-medium text-foreground dark:text-gray-100">{criterion.title}</p>
+                    <p className="text-sm leading-relaxed text-foreground dark:text-gray-100">{criterion.howToTest}</p>
+                    <div className="text-xs text-muted-foreground bg-muted dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded">
+                      WCAG {criterion.wcagId} • Level {criterion.level}
+                    </div>
+                    <div className="pt-2 border-t border-border dark:border-gray-600">
+                      <a 
+                        href={criterion.understandingUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary dark:text-blue-400 hover:text-primary/80 dark:hover:text-blue-300 hover:underline underline-offset-2 transition-colors"
+                      >
+                        View Understanding WCAG →
+                      </a>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <RadioGroup
+            value={currentStatus}
+            onValueChange={(value) => onStatusChange(criterion.wcagId, value as TestStatus)}
+            className="flex flex-row gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Pass" id={`${criterion.wcagId}-${criterion.wcagVersion}-pass`} />
+              <Label
+                htmlFor={`${criterion.wcagId}-${criterion.wcagVersion}-pass`}
+                className="text-sm text-green-600 cursor-pointer"
+              >
+                Pass
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Fail" id={`${criterion.wcagId}-${criterion.wcagVersion}-fail`} />
+              <Label
+                htmlFor={`${criterion.wcagId}-${criterion.wcagVersion}-fail`}
+                className="text-sm text-red-600 cursor-pointer"
+              >
+                Fail
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="N/A" id={`${criterion.wcagId}-${criterion.wcagVersion}-na`} />
+              <Label
+                htmlFor={`${criterion.wcagId}-${criterion.wcagVersion}-na`}
+                className="text-sm text-gray-500 cursor-pointer"
+              >
+                N/A
+              </Label>
+            </div>
+          </RadioGroup>
+
+          {currentStatus === 'Fail' && (
+            <div className="flex flex-col gap-2 pt-2 border-t">
+              <EvidenceUploadDialog
+                wcagId={criterion.wcagId}
+                criterionTitle={criterion.title}
+                testId={session.testId}
+                isOpen={uploadModalOpen === criterion.wcagId}
+                onClose={() => setUploadModalOpen(null)}
+                onUploadComplete={handleEvidenceUploadComplete}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 w-full"
+                onClick={() => setUploadModalOpen(criterion.wcagId)}
+              >
+                <Upload className="h-3 w-3 mr-1" aria-hidden="true" />
+                Evidence
+                {result?.evidence && result.evidence.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-4 px-1 text-xs">
+                    {result.evidence.length}
+                  </Badge>
+                )}
+              </Button>
+              
+              <TestNoteDialog
+                wcagId={criterion.wcagId}
+                criterionTitle={criterion.title}
+                isOpen={noteModalOpen === criterion.wcagId}
+                initialNote={result?.note || ''}
+                onClose={() => setNoteModalOpen(null)}
+                onSave={handleNoteSave}
+              />
+              <Button
+                size="sm"
+                variant={result?.note ? "default" : "outline"}
+                className="h-7 w-full"
+                onClick={() => setNoteModalOpen(criterion.wcagId)}
+              >
+                <AlertTriangle className="h-3 w-3 mr-1" aria-hidden="true" />
+                Note
+                {result?.note && (
+                  <Badge variant="secondary" className="ml-2 h-4 px-1 text-xs">
+                    Added
+                  </Badge>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Show note preview if exists */}
+          {result?.note && (
+            <div className="pt-2 border-t">
+              <div className="text-xs text-muted-foreground mb-1">Note:</div>
+              <div className="text-sm bg-muted/50 p-2 rounded text-foreground">
+                {result.note.length > 100 
+                  ? `${result.note.substring(0, 100)}...` 
+                  : result.note
+                }
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  if (gridLayout) {
+    return (
+      <div className="space-y-4">
+        {WCAG_PRINCIPLES.map((principle) => {
+          const principleCriteria = groupedCriteria[principle.name] || [];
+          if (principleCriteria.length === 0) return null;
+
+          return (
+            <Collapsible
+              key={principle.id}
+              open={expandedPrinciples.has(principle.id)}
+              onOpenChange={() => togglePrinciple(principle.id)}
+            >
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start p-4 h-auto text-left hover:bg-muted/50 rounded-lg"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    {expandedPrinciples.has(principle.id) ? (
+                      <ChevronDown className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-lg text-foreground">
+                        {principle.id}. {principle.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {principleCriteria.length} criteria • Click to {expandedPrinciples.has(principle.id) ? 'collapse' : 'expand'}
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-sm px-3 py-1">
+                      {principleCriteria.length}
+                    </Badge>
+                  </div>
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {principleCriteria.map((criterion, index) => renderCriterionCard(criterion, index))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Original list layout
   return (
     <div className="space-y-2 p-4">
       {WCAG_PRINCIPLES.map((principle) => {
@@ -117,170 +331,7 @@ export default function WCAGManualChecklist({
             </CollapsibleTrigger>
 
             <CollapsibleContent className="pl-6 space-y-2">
-              {principleCriteria.map((criterion) => {
-                const result = getCriterionResult(session, criterion.wcagId);
-                const currentStatus = result?.status || 'Needs Senior Review';
-
-                return (
-                  <Card key={criterion.wcagId} className="border rounded-lg">
-                    <CardContent className="p-3 space-y-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-sm">
-                              {criterion.wcagId}
-                            </span>
-                            <Badge className={getLevelBadgeColor(criterion.level)}>
-                              {criterion.level}
-                            </Badge>
-                          </div>
-                          <h4 className="font-medium text-foreground mb-1">
-                            {criterion.title}
-                          </h4>
-                        </div>
-
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <Info className="h-3 w-3" />
-                                <span className="sr-only">
-                                  More information about {criterion.title}
-                                </span>
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="max-w-md">
-                              <div className="space-y-2">
-                                <p className="font-medium">{criterion.title}</p>
-                                <p className="text-sm">{criterion.howToTest}</p>
-                                <div className="text-xs text-muted-foreground">
-                                  WCAG {criterion.wcagId} • Level {criterion.level}
-                                </div>
-                                <div className="pt-2 border-t">
-                                  <a 
-                                    href={criterion.understandingUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-blue-600 hover:underline"
-                                  >
-                                    View Understanding WCAG →
-                                  </a>
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-
-                      <RadioGroup
-                        value={currentStatus}
-                        onValueChange={(value) => onStatusChange(criterion.wcagId, value as TestStatus)}
-                        className="flex flex-row gap-4"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Pass" id={`${criterion.wcagId}-pass`} />
-                          <Label
-                            htmlFor={`${criterion.wcagId}-pass`}
-                            className="text-sm text-green-600 cursor-pointer"
-                          >
-                            Pass
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Fail" id={`${criterion.wcagId}-fail`} />
-                          <Label
-                            htmlFor={`${criterion.wcagId}-fail`}
-                            className="text-sm text-red-600 cursor-pointer"
-                          >
-                            Fail
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Needs Senior Review" id={`${criterion.wcagId}-review`} />
-                          <Label
-                            htmlFor={`${criterion.wcagId}-review`}
-                            className="text-sm text-yellow-600 cursor-pointer"
-                          >
-                            Review
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="N/A" id={`${criterion.wcagId}-na`} />
-                          <Label
-                            htmlFor={`${criterion.wcagId}-na`}
-                            className="text-sm text-gray-500 cursor-pointer"
-                          >
-                            N/A
-                          </Label>
-                        </div>
-                      </RadioGroup>
-
-                      {currentStatus === 'Fail' && (
-                        <div className="flex items-center gap-2 pt-2 border-t">
-                          <EvidenceUploadDialog
-                            wcagId={criterion.wcagId}
-                            criterionTitle={criterion.title}
-                            testId={session.testId}
-                            isOpen={uploadModalOpen === criterion.wcagId}
-                            onClose={() => setUploadModalOpen(null)}
-                            onUploadComplete={handleEvidenceUploadComplete}
-                          />
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7"
-                            onClick={() => setUploadModalOpen(criterion.wcagId)}
-                          >
-                            <Upload className="h-3 w-3 mr-1" aria-hidden="true" />
-                            Evidence
-                            {result?.evidence && result.evidence.length > 0 && (
-                              <Badge variant="secondary" className="ml-2 h-4 px-1 text-xs">
-                                {result.evidence.length}
-                              </Badge>
-                            )}
-                          </Button>
-                          
-                          <TestNoteDialog
-                            wcagId={criterion.wcagId}
-                            criterionTitle={criterion.title}
-                            isOpen={noteModalOpen === criterion.wcagId}
-                            initialNote={result?.note || ''}
-                            onClose={() => setNoteModalOpen(null)}
-                            onSave={handleNoteSave}
-                          />
-                          <Button
-                            size="sm"
-                            variant={result?.note ? "default" : "outline"}
-                            className="h-7"
-                            onClick={() => setNoteModalOpen(criterion.wcagId)}
-                          >
-                            <AlertTriangle className="h-3 w-3 mr-1" aria-hidden="true" />
-                            Note
-                            {result?.note && (
-                              <Badge variant="secondary" className="ml-2 h-4 px-1 text-xs">
-                                Added
-                              </Badge>
-                            )}
-                          </Button>
-                        </div>
-                      )}
-
-                      {/* Show note preview if exists */}
-                      {result?.note && (
-                        <div className="pt-2 border-t">
-                          <div className="text-xs text-muted-foreground mb-1">Note:</div>
-                          <div className="text-sm bg-muted/50 p-2 rounded text-foreground">
-                            {result.note.length > 100 
-                              ? `${result.note.substring(0, 100)}...` 
-                              : result.note
-                            }
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              {principleCriteria.map((criterion, index) => renderCriterionCard(criterion, index))}
             </CollapsibleContent>
           </Collapsible>
         );

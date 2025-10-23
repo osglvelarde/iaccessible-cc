@@ -16,7 +16,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { parseCrawledPages, getUniqueDepartments, getUniqueOperatingUnits, getUniqueOrganizations, filterPages, CrawledPage } from '@/lib/csv-parser';
-import { TestSessionSummary, getTestStatusFromSessionSummary, formatDate } from '@/lib/manual-testing';
+import { TestSessionSummary, TestSession, getTestStatusFromSessionSummary, formatDate, calculateSessionSummary } from '@/lib/manual-testing';
+import { getCriteriaForVersionAndLevel } from '@/lib/wcag-complete';
 import Link from 'next/link';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -78,8 +79,14 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
     try {
       const response = await fetch('/api/manual-testing/sessions', { method: 'PUT' });
       if (response.ok) {
-        const sessions = await response.json();
-        setTestSessions(sessions);
+        const sessions: TestSession[] = await response.json();
+        // Convert TestSession to TestSessionSummary with proper progress calculation
+        const sessionSummaries = sessions.map(session => {
+          // Get the total criteria count based on WCAG version and level
+          const criteria = getCriteriaForVersionAndLevel(session.wcagVersion, session.level);
+          return calculateSessionSummary(session, criteria.length);
+        });
+        setTestSessions(sessionSummaries);
       }
     } catch (error) {
       console.error('Error loading test sessions:', error);
@@ -832,9 +839,10 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                                   style={{ width: `${session.progressPercent}%` }}
                                 />
                               </div>
-                              <span className="text-xs text-muted-foreground">
-                                {session.progressPercent}%
-                              </span>
+                              <div className="flex flex-col text-xs text-muted-foreground">
+                                <span className="font-medium">{session.completedCriteria}/{session.totalCriteria}</span>
+                                <span>{session.progressPercent}%</span>
+                              </div>
                             </div>
                           ) : (
                             <span className="text-muted-foreground text-sm">-</span>
@@ -1059,7 +1067,10 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Progress</span>
-                          <span className="font-medium">{session.progressPercent}%</span>
+                          <div className="flex flex-col items-end">
+                            <span className="font-medium">{session.completedCriteria}/{session.totalCriteria}</span>
+                            <span className="text-muted-foreground">{session.progressPercent}%</span>
+                          </div>
                         </div>
                         <div className="w-full bg-muted rounded-full h-1.5">
                           <div 
@@ -1122,7 +1133,10 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between text-sm">
                                   <span>Progress</span>
-                                  <span>{session.progressPercent}%</span>
+                                  <div className="flex flex-col items-end">
+                                    <span className="font-medium">{session.completedCriteria}/{session.totalCriteria}</span>
+                                    <span className="text-muted-foreground text-xs">{session.progressPercent}%</span>
+                                  </div>
                                 </div>
                                 <div className="w-full bg-muted rounded-full h-2">
                                   <div 

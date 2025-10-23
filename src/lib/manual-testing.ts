@@ -22,7 +22,7 @@ export interface TestSession {
   pageUrl: string;
   department: string;
   organization: string;
-  wcagVersion: '2.1' | '2.2';
+  wcagVersion: '2.0' | '2.1' | '2.2';
   level: 'A' | 'AA' | 'AAA';
   startedAt: string;
   lastUpdatedAt: string;
@@ -36,7 +36,7 @@ export interface TestSessionSummary {
   pageUrl: string;
   department: string;
   organization: string;
-  wcagVersion: '2.1' | '2.2';
+  wcagVersion: '2.0' | '2.1' | '2.2';
   level: 'A' | 'AA' | 'AAA';
   startedAt: string;
   lastUpdatedAt: string;
