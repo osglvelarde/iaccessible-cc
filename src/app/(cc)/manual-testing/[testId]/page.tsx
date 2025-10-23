@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Save, AlertCircle, Settings, ExternalLink, Copy, CheckCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -62,27 +62,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   const [urlCopied, setUrlCopied] = useState(false);
   const [showTabPanel, setShowTabPanel] = useState(true);
 
-  useEffect(() => {
-    if (testId) {
-      initializeSession();
-    }
-  }, [testId, pageUrl]);
-
-  // Auto-open page in new tab when session is ready
-  useEffect(() => {
-    if (session && pageUrl) {
-      const hasOpenedTab = sessionStorage.getItem(`tab-opened-${testId}`);
-      if (!hasOpenedTab) {
-        const newTab = window.open(pageUrl, '_blank');
-        if (newTab) {
-          sessionStorage.setItem(`tab-opened-${testId}`, 'true');
-          setExternalTab(newTab);
-        }
-      }
-    }
-  }, [session, pageUrl, testId]);
-
-  const initializeSession = async () => {
+  const initializeSession = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -129,7 +109,27 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
     } finally {
       setLoading(false);
     }
-  };
+  }, [testId, pageUrl]);
+
+  useEffect(() => {
+    if (testId) {
+      initializeSession();
+    }
+  }, [testId, pageUrl, initializeSession]);
+
+  // Auto-open page in new tab when session is ready
+  useEffect(() => {
+    if (session && pageUrl) {
+      const hasOpenedTab = sessionStorage.getItem(`tab-opened-${testId}`);
+      if (!hasOpenedTab) {
+        const newTab = window.open(pageUrl, '_blank');
+        if (newTab) {
+          sessionStorage.setItem(`tab-opened-${testId}`, 'true');
+          setExternalTab(newTab);
+        }
+      }
+    }
+  }, [session, pageUrl, testId]);
 
   const handleCriterionStatusChange = async (wcagId: string, status: 'Pass' | 'Fail' | 'N/A' | 'Needs Senior Review') => {
     if (!session) return;
@@ -526,10 +526,10 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
                   <div>
                     <h4 className="font-medium text-sm mb-2">How to Test</h4>
                     <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                      <li>Click "Open Page" to open the page in a new tab</li>
+                      <li>Click &quot;Open Page&quot; to open the page in a new tab</li>
                       <li>Use the checklist below to test each WCAG criterion</li>
                       <li>Test keyboard navigation, screen reader compatibility, and visual accessibility</li>
-                      <li>Mark criteria as "Pass", "Fail", or "Not Applicable" as you test</li>
+                      <li>Mark criteria as &quot;Pass&quot;, &quot;Fail&quot;, or &quot;Not Applicable&quot; as you test</li>
                     </ol>
                   </div>
                   {pageData && (

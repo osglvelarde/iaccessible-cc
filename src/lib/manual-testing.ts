@@ -314,7 +314,7 @@ export function getTestStatusFromSessionSummary(session: TestSessionSummary): 'N
     return 'Not Started';
   }
   
-  // Consider completed if all criteria have been evaluated
-  const totalEvaluated = session.passCount + session.failCount + session.naCount;
+  // Consider completed if all criteria have been evaluated (including needs review)
+  const totalEvaluated = session.passCount + session.failCount + session.naCount + session.needsReviewCount;
   return totalEvaluated === session.totalCriteria ? 'Completed' : 'In Progress';
 }
