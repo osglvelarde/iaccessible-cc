@@ -20,7 +20,7 @@ type Row = [ModuleKey, string, string, string, string, string?];
 
 const rows: Row[] = [
     // Reports & Dashboards
-    ["dashboard", "Dashboard", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://apps.example.gov/dashboard", "/dashboard"],
+    ["dashboard", "Dashboards and KPIs", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://apps.example.gov/dashboard", "/dashboard"],
     ["dataQuery", "Data Query Module", "Query scan results and accessibility data using filters, search, and exports.", "NEXT_PUBLIC_DATAQUERY_URL", "https://apps.example.gov/data-query", "/data-query"],
 
     // Scanning Tools
