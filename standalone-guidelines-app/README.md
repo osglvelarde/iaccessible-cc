@@ -54,25 +54,46 @@ npm start
 
 ## Deploying to Vercel
 
-This app is ready to deploy independently on Vercel:
+### Option 1: Configure Root Directory in Vercel (Recommended for this repository)
 
-1. **Push to a separate repository** (recommended):
+Since the standalone app is in a subdirectory, configure Vercel to use it as the root:
+
+1. **Import the repository**:
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository: `osglvelarde/iaccessible-cc`
+   - Select the branch: `feature/standalone-guidelines-app`
+
+2. **Configure Root Directory**:
+   - Go to **Settings** → **General**
+   - Under **Root Directory**, set: `standalone-guidelines-app`
+   - Save settings
+
+3. **Deploy**:
+   - Vercel will automatically detect it's a Next.js app
+   - Click **Deploy**
+
+### Option 2: Separate Repository (Best for Independent Deployment)
+
+For completely independent deployment:
+
+1. **Create a new repository**:
    - Create a new GitHub repository
-   - Copy the `standalone-guidelines-app` folder contents to the new repo
-   - Push to GitHub
+   - Copy **only the contents** of `standalone-guidelines-app/` folder (not the folder itself)
+   - Push to the new repository
 
 2. **Deploy on Vercel**:
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Set the root directory to `.` (root of the standalone app)
+   - Import the new repository
    - Vercel will automatically detect it's a Next.js app
-   - Deploy!
+   - No root directory configuration needed
 
-3. **Or use Vercel CLI**:
-   ```bash
-   cd standalone-guidelines-app
-   vercel
-   ```
+### Option 3: Vercel CLI
+
+If deploying from the repository root, you'll need to specify the directory:
+
+```bash
+cd standalone-guidelines-app
+vercel --cwd standalone-guidelines-app
+```
 
 ## Project Structure
 
