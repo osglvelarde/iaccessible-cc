@@ -28,6 +28,15 @@ export const MODULE_FEATURES: ModuleFeatures = {
       schedule_queries: { name: 'Schedule Queries', description: 'Schedule recurring queries' }
     }
   },
+  uptimeMonitoring: {
+    moduleName: 'Uptime Monitoring Tool',
+    features: {
+      view_status: { name: 'View Status', description: 'View uptime status and availability metrics' },
+      configure_monitors: { name: 'Configure Monitors', description: 'Configure uptime monitoring targets and thresholds' },
+      view_alerts: { name: 'View Alerts', description: 'View uptime alerts and notifications' },
+      view_reports: { name: 'View Reports', description: 'View uptime reports and historical data' }
+    }
+  },
   webpageScan: {
     moduleName: 'Webpage Scan',
     features: {
@@ -202,6 +211,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
     permissions: [
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
+      createModulePermission('uptimeMonitoring', 'execute'),
       createModulePermission('webpageScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),
@@ -247,6 +257,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
     permissions: [
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
+      createModulePermission('uptimeMonitoring', 'execute'),
       createModulePermission('webpageScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),

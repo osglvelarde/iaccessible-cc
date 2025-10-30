@@ -1,5 +1,5 @@
 export type ModuleKey =
-    | "dashboard" | "dataQuery" | "webpageScan" | "pdfScan"
+    | "dashboard" | "dataQuery" | "uptimeMonitoring" | "webpageScan" | "pdfScan"
     | "sitemap" | "scanMonitor" | "scansScheduler" | "intake" | "manualTesting"
     | "pdfRemediation" | "guidelines" | "supportBot" | "settings" | "usersRoles";
 
@@ -22,6 +22,7 @@ const rows: Row[] = [
     // Reports & Dashboards
     ["dashboard", "Dashboards and KPIs", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://apps.example.gov/dashboard", "/dashboard"],
     ["dataQuery", "Data Query Module", "Query scan results and accessibility data using filters, search, and exports.", "NEXT_PUBLIC_DATAQUERY_URL", "https://apps.example.gov/data-query", "/data-query"],
+    ["uptimeMonitoring", "Uptime Monitoring Tool", "Monitor website uptime, availability, and response times for accessibility compliance.", "NEXT_PUBLIC_UPTIME_MONITORING_URL", "/uptime-monitoring", "/uptime-monitoring"],
 
     // Scanning Tools
     ["webpageScan", "Webpage Scan", "Run instant ad-hoc scans on any webpage for accessibility, readability, SEO, and GEO compliance.", "NEXT_PUBLIC_WEBSCAN_URL", "/scan/ad-hoc", "/scan/ad-hoc"],
@@ -51,7 +52,7 @@ const allModules: Module[] = rows.map(([key, title, desc, env, def, route]) => (
 export const MODULE_GROUPS: ModuleGroup[] = [
     {
         title: "Reports & Dashboards",
-        modules: allModules.filter(m => ["dashboard", "dataQuery"].includes(m.key))
+        modules: allModules.filter(m => ["dashboard", "dataQuery", "uptimeMonitoring"].includes(m.key))
     },
     {
         title: "Scanning Tools",
