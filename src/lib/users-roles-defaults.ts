@@ -37,6 +37,15 @@ export const MODULE_FEATURES: ModuleFeatures = {
       schedule_scans: { name: 'Schedule Scans', description: 'Schedule recurring scans' }
     }
   },
+  waveScan: {
+    moduleName: 'WAVE Webpage Scan',
+    features: {
+      start_scan: { name: 'Start Scan', description: 'Initiate new WAVE scans' },
+      view_results: { name: 'View Results', description: 'View WAVE scan results and reports' },
+      download_reports: { name: 'Download Reports', description: 'Download WAVE scan reports' },
+      schedule_scans: { name: 'Schedule Scans', description: 'Schedule recurring WAVE scans' }
+    }
+  },
   pdfScan: {
     moduleName: 'PDF Accessibility Scan',
     features: {
@@ -185,6 +194,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
       createModulePermission('webpageScan', 'execute'),
+      createModulePermission('waveScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),
       createModulePermission('scanMonitor', 'read'),
@@ -203,6 +213,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
       createModulePermission('webpageScan', 'execute'),
+      createModulePermission('waveScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),
       createModulePermission('scanMonitor', 'read'),
@@ -228,6 +239,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
       createModulePermission('webpageScan', 'execute'),
+      createModulePermission('waveScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),
       createModulePermission('scanMonitor', 'read'),
@@ -248,6 +260,7 @@ export const PREDEFINED_ROLES: Record<RoleType, Omit<UserGroup, 'id' | 'organiza
       createModulePermission('dashboard', 'read'),
       createModulePermission('dataQuery', 'read'),
       createModulePermission('webpageScan', 'execute'),
+      createModulePermission('waveScan', 'execute'),
       createModulePermission('pdfScan', 'execute'),
       createModulePermission('sitemap', 'execute'),
       createModulePermission('scanMonitor', 'read'),

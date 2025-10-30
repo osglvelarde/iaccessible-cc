@@ -128,7 +128,11 @@ export default function ScanSummaryCards({ summary, className }: ScanSummaryCard
                 </CardHeader>
                 <div className="px-6 pb-6">
                   <div className={cn("text-3xl font-bold", card.color)}>
-                    {card.title === "Total Issues" ? card.value : `${card.value}%`}
+                    {card.title === "Total Issues" 
+                      ? card.value 
+                      : card.value !== null && card.value !== undefined 
+                        ? `${card.value}%` 
+                        : "N/A"}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {card.subtitle}

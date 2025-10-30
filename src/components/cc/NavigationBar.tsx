@@ -62,6 +62,7 @@ export default function NavigationBar() {
       dataQuery: BarChart3,
       uptimeMonitoring: BarChart3,
       webpageScan: Search,
+      waveScan: Search,
       pdfScan: Search,
       scanMonitor: Search,
       scansScheduler: Search,

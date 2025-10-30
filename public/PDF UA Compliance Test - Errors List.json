@@ -1,0 +1,1704 @@
+{
+"Aspose PDF-UA Complinace Test":[
+ {
+  "Type": "General",
+  "Code": "05:01",
+  "Severity": "Error",
+  "Message": "PDF\/UA identifier missing",
+  "ISO 32000-2 Clause": "14.8.2.2",
+  "ISO 32000-2 Reference Description": "PDF\/UA identifier must be present in metadata (dc:identifier).",
+  "ISO 14289-1 Clause": 7.5,
+  "Clause Description": "The PDF\/UA identifier (PDF\/UA-1) shall be included in the document metadata to declare conformance."
+ },
+ {
+  "Type": "General",
+  "Code": "6.2:1.1",
+  "Severity": "Error",
+  "Message": "Structural parent tree: Inconsistent entry found",
+  "ISO 32000-2 Clause": "14.7.4",
+  "ISO 32000-2 Reference Description": "Structure tree and parent tree must be consistent and synchronized.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "A conforming file must include a valid and consistent structure tree with a correct ParentTree entry."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:1.1(14.8.1)",
+  "Severity": "Error",
+  "Message": "Document is not marked as tagged",
+  "ISO 32000-2 Clause": "14.8.2",
+  "ISO 32000-2 Reference Description": "Document must be tagged for accessibility.",
+  "ISO 14289-1 Clause": 7.1,
+  "Clause Description": "Tagged PDF shall be used, and the document catalog shall include a MarkInfo dictionary with Marked = true."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:1.1(14.8)",
+  "Severity": "Error",
+  "Message": "[OBJECT_NAME] object not tagged",
+  "ISO 32000-2 Clause": "14.8.2",
+  "ISO 32000-2 Reference Description": "All content objects must be part of a tag structure.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "All meaningful content must be contained within tagged elements in the logical structure tree."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:1.2(14.8.2.2)",
+  "Severity": "Error",
+  "Message": "Artifact present inside tagged content",
+  "ISO 32000-2 Clause": "14.8.2.2",
+  "ISO 32000-2 Reference Description": "Artifacts should not be nested within tagged elements.",
+  "ISO 14289-1 Clause": 7.14,
+  "Clause Description": "Tagged content must not include artifacts. Artifacts must be clearly outside the structure hierarchy."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:1.3(14.8.2.2)",
+  "Severity": "Error",
+  "Message": "Tagged content present inside an artifact",
+  "ISO 32000-2 Clause": "14.8.2.2",
+  "ISO 32000-2 Reference Description": "Tagged content should not appear inside artifacts.",
+  "ISO 14289-1 Clause": 7.14,
+  "Clause Description": "Tagged content shall not be embedded within artifacts. Artifacts are to be ignored by assistive tech."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.1",
+  "Severity": "Warning",
+  "Message": "Structure tree missing",
+  "ISO 32000-2 Clause": "14.7.3",
+  "ISO 32000-2 Reference Description": "Structure tree must be present in tagged PDF.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "A structure tree is required for tagged PDF and must be properly defined in the StructTreeRoot."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.2",
+  "Severity": "Warning",
+  "Message": "‘Document’ structure element found which is not a root element",
+  "ISO 32000-2 Clause": "14.7.3",
+  "ISO 32000-2 Reference Description": "The Document tag should be the root of the structure tree.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "The Document structure element must serve as the root of the structure tree."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.3",
+  "Severity": "Warning",
+  "Message": "‘[ELEMENT_NAME]’ structure element used as root element",
+  "ISO 32000-2 Clause": "14.7.3",
+  "ISO 32000-2 Reference Description": "Only a Document element is valid as the structure tree root.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "Only the Document element is permitted as the structure tree root."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.4.1",
+  "Severity": "Warning",
+  "Message": "Possibly inappropriate use of a ‘[ELEMENT_NAME]’ structure element",
+  "ISO 32000-2 Clause": "14.8.4",
+  "ISO 32000-2 Reference Description": "Element types must match standard semantic structure roles.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "Standard structure types must be used correctly according to their semantic purpose."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.4.2",
+  "Severity": "Error",
+  "Message": "Invalid use of a ‘[ELEMENT_NAME]’ structure element",
+  "ISO 32000-2 Clause": "14.8.4",
+  "ISO 32000-2 Reference Description": "Elements must conform to structure type rules.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "Structure elements must follow the hierarchical rules defined in the PDF\/UA standard."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:2.5",
+  "Severity": "Warning",
+  "Message": "Possibly wrong nested ‘[ELEMENT_NAME]’ struct element into StructTreeRoot",
+  "ISO 32000-2 Clause": "14.7.3",
+  "ISO 32000-2 Reference Description": "Nested elements must respect the structural hierarchy.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "Elements must be nested logically within the StructTreeRoot following role mapping rules."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:3(14.8.4)",
+  "Severity": "Error",
+  "Message": "Non-standard structure type ‘[TYPE_NAME]’ is neither mapped to a standard structure type nor to another non-standard structure type",
+  "ISO 32000-2 Clause": "14.8.4",
+  "ISO 32000-2 Reference Description": "Custom types must be mapped to known types or valid extensions.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "Custom structure types must be mapped to standard types via the RoleMap."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:4(14.8.4)",
+  "Severity": "Warning",
+  "Message": "Standard structure type ‘[TYPE_NAME]’ is remapped to ‘[TYPE_NAME]’",
+  "ISO 32000-2 Clause": "14.8.4",
+  "ISO 32000-2 Reference Description": "Remapping standard types must preserve their meaning.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "Standard types shall not be remapped to other types; remapping is restricted to custom types."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:5",
+  "Severity": "Need check manual",
+  "Message": "Color contrast",
+  "ISO 32000-2 Clause": "14.8.4.3",
+  "ISO 32000-2 Reference Description": "Ensure sufficient contrast between foreground and background.",
+  "ISO 14289-1 Clause": 7.18,
+  "Clause Description": "Documents must provide sufficient contrast between text and background for readability."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:6.1",
+  "Severity": "Error",
+  "Message": "XMP metadata missing in document",
+  "ISO 32000-2 Clause": "14.8.2.3",
+  "ISO 32000-2 Reference Description": "XMP metadata must be present and conform to schema.",
+  "ISO 14289-1 Clause": 7.5,
+  "Clause Description": "Conforming PDF\/UA files must contain XMP metadata, including identifier and conformance info."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:6.2",
+  "Severity": "Error",
+  "Message": "Title missing in document’s XMP metadata",
+  "ISO 32000-2 Clause": "14.8.2.3",
+  "ISO 32000-2 Reference Description": "Document title must be included in XMP metadata.",
+  "ISO 14289-1 Clause": "7.5.2",
+  "Clause Description": "The XMP metadata must include a valid document title."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:6.3",
+  "Severity": "Warning",
+  "Message": "Title is empty in document’s XMP metadata",
+  "ISO 32000-2 Clause": "14.8.2.3",
+  "ISO 32000-2 Reference Description": "Document title must be non-empty in metadata.",
+  "ISO 14289-1 Clause": "7.5.2",
+  "Clause Description": "Document title must not be empty in the XMP metadata."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:7.1(12.2)",
+  "Severity": "Warning",
+  "Message": "‘ViewerPreferences’ dictionary missing",
+  "ISO 32000-2 Clause": 12.2,
+  "ISO 32000-2 Reference Description": "ViewerPreferences dictionary helps enforce accessibility behavior.",
+  "ISO 14289-1 Clause": 7.6,
+  "Clause Description": "The DisplayDocTitle entry shall be set to true in the ViewerPreferences dictionary."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:7.2(12.2)",
+  "Severity": "Error",
+  "Message": "‘DisplayDocTitle’ entry is not set",
+  "ISO 32000-2 Clause": 12.2,
+  "ISO 32000-2 Reference Description": "DisplayDocTitle should be enabled to show document title in UI.",
+  "ISO 14289-1 Clause": 7.6,
+  "Clause Description": "DisplayDocTitle is required to expose the document title in user agents."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:8(14.7.1)",
+  "Severity": "Error",
+  "Message": "‘Suspects’ entry is set",
+  "ISO 32000-2 Clause": "14.7.1",
+  "ISO 32000-2 Reference Description": "Suspect entries indicate unverified structure and must be removed.",
+  "ISO 14289-1 Clause": 7.11,
+  "Clause Description": "‘Suspects’ entries shall not be present in conforming files."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:9.1(14.7)",
+  "Severity": "Error",
+  "Message": "‘StructParents’ key missing in page",
+  "ISO 32000-2 Clause": 14.7,
+  "ISO 32000-2 Reference Description": "Each page must include StructParents entry to link with structure tree.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "Pages must include StructParents values for proper mapping in the parent tree."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:9.2(14.7)",
+  "Severity": "Error",
+  "Message": "‘StructParent’ entry missing in the annotation",
+  "ISO 32000-2 Clause": 14.7,
+  "ISO 32000-2 Reference Description": "Annotations must have StructParent entry to map to structure tree.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "All annotations must be included in the parent tree with valid StructParent entries."
+ },
+ {
+  "Type": "General",
+  "Code": "7.1:9.3(14.7)",
+  "Severity": "Error",
+  "Message": "Entry for given ‘StructParents’ not found",
+  "ISO 32000-2 Clause": 14.7,
+  "ISO 32000-2 Reference Description": "Referenced StructParent must exist and map to correct structure tree node.",
+  "ISO 14289-1 Clause": 7.9,
+  "Clause Description": "StructParents and StructParent must reference valid entries in the structure tree."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:1",
+  "Severity": "Need check manual",
+  "Message": "Logical Reading Order",
+  "ISO 32000-2 Clause": "14.8.4.3",
+  "ISO 32000-2 Reference Description": "Content must be presented in a logical reading order, enabling correct interpretation by assistive technologies.",
+  "ISO 14289-1 Clause": "7.1.3",
+  "Clause Description": "Content shall be in logical reading order."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:2(14.8.2.4.2)",
+  "Severity": "Error",
+  "Message": "Characters in a text object cannot be mapped to Unicode",
+  "ISO 32000-2 Clause": "14.8.2.4.2",
+  "ISO 32000-2 Reference Description": "All characters must be mappable to Unicode to ensure textual content is interpretable by assistive technologies.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Text shall be Unicode-mappable."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:3.1(14.9.2.2)",
+  "Severity": "Error",
+  "Message": "Natural language for text object cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "All text objects must specify a natural language, allowing proper pronunciation and processing by screen readers.",
+  "ISO 14289-1 Clause": "7.2.2",
+  "Clause Description": "Text objects must declare natural language."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:3.2(14.9.2.2)",
+  "Severity": "Error",
+  "Message": "Natural language of alternative text cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "Alternate text associated with non-text elements must include a specified language.",
+  "ISO 14289-1 Clause": "7.2.2",
+  "Clause Description": "Alternative text must specify natural language."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:3.3(14.9.2.2)",
+  "Severity": "Error",
+  "Message": "Natural language of actual text cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "ActualText, used to override visible text for accessibility, must have a defined language.",
+  "ISO 14289-1 Clause": "7.2.2",
+  "Clause Description": "ActualText must also be in the correct natural language."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:3.4(14.9.2.2)",
+  "Severity": "Error",
+  "Message": "Natural language of expansion text cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "Expansion text, often used in abbreviations or acronyms, must also be tagged with a language.",
+  "ISO 14289-1 Clause": "7.2.2",
+  "Clause Description": "Expansion text must declare natural language."
+ },
+ {
+  "Type": "Text",
+  "Code": "7.2:4(14.9.4)",
+  "Severity": "Error",
+  "Message": "Stretchable character no tagged using ActualText",
+  "ISO 32000-2 Clause": "14.9.4",
+  "ISO 32000-2 Reference Description": "Stretchable or decorative characters must be tagged with ActualText to convey meaning to assistive technologies.",
+  "ISO 14289-1 Clause": "7.1.6",
+  "Clause Description": "Stretchable characters (e.g., ligatures) shall use ActualText."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.3.1",
+  "Severity": "Error",
+  "Message": "Character collection in CIDFont is not compartible with character collection of internal CMap",
+  "ISO 32000-2 Clause": "9.7.4.2",
+  "ISO 32000-2 Reference Description": "CIDFonts must use character collections consistent with the internal CMap to ensure accurate text extraction and accessibility.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Fonts must support correct mapping between CID and Unicode."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.3.2",
+  "Severity": "Error",
+  "Message": "CIDToGIDMap is not embedded or incomplete in font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.7.4.3",
+  "ISO 32000-2 Reference Description": "The CIDToGIDMap must be embedded and complete to enable correct character rendering and accessibility.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Embedded fonts shall include complete mapping data."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.3.2",
+  "Severity": "Error",
+  "Message": "CMap is not embedded for font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.10.3",
+  "ISO 32000-2 Reference Description": "To ensure reliable character mapping, a CMap must be embedded with the font or properly referenced.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "All required font program data must be embedded."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.4.2",
+  "Severity": "Error",
+  "Message": "CIDSet is missing or incomplete for font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.7.6.2",
+  "ISO 32000-2 Reference Description": "CIDSet must declare all glyphs used in the document for subset fonts to support accessibility and validation.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "CIDSet shall be present for embedded fonts."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.4.2",
+  "Severity": "Error",
+  "Message": "Glyphs missing in embedded font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.7.6.1",
+  "ISO 32000-2 Reference Description": "All glyphs referenced in the content must be present in the embedded font to ensure full accessibility.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Fonts must contain all glyphs used in the document."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.6",
+  "Severity": "Error",
+  "Message": "Non-symbolic TrueType font ‘[FONT_NAME]’ has no cmap entries",
+  "ISO 32000-2 Clause": "9.6.6",
+  "ISO 32000-2 Reference Description": "Non-symbolic TrueType fonts must include cmap tables for character-to-glyph mapping.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Font encoding shall be Unicode-compatible."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.6",
+  "Severity": "Error",
+  "Message": "Encoding entry prohibited for symbolic TrueType font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.6.6",
+  "ISO 32000-2 Reference Description": "Symbolic TrueType fonts must not specify an Encoding entry; the glyph mapping must rely solely on cmap.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Symbolic fonts must not declare Encoding entries."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.6",
+  "Severity": "Error",
+  "Message": "Incorrect encoding is used for TrueType font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.6.6",
+  "ISO 32000-2 Reference Description": "Fonts must use standard encoding or a valid cmap to support Unicode mapping and accessibility.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Fonts must follow encoding rules for PDF\/UA."
+ },
+ {
+  "Type": "Fonts",
+  "Code": "7.21.6",
+  "Severity": "Error",
+  "Message": "Incorrect “Differences” array for non-symbolic TrueType font ‘[FONT_NAME]’",
+  "ISO 32000-2 Clause": "9.6.6",
+  "ISO 32000-2 Reference Description": "The 'Differences' array in font encoding must correctly map character codes to glyph names.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "“Differences” arrays must conform to encoding standards."
+ },
+ {
+  "Type": "Graphics",
+  "Code": "7.3:1(14.8.4.5)",
+  "Severity": "Error",
+  "Message": "‘[ELEMENT_NAME]’ element on a single page with no bounding box",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Each graphical structure element must have a bounding box defined so that assistive technologies can locate and reference it appropriately.",
+  "ISO 14289-1 Clause": "7.1.4",
+  "Clause Description": "Graphic elements must have bounding boxes."
+ },
+ {
+  "Type": "Graphics",
+  "Code": "7.3:2",
+  "Severity": "Error",
+  "Message": "Alternative text missing for ‘[ELEMENT_NAME]’ structure element",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Graphical content must be accompanied by alternative text to convey its meaning to users who cannot perceive visual information.",
+  "ISO 14289-1 Clause": "7.2.3",
+  "Clause Description": "Graphic elements must include alt text."
+ },
+ {
+  "Type": "Graphics",
+  "Code": "7.3:3",
+  "Severity": "Error",
+  "Message": "Caption accompanying figure missing",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Figures should be accompanied by captions or descriptive text where required, to enhance understanding for screen reader users.",
+  "ISO 14289-1 Clause": "7.2.4",
+  "Clause Description": "Figures must have captions if needed to convey meaning."
+ },
+ {
+  "Type": "Graphics",
+  "Code": "7.3:4(14.8.4.5)",
+  "Severity": "Error",
+  "Message": "Graphics object appears between the BT and ET operators",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Graphics must not be placed within marked text blocks (BT\/ET), which are reserved for text content. Doing so disrupts semantic reading order.",
+  "ISO 14289-1 Clause": "7.1.5",
+  "Clause Description": "Marked content sequences must follow text structure rules."
+ },
+ {
+  "Type": "Headings",
+  "Code": "7.4.2:1",
+  "Severity": "Error",
+  "Message": "The first heading is not on the first level",
+  "ISO 32000-2 Clause": "14.8.4.4",
+  "ISO 32000-2 Reference Description": "The logical structure must begin with a level-1 heading to reflect a proper document outline and reading order.",
+  "ISO 14289-1 Clause": "7.8.4",
+  "Clause Description": "Document headings must begin at level 1 (<H1>) to establish a logical structure for assistive technologies. Skipping initial heading levels impairs navigability."
+ },
+ {
+  "Type": "Headings",
+  "Code": "7.4.2:2",
+  "Severity": "Error",
+  "Message": "Numbered heading skips one ore more heading levels",
+  "ISO 32000-2 Clause": "14.8.4.4",
+  "ISO 32000-2 Reference Description": "Headings must be hierarchically consistent without skipping levels to preserve navigability and structure.",
+  "ISO 14289-1 Clause": "7.8.4",
+  "Clause Description": "Heading levels must be nested logically (e.g., H1 followed by H2, not H1 followed by H3) to reflect document hierarchy accurately for users of screen readers."
+ },
+ {
+  "Type": "Headings",
+  "Code": "7.4.4:1",
+  "Severity": "Error",
+  "Message": "‘H’ and ‘Hn’ structure elements found",
+  "ISO 32000-2 Clause": "14.8.4.4",
+  "ISO 32000-2 Reference Description": "Only one of either ‘H’ or ‘Hn’ structure types should be used throughout the document to maintain consistency in heading structure.",
+  "ISO 14289-1 Clause": "7.8.4",
+  "Clause Description": "Use of both H (generic heading) and Hn (level-specific heading like H1, H2, etc.) must be consistent. Mixed usage introduces ambiguity in the heading structure."
+ },
+ {
+  "Type": "Headings",
+  "Code": "7.4.4:2",
+  "Severity": "Error",
+  "Message": "More than one ‘H’ structure element inside the parent structure element",
+  "ISO 32000-2 Clause": "14.8.4.4",
+  "ISO 32000-2 Reference Description": "Each parent structure element should contain only one heading to ensure semantic clarity and assistive navigation.",
+  "ISO 14289-1 Clause": "7.8.4",
+  "Clause Description": "Each heading element (Hn) must be correctly nested and not duplicated within the same structural container. Redundant heading tags can mislead assistive technology users."
+ },
+ {
+  "Type": "Tables",
+  "Code": "7.5:1",
+  "Severity": "Warning",
+  "Message": "Irregular table row",
+  "ISO 32000-2 Clause": "14.8.4.6",
+  "ISO 32000-2 Reference Description": "Tables must have regular structure -- each row should have the same number of columns unless spanning is explicitly defined and tagged.",
+  "ISO 14289-1 Clause": 7.13,
+  "Clause Description": "Table rows must follow a consistent logical structure, where each row must have the same number of data cells or headers, unless explicitly tagged and described otherwise."
+ },
+ {
+  "Type": "Tables",
+  "Code": "7.5:2",
+  "Severity": "Error",
+  "Message": "Table header cell has no associated subcells",
+  "ISO 32000-2 Clause": "14.8.4.6",
+  "ISO 32000-2 Reference Description": "Each table header cell must clearly define its relationship to associated data cells using appropriate attributes (e.g., Scope, Headers).",
+  "ISO 14289-1 Clause": "7.13.2",
+  "Clause Description": "Table header cells (<TH> or TH tagged elements) must be explicitly associated with the data cells they describe using attributes such as \/Scope, \/Headers, or a structure tree."
+ },
+ {
+  "Type": "Tables",
+  "Code": "7.5:3.1",
+  "Severity": "Warning",
+  "Message": "Table headers missing",
+  "ISO 32000-2 Clause": "14.8.4.6",
+  "ISO 32000-2 Reference Description": "Tables should include header rows to describe the data in each column, enhancing accessibility and navigation.",
+  "ISO 14289-1 Clause": "7.13.1",
+  "Clause Description": "All data tables must include appropriate header rows or columns marked with \/Scope attributes so that assistive technologies can convey relationships accurately."
+ },
+ {
+  "Type": "Tables",
+  "Code": "7.5:3.2",
+  "Severity": "Warning",
+  "Message": "Table summary missing",
+  "ISO 32000-2 Clause": "14.8.4.6",
+  "ISO 32000-2 Reference Description": "A table summary should be provided to describe the table's purpose and structure for users relying on assistive technology.",
+  "ISO 14289-1 Clause": 7.13,
+  "Clause Description": "Tables that require additional context must include a summary or description (often in the \/Alt or \/Summary attribute) to communicate structure and purpose to assistive technologies."
+ },
+ {
+  "Type": "Lists",
+  "Code": "7.6:1",
+  "Severity": "Error",
+  "Message": "‘LI’ structure element must be a child of ‘L’ element",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "List Item (LI) elements must be properly nested under List (L) elements to preserve semantic list structure.",
+  "ISO 14289-1 Clause": "7.8.5.1",
+  "Clause Description": "According to ISO 14289-1 Clause 7.8.5.1, a list item (LI) must be contained within a list (L) structure element. This ensures that assistive technologies can properly interpret the semantics of the list structure."
+ },
+ {
+  "Type": "Lists",
+  "Code": "7.6:2",
+  "Severity": "Error",
+  "Message": "‘Lbl’ and ‘LBody’ structure element must be children of ‘LI’ element",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Label (Lbl) and List Body (LBody) elements must be nested inside List Items (LI) for valid structural representation.",
+  "ISO 14289-1 Clause": "7.8.5.2",
+  "Clause Description": "As stated in Clause 7.8.5.2, each LI (list item) must include exactly one Lbl (label, e.g., bullet or number) and one LBody (the list item's content). This provides proper context and meaning to list structures for users of assistive technologies."
+ },
+ {
+  "Type": "Notes and references",
+  "Code": "7.9:2.1",
+  "Severity": "Error",
+  "Message": "ID missing in ‘Note’ structure element",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Note elements must include a unique ID attribute to be referenced from annotations or content.",
+  "ISO 14289-1 Clause": "7.8.6.3",
+  "Clause Description": "Each Note structure element must have a unique ID defined in its attributes. This ID is critical for referencing the note correctly from other elements such as Reference, ensuring logical associations and navigability in assistive technologies."
+ },
+ {
+  "Type": "Notes and references",
+  "Code": "7.9:2.2",
+  "Severity": "Error",
+  "Message": "ID entry in ‘Note’ structure element is not unique",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Each Note element must have a unique identifier for unambiguous reference in logical structure trees.",
+  "ISO 14289-1 Clause": "7.8.6.3",
+  "Clause Description": "As mandated by Clause 7.8.6.3, IDs in Note elements must be unique throughout the document. Duplicate IDs disrupt the document's logical structure and confuse referencing elements like Reference, negatively impacting accessibility."
+ },
+ {
+  "Type": "Optional content",
+  "Code": "7.10:1",
+  "Severity": "Error",
+  "Message": "‘Name’ missing in optional content configuration dictionary",
+  "ISO 32000-2 Clause": "8.11.2",
+  "ISO 32000-2 Reference Description": "A name entry must be present in the optional content configuration dictionary for user interface labeling.",
+  "ISO 14289-1 Clause": "7.18.2",
+  "Clause Description": "Optional Content Configuration Dictionary must include a valid \/Name key to identify the configuration."
+ },
+ {
+  "Type": "Optional content",
+  "Code": "7.10:2",
+  "Severity": "Error",
+  "Message": "Optional content configuration dictionary contains ‘AS’ key",
+  "ISO 32000-2 Clause": "8.11.2",
+  "ISO 32000-2 Reference Description": "The 'AS' (Usage Application) key is not allowed in PDF\/UA-compliant optional content dictionaries.",
+  "ISO 14289-1 Clause": "7.18.2",
+  "Clause Description": "The use of \/AS (Alternate State) key is not permitted as it introduces variability not compatible with accessibility requirements."
+ },
+ {
+  "Type": "Embedded files",
+  "Code": "7.11:1",
+  "Severity": "Error",
+  "Message": "‘F’ or ‘UF’ key missing in the file specification",
+  "ISO 32000-2 Clause": "7.11.1",
+  "ISO 32000-2 Reference Description": "File specifications must include either the File (F) or Unicode File (UF) key to define the file path or name.",
+  "ISO 14289-1 Clause": "7.16.4",
+  "Clause Description": "File Specification Dictionary must include either an \/F or \/UF entry to identify the file path or file name."
+ },
+ {
+  "Type": "Embedded files",
+  "Code": "7.11:2",
+  "Severity": "Warning",
+  "Message": "‘Desc’ key missing in the file specification",
+  "ISO 32000-2 Clause": "7.11.2",
+  "ISO 32000-2 Reference Description": "A description (Desc) key helps assistive technologies describe the embedded file and should be included.",
+  "ISO 14289-1 Clause": "7.16.4",
+  "Clause Description": "The \/Desc key is required in embedded file streams to describe the file for assistive technology."
+ },
+ {
+  "Type": "Digital Signatures",
+  "Code": "7.13:1",
+  "Severity": "Error",
+  "Message": "Signature form field ‘[FIELD_NAME]’ does not conform to the specification",
+  "ISO 32000-2 Clause": "12.7.3",
+  "ISO 32000-2 Reference Description": "Signature fields must adhere to the specified format and structure for accessibility and validation.",
+  "ISO 14289-1 Clause": 7.19,
+  "Clause Description": "Signature fields must conform to tagging and structure rules outlined for form fields, including proper naming and logical placement."
+ },
+ {
+  "Type": "Digital Signatures",
+  "Code": "7.13:2.1",
+  "Severity": "Error",
+  "Message": "Natural language of an alternate name of a form field ‘[FIELD_NAME]’ cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "All form field names must include language information to enable accurate reading by assistive technologies.",
+  "ISO 14289-1 Clause": 7.19,
+  "Clause Description": "Form fields must include alternate names (\/TU) with natural language values to be accessible."
+ },
+ {
+  "Type": "Digital Signatures",
+  "Code": "7.13:2.2",
+  "Severity": "Error",
+  "Message": "Alternate field name entry missing in form field ‘[FIELD_NAME]’",
+  "ISO 32000-2 Clause": "12.7.3",
+  "ISO 32000-2 Reference Description": "Each form field must provide a T entry and an optional TU entry for assistive technology support.",
+  "ISO 14289-1 Clause": 7.19,
+  "Clause Description": "Alternate field names must be provided in the structure tree using \/Alt attributes or similar."
+ },
+ {
+  "Type": "Non-interactive forms",
+  "Code": "7.14:1",
+  "Severity": "Error",
+  "Message": "‘PrintField’ attribute missing in non-interactive form item",
+  "ISO 32000-2 Clause": "12.7.3",
+  "ISO 32000-2 Reference Description": "Non-interactive form fields must include the PrintField attribute to define visibility in print output.",
+  "ISO 14289-1 Clause": 7.19,
+  "Clause Description": "Non-interactive form fields must include the \/PrintField attribute to clarify display intent."
+ },
+ {
+  "Type": "XFA",
+  "Code": "7.15:1",
+  "Severity": "Error",
+  "Message": "PDF contains a dynamic XFA form",
+  "ISO 32000-2 Clause": "12.7.8",
+  "ISO 32000-2 Reference Description": "Dynamic XFA forms are not permitted in PDF\/UA-compliant documents because they rely on non-standard behavior.",
+  "ISO 14289-1 Clause": 7.2,
+  "Clause Description": "Dynamic XFA forms are disallowed because they cannot be reliably tagged for accessibility."
+ },
+ {
+  "Type": "Security",
+  "Code": "7.16:1(7.6.3.2)",
+  "Severity": "Error",
+  "Message": "Security settings block assistive technologies from accessing document’s content",
+  "ISO 32000-2 Clause": "7.6.3.2",
+  "ISO 32000-2 Reference Description": "PDF\/UA files must allow assistive technologies access to document content without restriction.",
+  "ISO 14289-1 Clause": "7.21.1",
+  "Clause Description": "Security settings must not block assistive technology (e.g., screen readers) from accessing document content."
+ },
+ {
+  "Type": "Security",
+  "Code": "7.16:2(7.6.3.2)",
+  "Severity": "Error",
+  "Message": "Conversion is not allowed by permission restrictions",
+  "ISO 32000-2 Clause": "7.6.3.2",
+  "ISO 32000-2 Reference Description": "PDF documents must allow content copying\/conversion for accessibility tools.",
+  "ISO 14289-1 Clause": "7.21.1",
+  "Clause Description": "Conversion permissions must not block access required by assistive technologies or remediation tools."
+ },
+ {
+  "Type": "Navigation",
+  "Code": "7.17:1",
+  "Severity": "Error",
+  "Message": "Document Outlines Error",
+  "ISO 32000-2 Clause": "14.8.4.4",
+  "ISO 32000-2 Reference Description": "Document outlines (bookmarks) must be structured and accessible.",
+  "ISO 14289-1 Clause": 7.14,
+  "Clause Description": "Outlines (bookmarks) must be structured and usable by screen readers, properly reflecting the document's structure."
+ },
+ {
+  "Type": "Navigation",
+  "Code": "7.17:2",
+  "Severity": "Error",
+  "Message": "Natural language of outlines can be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "Outline titles must specify a language so they can be accurately read by assistive technologies.",
+  "ISO 14289-1 Clause": 7.14,
+  "Clause Description": "All outline entries must declare their natural language using \/Lang."
+ },
+ {
+  "Type": "Navigation",
+  "Code": "7.17:3",
+  "Severity": "Need manual check",
+  "Message": "Semantically appropriate Page Labels",
+  "ISO 32000-2 Clause": "12.4.2",
+  "ISO 32000-2 Reference Description": "Page labels must follow a logical and semantically appropriate order for ease of navigation.",
+  "ISO 14289-1 Clause": 7.14,
+  "Clause Description": "Page labels must semantically match the visible page number for consistent navigation."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.1:1",
+  "Severity": "Error",
+  "Message": "Natural language of Contents entry cannot be determined",
+  "ISO 32000-2 Clause": "14.9.2.2",
+  "ISO 32000-2 Reference Description": "Annotation contents must declare the language used for assistive parsing.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "The \/Contents of an annotation must include language metadata."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.1:2",
+  "Severity": "Error",
+  "Message": "Alternative description missing for an annotation",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "All annotations must have an alternative text description where appropriate.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "All annotations must have an alternate description to assist non-sighted users."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.1:3",
+  "Severity": "Error",
+  "Message": "Annotation is not nested inside an ‘Annot’ structure element",
+  "ISO 32000-2 Clause": "14.8.4.5",
+  "ISO 32000-2 Reference Description": "Annotations must be included in the structure tree within an appropriate container.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "All annotations must be nested inside a valid \/Annot structure element."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.2:1",
+  "Severity": "Error",
+  "Message": "An annotation with subtype undefined in ISO 32000 does not meet 7.18.1",
+  "ISO 32000-2 Clause": "12.5.6",
+  "ISO 32000-2 Reference Description": "Only annotations defined in the standard may be used in PDF\/UA.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "Annotations using undefined subtypes are non-conforming."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.2:2",
+  "Severity": "Error",
+  "Message": "An annotation of subtype TrapNet exists",
+  "ISO 32000-2 Clause": "12.5.6",
+  "ISO 32000-2 Reference Description": "TrapNet annotations are not supported in accessible PDF.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "Annotations with subtype TrapNet are deprecated and not allowed."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.3:1",
+  "Severity": "Error",
+  "Message": "Tab order entry in page with annotations not set to ‘S’ (Structure)",
+  "ISO 32000-2 Clause": "12.5.2",
+  "ISO 32000-2 Reference Description": "Tab order must be set to 'S' to enforce a logical navigation path.",
+  "ISO 14289-1 Clause": "7.15.1",
+  "Clause Description": "Annotation tab order must be explicitly set to S (Structure)."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.4:1",
+  "Severity": "Error",
+  "Message": "‘Widget’ annotation not nested inside a ‘Form’ structure element",
+  "ISO 32000-2 Clause": "12.7.3",
+  "ISO 32000-2 Reference Description": "Widgets must be logically tagged in the structure tree under form fields.",
+  "ISO 14289-1 Clause": "7.15.2",
+  "Clause Description": "Widget annotations must be nested inside a \/Form structure element."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.5:1",
+  "Severity": "Error",
+  "Message": "‘Link’ annotation is not nested inside a ‘Link’ structure element",
+  "ISO 32000-2 Clause": "12.6.4",
+  "ISO 32000-2 Reference Description": "Link annotations must be tagged within Link structure elements to expose purpose.",
+  "ISO 14289-1 Clause": "7.15.3",
+  "Clause Description": "Link annotations must be nested within a \/Link structure element."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.6.2:1",
+  "Severity": "Error",
+  "Message": "CT key is missing from the media clip data dictionary",
+  "ISO 32000-2 Clause": "12.6.4.9",
+  "ISO 32000-2 Reference Description": "Media annotations must specify content type using CT key.",
+  "ISO 14289-1 Clause": "7.15.4",
+  "Clause Description": "Rich media annotations must include a CT key in the media clip dictionary."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.6.2:2",
+  "Severity": "Error",
+  "Message": "Alt key is missing from the media clip data dictionary",
+  "ISO 32000-2 Clause": "12.6.4.9",
+  "ISO 32000-2 Reference Description": "Alternate text (Alt) must be included for media annotations to aid accessibility.",
+  "ISO 14289-1 Clause": "7.15.4",
+  "Clause Description": "Media content must include alternate text (\/Alt) for accessibility."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.7:1",
+  "Severity": "Error",
+  "Message": "File attachment annotation. ‘F’ or ‘UF’ key missing in file specification",
+  "ISO 32000-2 Clause": "12.6.4.3",
+  "ISO 32000-2 Reference Description": "Attached files must specify file names using F or UF keys.",
+  "ISO 14289-1 Clause": "7.16.4",
+  "Clause Description": "Attached files must specify \/F or \/UF keys to identify their name."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.7:2",
+  "Severity": "Warning",
+  "Message": "File attachment annotation. ‘Desc’ key missing in file specification",
+  "ISO 32000-2 Clause": "12.6.4.3",
+  "ISO 32000-2 Reference Description": "Description key should be provided to clarify the file attachment's purpose.",
+  "ISO 14289-1 Clause": "7.16.4",
+  "Clause Description": "The \/Desc key is required to explain the file to assistive tech."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.8:1",
+  "Severity": "Error",
+  "Message": "A PrinterMark annotation is included in logical structure",
+  "ISO 32000-2 Clause": "12.6.4.7",
+  "ISO 32000-2 Reference Description": "Printer marks should not be included in the structure tree; they are visual artifacts only.",
+  "ISO 14289-1 Clause": "7.15.5",
+  "Clause Description": "Printer mark annotations must not appear in the logical structure."
+ },
+ {
+  "Type": "Annotations",
+  "Code": "7.18.8:2",
+  "Severity": "Error",
+  "Message": "The appearance stream of a PrinterMark annotation is not marked as Artifact",
+  "ISO 32000-2 Clause": "14.8.2.2",
+  "ISO 32000-2 Reference Description": "Printer marks must be designated as artifacts so that they are skipped by assistive tech.",
+  "ISO 14289-1 Clause": "7.15.5",
+  "Clause Description": "Printer mark appearance streams must be designated as \/Artifact."
+ },
+ {
+  "Type": "Actions",
+  "Code": "7.19:1",
+  "Severity": "Need check manual",
+  "Message": "Actions were found. Need to check actions according to specification PDF\/UA manually",
+  "ISO 32000-2 Clause": "12.6.4.5",
+  "ISO 32000-2 Reference Description": "All actions in PDF\/UA must meet accessibility and navigation requirements.",
+  "ISO 14289-1 Clause": 7.22,
+  "Clause Description": "Actions (e.g., JavaScript or GoTo) must be checked manually to ensure they do not interfere with accessibility or introduce barriers."
+ },
+ {
+  "Type": "Xobjects",
+  "Code": "7.20:1",
+  "Severity": "Error",
+  "Message": "Reference XObject shall not be used in conforming PDF\/UA file",
+  "ISO 32000-2 Clause": 8.1,
+  "ISO 32000-2 Reference Description": "Reference XObjects are not allowed as they are not reliably interpreted by assistive technologies.",
+  "ISO 14289-1 Clause": "7.17.3",
+  "Clause Description": "Reference XObjects cannot be used because their content is not accessible to assistive technologies."
+ },
+ {
+  "Type": "Xobjects",
+  "Code": "7.20:2",
+  "Severity": "Error",
+  "Message": "The content of Form XObject isn’t incorporated into structure elements",
+  "ISO 32000-2 Clause": 8.1,
+  "ISO 32000-2 Reference Description": "Content within Form XObjects must be tagged and included in the structure tree to ensure accessibility.",
+  "ISO 14289-1 Clause": "7.17.3",
+  "Clause Description": "Form XObject content must be included in the structure tree to be perceivable and navigable."
+ }
+],
+"Clause Mapping":[
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": 14.8,
+  "Description": "Tagged PDF: general structure and compliance rules",
+  "Overview and Requirements": "Defines overarching requirements for Tagged PDF including structural rules, tagging integrity, role maps, and semantic clarity to ensure logical structure. Tools: PAC, CommonLook, Adobe Acrobat Preflight.",
+  "Prompt: General Remediation Understanding": "What is the role of general structure rules in PDF\/UA compliance?; How does ISO 32000-2 Clause 14.8 affect PDF tagging practices?",
+  "Prompt: Remediation Techniques & How-To Guide": "How to structure a PDF document to meet Clause 14.8?; Steps to implement compliant tag structures across document types.",
+  "Prompt: Testing and Validation": "What tools verify Clause 14.8 structure compliance?; How to interpret structure tree test results?",
+  "Prompt: Tagging Structure and Semantics": "What semantic rules apply under Clause 14.8?; Best practices for applying structure element roles.",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "How does Clause 14.8 map to WCAG?; What are the crosswalk implications of PDF\/UA and ISO 32000-2?",
+  "Prompt: Tools-Specific Guidance": "How to check Clause 14.8 structure in CommonLook?; Which PAC 2024 feature targets general structure rules?",
+  "Prompt: Training, Checklists, and Best Practices": "What checklist items correspond to Clause 14.8?; List best practices for tagged PDF structure compliance.",
+  "Prompt: Error Interpretation": "What does 'untagged content' mean in Clause 14.8 errors?; How to resolve logical structure root issues?",
+  "Prompt: Advanced and Edge Cases": "How does Clause 14.8 handle multilingual PDFs?; Tagging best practices for long complex documents."
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.1",
+  "Description": "Document tagging requirements",
+  "Overview and Requirements": "Specifies tagging mandates such as inclusion of a structure tree, root entry, and namespace. Tools: Acrobat, axesPDF QuickFix, PDF Accessibility Checker.",
+  "Prompt: General Remediation Understanding": "Why is document tagging required for PDF accessibility?; What are the implications of missing tag structures?",
+  "Prompt: Remediation Techniques & How-To Guide": "How to manually tag untagged content?; How to verify a document meets Clause 14.8.1 tagging requirements?",
+  "Prompt: Testing and Validation": "How to test that all document content is tagged?; What validators confirm compliance with Clause 14.8.1?",
+  "Prompt: Tagging Structure and Semantics": "What are common structure elements used for document tagging?; How to apply correct semantic roles in PDFs?",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "How does tagging relate to reading order in PDFs?; Techniques to align tags with reading order.",
+  "Prompt: Standards Crosswalks and Mapping": "Is Clause 14.8.1 aligned with WCAG success criteria?; Mapping ISO 32000-2 to PDF\/UA tagging guidance.",
+  "Prompt: Tools-Specific Guidance": "Using Acrobat’s Tags panel for 14.8.1 compliance; Automating tag checks with axesPDF or CommonLook.",
+  "Prompt: Training, Checklists, and Best Practices": "Checklist for validating full document tagging; Best practices for maintaining logical document tags.",
+  "Prompt: Error Interpretation": "What does a 'tagged content missing' error mean?; How to fix invalid or misapplied tags?",
+  "Prompt: Advanced and Edge Cases": "Edge cases for scanned documents with auto-tagging; Handling embedded objects in tagged structure trees."
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.2",
+  "Description": "Tagged content and artifacts",
+  "Overview and Requirements": "Focuses on how tagged content and artifacts are handled distinctly; prohibits blending content types. Techniques: Mark artifacts correctly in content streams.",
+  "Prompt: General Remediation Understanding": "Why must artifacts be excluded from the tag tree?; What defines a valid tag versus artifact in ISO 32000-2?",
+  "Prompt: Remediation Techniques & How-To Guide": "How to correctly identify and mark artifacts in Acrobat Pro?; Steps to remove non-content elements from the tag tree.",
+  "Prompt: Testing and Validation": "How to test for proper artifact designation?; Which test tools highlight tagging violations for artifacts?",
+  "Prompt: Tagging Structure and Semantics": "How to tag decorative vs meaningful content?; What semantic conflicts can arise in artifact tagging?",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Does artifact handling relate to any WCAG techniques?; Map Clause 14.8.2 to PDF\/UA test conditions.",
+  "Prompt: Tools-Specific Guidance": "How does PAC 2024 handle artifacts?; Identifying misplaced tags using Adobe Acrobat Pro.",
+  "Prompt: Training, Checklists, and Best Practices": "Checklist for artifact testing in PDFs; Best practices for excluding non-structural content.",
+  "Prompt: Error Interpretation": "What causes 'artifact incorrectly tagged' errors?; How to diagnose tag tree conflicts with artifacts?",
+  "Prompt: Advanced and Edge Cases": "Tagging footnotes or floating annotations; Excluding header\/footer elements from content tree."
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.2.2",
+  "Description": "Prohibition of artifacts inside tags and vice versa",
+  "Overview and Requirements": "Requires strict separation: artifacts must not appear within tagged content and vice versa. Ensure proper use of \/Artifact in PDF syntax.",
+  "Prompt: General Remediation Understanding": "What is the impact of placing artifacts inside tags?; Why should artifacts be separated from the content tree?",
+  "Prompt: Remediation Techniques & How-To Guide": "Use PDF remediation tools to remove artifacts from tag tree.; Reassign decorative elements correctly.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "Not applicable",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Complex custom tags; nested artifacts"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.2.4",
+  "Description": "Unicode text requirements",
+  "Overview and Requirements": "Mandates Unicode-compliant text to ensure interoperability and assistive technology readability. Apply Unicode mapping using font encoding techniques.",
+  "Prompt: General Remediation Understanding": "What are Unicode text requirements for accessible PDFs?; Why is Unicode essential for screen reader support?",
+  "Prompt: Remediation Techniques & How-To Guide": "Use Unicode-compliant fonts.; Apply Unicode values using tagging tools (e.g., PAC, CommonLook).",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Scripts with Unicode fallback"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.2.4.2",
+  "Description": "Unicode mapping for characters",
+  "Overview and Requirements": "Enforces accurate mapping between characters and Unicode values. Confirm with font tools or PAC 2021's font mapping analysis.",
+  "Prompt: General Remediation Understanding": "Explain Unicode mapping for characters.; What role does 14.8.2.4.2 play in internationalization?",
+  "Prompt: Remediation Techniques & How-To Guide": "Validate character encoding maps in Acrobat Pro.; Use Unicode CMap tables where applicable.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Right-to-left language issues"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4",
+  "Description": "Structure elements, standard and custom",
+  "Overview and Requirements": "Describes acceptable standard and custom structure elements. Use role maps and ensure consistency across document structure.",
+  "Prompt: General Remediation Understanding": "What are standard and custom structure elements in PDFs?; How do structure elements influence screen reader behavior?",
+  "Prompt: Remediation Techniques & How-To Guide": "Apply standard tags in Adobe Acrobat or CommonLook.; For custom tags, define them in the RoleMap.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Use Metadata Editor",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Custom structure types with namespaces"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4.4",
+  "Description": "Use of headings and heading consistency",
+  "Overview and Requirements": "Requires consistent heading use (e.g., H1, H2 hierarchy). Check with structure tree viewers or Acrobat's tags pane.",
+  "Prompt: General Remediation Understanding": "Why is heading consistency important in accessible documents?; What constitutes a proper heading hierarchy?",
+  "Prompt: Remediation Techniques & How-To Guide": "Ensure heading tags (H1â€“H6) follow a sequence.; Fix broken heading order using accessibility checkers.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "Relevant for heading order",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Mixed heading levels with bookmarks"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4.5",
+  "Description": "Lists, tables, figures, and graphics",
+  "Overview and Requirements": "Establishes proper tagging of figures, tables, and lists. Apply tags like <Figure>, <L>, <LI>, <Table>. Verify with screen reader simulation.",
+  "Prompt: General Remediation Understanding": "How should lists, tables, and figures be tagged?; What are common errors in complex structure tagging?",
+  "Prompt: Remediation Techniques & How-To Guide": "Use List, Lbl, and LBody tags properly.; Label tables with <Table> and provide <TH>\/<TD>.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Figures nested inside tables"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4.6",
+  "Description": "Table structure and tagging",
+  "Overview and Requirements": "Specifies that tables must include headers (<TH>) associated with data cells. Tools: axesPDF, Adobe Acrobat, screen reader testing.",
+  "Prompt: General Remediation Understanding": "Explain proper table structure tagging per 14.8.4.6.; How are headers associated with data cells?",
+  "Prompt: Remediation Techniques & How-To Guide": "Tag tables with <Table>, <TR>, <TH>, and <TD>; Use scope or headers attributes properly.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "Essential for table order",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Tables with merged cells or nested tables"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4.7",
+  "Description": "Role mapping requirements",
+  "Overview and Requirements": "Mandates correct role mapping for custom tags to standard roles. Verify in structure tree's RoleMap entry.",
+  "Prompt: General Remediation Understanding": "What is role mapping in PDF tagging?; When do you use custom role maps?",
+  "Prompt: Remediation Techniques & How-To Guide": "Define custom role mappings using RoleMap dictionary.; Check mappings against standard roles.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Role conflicts in inherited tags"
+ },
+ {
+  "Type": "Tagging & Logical Structure",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.8.4.8",
+  "Description": "Structure tree constraints",
+  "Overview and Requirements": "Outlines constraints on how structure trees must be built—valid parents\/children, completeness. Validate with PAC or Acrobat Preflight.",
+  "Prompt: General Remediation Understanding": "What are structure tree constraints?; Why must the structure tree be hierarchical and logical?",
+  "Prompt: Remediation Techniques & How-To Guide": "Validate structure tree in PAC 2021.; Use Acrobat's Reading Order tool to correct nesting.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "N\/A",
+  "Prompt: Reading Order and Flow": "Important for structure logic",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Circular tree references"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.3.3",
+  "Description": "XMP metadata requirements",
+  "Overview and Requirements": "Requires XMP metadata embedded for document title, author, language. Tools: Acrobat's document properties, ExifTool.",
+  "Prompt: General Remediation Understanding": "What is XMP metadata?; How does it relate to accessibility metadata?",
+  "Prompt: Remediation Techniques & How-To Guide": "Add metadata using Acrobatâ€™s Document Properties.; Embed XMP using XML editors if needed.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Edit XMP in Acrobat",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Custom XMP schema extensions"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.3.3.1",
+  "Description": "Document information dictionary",
+  "Overview and Requirements": "Defines the document information dictionary including title, author, subject, and keywords. Required for consistent metadata handling and discoverability by assistive technologies and cataloging systems.",
+  "Prompt: General Remediation Understanding": "Explain document info dictionary fields.; How are they validated for conformance?",
+  "Prompt: Remediation Techniques & How-To Guide": "Use Acrobat's File > Properties > Description tab.; Fill Title, Author, Subject, Keywords.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Use Document Properties pane",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Corrupted or missing metadata entries"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.9.1",
+  "Description": "General metadata tagging",
+  "Overview and Requirements": "Mandates general tagging of metadata in a PDF for document-level accessibility; includes authoring details and creation\/modification timestamps.",
+  "Prompt: General Remediation Understanding": "What is general metadata tagging in PDF\/UA?; Why is standardized metadata important?",
+  "Prompt: Remediation Techniques & How-To Guide": "Tag metadata with correct property values.; Use Acrobat Pro Preflight > PDF\/UA profile.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Add <Metadata> tag",
+  "Prompt: Reading Order and Flow": "N\/A",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Multilingual content handling"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.9.2.2",
+  "Description": "Language specification for tagged text",
+  "Overview and Requirements": "Specifies how language attributes must be applied to tagged text to support proper pronunciation, translation, and processing by screen readers. Use lang attributes in tags (e.g., \/Lang).",
+  "Prompt: General Remediation Understanding": "Why must language be specified in tagged content?; How does it improve assistive tech support?",
+  "Prompt: Remediation Techniques & How-To Guide": "Set language tags using Acrobat's Tags pane.; Add Lang entry to the document root.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Set Lang attribute",
+  "Prompt: Reading Order and Flow": "Relevant for multilingual reading",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Inline language switches"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.9.3",
+  "Description": "Logical reading order",
+  "Overview and Requirements": "Describes logical reading order requirements; ensures content is presented in a sequence that aligns with intended user understanding. Verified using accessibility checkers and screen reader previews.",
+  "Prompt: General Remediation Understanding": "What does logical reading order entail?; Why is reading order a fundamental requirement?",
+  "Prompt: Remediation Techniques & How-To Guide": "Tag content in logical order using the Reading Order tool.; Validate with screen reader testing.",
+  "Prompt: Testing and Validation": "PAC 2021; Adobe Acrobat Preflight",
+  "Prompt: Tagging Structure and Semantics": "Use Tag pane in Acrobat; Validate role maps",
+  "Prompt: Connet-Specific Accessibility": "N\/A",
+  "Prompt: Metadata, Navigation, Document Settings": "Tag logical order via structure tree",
+  "Prompt: Reading Order and Flow": "Critical for screen reader flow",
+  "Prompt: Standards Crosswalks and Mapping": "Map to PDF\/UA-1; Compare to WCAG 1.3",
+  "Prompt: Tools-Specific Guidance": "Acrobat Pro DC; CommonLook; axesPDF",
+  "Prompt: Training, Checklists, and Best Practices": "Use Matterhorn Protocol; WCAG techniques",
+  "Prompt: Error Interpretation": "Refer to Aspose\/PAC error descriptions",
+  "Prompt: Advanced and Edge Cases": "Overlapping elements across tags"
+ },
+ {
+  "Type": "Metadata & Document Info",
+  "Standard": "ISO 32000-2",
+  "Clause": "14.9.4",
+  "Description": "Use of ActualText and alternate text for accessibility",
+  "Overview and Requirements": "Specifies use of \/ActualText and \/Alt text for non-textual elements, such as symbols and images, to improve comprehension for screen reader users."
+ },
+ {
+  "Type": "Annotations & Form Fields",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.5.6",
+  "Description": "Annotation dictionary requirements",
+  "Overview and Requirements": "Establishes structure and required keys for annotation dictionaries to ensure all annotations are programmatically and semantically interpretable."
+ },
+ {
+  "Type": "Annotations & Form Fields",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.5.6.20",
+  "Description": "Requirements for PrinterMark annotations",
+  "Overview and Requirements": "Outlines PrinterMark annotation rules, including exclusion from logical structure and ensuring they do not interfere with screen readers."
+ },
+ {
+  "Type": "Annotations & Form Fields",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.7.3",
+  "Description": "Requirements for interactive form fields",
+  "Overview and Requirements": "Defines technical specifications for interactive form fields, including tagging, form field naming, and roles for accessibility APIs."
+ },
+ {
+  "Type": "Annotations & Form Fields",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.7.4",
+  "Description": "Field types and appearance (e.g., Title, TU, T)",
+  "Overview and Requirements": "Covers form field types (e.g., text, checkboxes) and accessibility properties (e.g., Title, TU, T) to facilitate assistive technology interpretation."
+ },
+ {
+  "Type": "Annotations & Form Fields",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.7.4.3",
+  "Description": "DisplayDocTitle setting",
+  "Overview and Requirements": "Requires that \/DisplayDocTitle flag is set for screen readers to prioritize document title over filename in presentation."
+ },
+ {
+  "Type": "Fonts & Text",
+  "Standard": "ISO 32000-2",
+  "Clause": "9.6.6.4",
+  "Description": "CIDFont mapping and CMap compatibility",
+  "Overview and Requirements": "Ensures correct CIDFont and CMap mappings for Unicode text rendering and assistive technology compatibility."
+ },
+ {
+  "Type": "Fonts & Text",
+  "Standard": "ISO 32000-2",
+  "Clause": "9.6.6.5",
+  "Description": "Embedded font constraints",
+  "Overview and Requirements": "Embedded font constraints ensure fonts are fully embedded and accessible to assistive technologies. Tools: Adobe Acrobat Preflight, PAC 3."
+ },
+ {
+  "Type": "Fonts & Text",
+  "Standard": "ISO 32000-2",
+  "Clause": "9.7.6",
+  "Description": "Encoding and character mapping",
+  "Overview and Requirements": "Encoding and character mapping must ensure correct interpretation of glyphs. Use Unicode mappings. Tools: CommonLook PDF Validator."
+ },
+ {
+  "Type": "Fonts & Text",
+  "Standard": "ISO 32000-2",
+  "Clause": "9.7.8",
+  "Description": "Unicode and text extraction rules",
+  "Overview and Requirements": "Unicode and text extraction rules guide how text is extracted\/read. Ensure proper ToUnicode maps. Tools: PDF Accessibility Checker (PAC), Adobe Acrobat."
+ },
+ {
+  "Type": "Navigation",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.3.3.2",
+  "Description": "Outlines and bookmarks",
+  "Overview and Requirements": "Outlines and bookmarks must follow logical document structure. Include meaningful titles and hierarchy. Tools: Acrobat, axesPDF."
+ },
+ {
+  "Type": "Navigation",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.3.3.3",
+  "Description": "Page labels",
+  "Overview and Requirements": "Page labels must be correct and meaningful (e.g., Roman numerals for front matter). Tools: Adobe Acrobat, PDFix."
+ },
+ {
+  "Type": "Security",
+  "Standard": "ISO 32000-2",
+  "Clause": "7.6.3.2",
+  "Description": "Security settings and accessibility exceptions",
+  "Overview and Requirements": "Security settings must not block assistive tech. Avoid encryption that restricts screen readers. Tools: Acrobat Security settings."
+ },
+ {
+  "Type": "Security",
+  "Standard": "ISO 32000-2",
+  "Clause": "8.11.2",
+  "Description": "Optional content configuration (layers and visibility)",
+  "Overview and Requirements": "Optional content configuration (layers\/visibility) must not interfere with accessibility. Tools: PDF accessibility tools with layer views."
+ },
+ {
+  "Type": "Security",
+  "Standard": "ISO 32000-2",
+  "Clause": "8.11.4",
+  "Description": "AS key prohibitions (not allowed in PDF\/UA)",
+  "Overview and Requirements": "AS key (used for visibility control) is prohibited. Ensure it is not used. Tools: PDF Inspector tools."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": 7.11,
+  "Description": "File specification dictionary",
+  "Overview and Requirements": "File specification dictionary must include all required keys like 'UF', 'F', and 'Desc'. Tools: PAC 3, Acrobat Preflight."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": 12.8,
+  "Description": "Rich media and media clip data dictionary",
+  "Overview and Requirements": "Rich media data dictionary must be well-formed and accessible. Alt text and CT keys needed. Tools: Adobe Acrobat Pro."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.8.4.2",
+  "Description": "Alternate text and CT key in media content",
+  "Overview and Requirements": "Alternate text and CT key must be present for media content. Tools: Acrobat, axesPDF."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.8.4.3",
+  "Description": "Alt descriptions in media files",
+  "Overview and Requirements": "Alt descriptions required in media files for accessibility. Tools: CommonLook, PDFix."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.8.4.4",
+  "Description": "Content references and structure",
+  "Overview and Requirements": "Content references must be logically structured. Tools: Acrobat, PDF accessibility plugins."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.8.4.5",
+  "Description": "PrinterMark handling in structure",
+  "Overview and Requirements": "PrinterMark annotations must not appear in logical structure. Tools: PDF validators, PAC."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.8.5",
+  "Description": "File attachments accessibility requirements",
+  "Overview and Requirements": "File attachments must be tagged with proper metadata and descriptions. Tools: PAC 3, Adobe Acrobat."
+ },
+ {
+  "Type": "Embedded Files, Rich Media, and Digital Signatures",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.7.3",
+  "Description": "Digital signature field format and tagging",
+  "Overview and Requirements": "Digital signature fields must be tagged correctly and named appropriately. Tools: Adobe Acrobat."
+ },
+ {
+  "Type": "Prohibited Content",
+  "Standard": "ISO 32000-2",
+  "Clause": 7.15,
+  "Description": "Dynamic XFA forms",
+  "Overview and Requirements": "Dynamic XFA forms are not allowed. Use static tagged PDF forms instead. Tools: Convert XFA to standard forms."
+ },
+ {
+  "Type": "Prohibited Content",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.6.4.5",
+  "Description": "JavaScript actions (need careful review)",
+  "Overview and Requirements": "JavaScript must be reviewed for accessibility and security implications. Avoid if not needed. Tools: PDF editors."
+ },
+ {
+  "Type": "Prohibited Content",
+  "Standard": "ISO 32000-2",
+  "Clause": "12.6.3",
+  "Description": "GoTo\/Launch actions not properly tagged",
+  "Overview and Requirements": "GoTo\/Launch actions must be properly tagged or avoided. Tools: Acrobat action inspector."
+ },
+ {
+  "Type": "General",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 1,
+  "Description": "Scope of PDF\/UA standard requirements",
+  "Overview and Requirements": "Defines the scope of PDF\/UA-1, outlining requirements for universally accessible PDF content. Establishes that the document is intended to ensure reliable access for users of assistive technology. It applies to both authors creating compliant documents and tools processing them, ensuring content is machine-readable and semantically meaningful."
+ },
+ {
+  "Type": "General",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 2,
+  "Description": "Normative references (ISO 32000-1)",
+  "Overview and Requirements": "References ISO 32000-1 as the foundational technical specification for PDF structure and behavior. This clause links the accessibility standards to the core PDF format standard, ensuring that all conformance builds on established PDF behaviors and object models."
+ },
+ {
+  "Type": "General",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 3,
+  "Description": "Terms and definitions for accessibility concepts",
+  "Overview and Requirements": "Presents standardized terms and definitions used throughout the document to support consistent interpretation. Key terms such as 'tagged PDF', 'assistive technology', 'structure elements', and 'alternate text' are clarified, which is essential for implementers."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.1,
+  "Description": "General conformance requirements",
+  "Overview and Requirements": "Establishes that a conforming file must meet all the requirements listed in subsequent clauses and must include a PDF\/UA identifier in its metadata. Also mandates the use of tagged PDF structure and prohibits inaccessible content. Tools: PAC 2021, CommonLook, Adobe Acrobat Pro Preflight."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.2,
+  "Description": "Tagged PDF conformance requirements",
+  "Overview and Requirements": "Requires that PDF documents use a properly structured tag tree with standard structure types. Artifacts must be properly excluded. All content must be within the structure tree. Tools: PDFix SDK, axesPDF."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.3,
+  "Description": "Constraints on use of structure elements",
+  "Overview and Requirements": "Limits use of custom or undefined structure types unless mapped correctly using a RoleMap dictionary. Ensures consistent semantics and interpretable document structure for assistive technologies."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.4,
+  "Description": "Use of annotations in accessible documents",
+  "Overview and Requirements": "Annotations must be tagged and include alternate descriptions. Annotations should be navigable and not disrupt the reading order. Validation using screen readers and PAC tool recommended."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.5,
+  "Description": "Use of actions and restrictions",
+  "Overview and Requirements": "Interactive features like JavaScript and named actions must not interfere with accessibility. Prohibits actions that disrupt navigation. Advises against timed responses or complex interactive scripts without alternatives."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.6,
+  "Description": "Font embedding and usage rules",
+  "Overview and Requirements": "Fonts must be embedded and Unicode-compliant to ensure accurate text extraction and pronunciation by assistive technologies. Tools: Acrobat Preflight font checks, Callas pdfToolbox."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.7,
+  "Description": "Color and contrast considerations",
+  "Overview and Requirements": "Ensures color and contrast support for visual clarity. Requires text and graphics to meet WCAG 2.0 Level AA contrast ratios. Tools: Colour Contrast Analyser, axe Accessibility."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.8,
+  "Description": "Interactive form accessibility",
+  "Overview and Requirements": "Interactive forms must be tagged, have labels, tooltips, and use logical navigation order. Requires field metadata and avoids script-dependent input. Testing with assistive technologies recommended."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.9,
+  "Description": "Metadata and document identification",
+  "Overview and Requirements": "Requires metadata fields such as Title, Author, Language, and PDF\/UA identifier. Ensures document discoverability and accurate rendering. Set via XMP metadata or tools like Acrobat or pdfaPilot."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.1,
+  "Description": "Optional content and XObjects usage",
+  "Overview and Requirements": "Optional content and XObjects must be marked as artifacts if not tagged. Prohibits content that affects logical structure or reading order. Tools: PAC 2021 artifact checker."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.11,
+  "Description": "Logical reading order and navigation",
+  "Overview and Requirements": "Reading order must match visual layout and be semantically accurate. Structure tree must reflect logical flow of content. Testing using screen readers (NVDA, JAWS) and manual tag inspection is required."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.12,
+  "Description": "Security and rights management for accessibility",
+  "Overview and Requirements": "Content must not be encrypted in ways that restrict screen readers. Security settings must allow content extraction. Validation via Acrobat security settings or Preflight tools."
+ },
+ {
+  "Type": "Conformance",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 4.13,
+  "Description": "Script and multimedia considerations",
+  "Overview and Requirements": "Multimedia elements must include captions and audio descriptions. Scripts must not inhibit accessibility or automatic navigation. Tools: Able Player, YouTube with captions, Acrobat video annotation."
+ },
+ {
+  "Type": "Document",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 5,
+  "Description": "Document-level accessibility requirements including metadata",
+  "Overview and Requirements": "Outlines high-level requirements that documents must meet to be declared conforming PDF\/UA. Includes tagged content, logical structure, metadata presence, and use of standard structure types. Enforced by validators like PAC 2021 or axesPDF."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.1,
+  "Description": "Structure types such as P, H, L, Table, etc.",
+  "Overview and Requirements": "This clause mandates the use of appropriate structure types (e.g., <P>, <H>, <L>, <Table>) to represent semantic meaning in PDF content. These tags must accurately reflect the nature of the content to assist screen readers. Tools such as Adobe Acrobat Pro, CommonLook PDF, and PAC 2021 can verify correct structure tagging. Authors should ensure tags are applied during authoring or remediation in compliance with the ISO structure model."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.2,
+  "Description": "Nesting and logical structure rules",
+  "Overview and Requirements": "Content elements must follow a correct nesting hierarchy. For example, headings must not be nested within paragraphs, and list items must be within list tags. The logical structure tree must mirror the visual and reading order. Use the Tags panel in Adobe Acrobat or accessibility checkers to verify proper nesting."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.3,
+  "Description": "Usage of standard structure types",
+  "Overview and Requirements": "All structural elements used in the PDF must be from the standard structure type set defined by ISO 32000-1. Custom types must be mapped via RoleMap to standard types. Use PDF accessibility validation tools like PAC 2021 to detect non-standard or unmapped roles."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.4,
+  "Description": "Associating table headers with data cells",
+  "Overview and Requirements": "Header cells must be correctly associated with data cells using <TH> tags and appropriate attributes such as 'Scope' or 'Headers'. This helps assistive technologies convey tabular relationships. Use Adobe Acrobat’s Table Inspector and screen reader simulators to confirm associations."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.5,
+  "Description": "Notes and references handling",
+  "Overview and Requirements": "Notes must be tagged using <Note> and provided with unique IDs when referenced. Reference links should clearly point to corresponding notes to preserve document clarity and accessibility. Use structure trees and ID checking tools to ensure references are valid."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.6,
+  "Description": "Text alternatives for non-text content",
+  "Overview and Requirements": "All non-text content (e.g., images, charts) must have meaningful alternative text via \/Alt attributes. Decorative items must be marked as artifacts. Use Acrobat’s Set Alternate Text tool or CommonLook Validator to ensure compliance."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.7,
+  "Description": "Lists and labels requirements",
+  "Overview and Requirements": "Lists must be structured using <L>, <LI>, <Lbl>, and <LBody> elements. Proper labeling improves navigation and comprehension for screen reader users. Use Acrobat Pro’s tag tree or automated testing tools to verify structural integrity."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.8,
+  "Description": "Annotation structure and properties",
+  "Overview and Requirements": "Annotations must include necessary metadata (e.g., Alt text) and be placed in appropriate tag containers. Avoid untagged or incorrectly structured annotations. Use tools that inspect PDF object properties for validation."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.9,
+  "Description": "Multimedia handling and accessibility",
+  "Overview and Requirements": "Multimedia elements must have synchronized alternatives such as captions and transcripts. Ensure proper tagging and artifact exclusion for assistive compatibility. Use accessibility tools like Able Player and multimedia validators to test playback accessibility."
+ },
+ {
+  "Type": "Structure",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 6.1,
+  "Description": "Navigation elements and links",
+  "Overview and Requirements": "Navigation elements such as bookmarks and links must be descriptive and correctly tagged. Use \/Link structure elements with appropriate \/Alt text or tooltips. Test with screen readers for usability."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.1,
+  "Description": "Structure tree and role map",
+  "Overview and Requirements": "The PDF must contain a complete structure tree representing document semantics. RoleMap entries must map custom tags to standard roles. Tools like PAC 2021 and Acrobat’s Tags panel are essential for inspection and validation."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.2,
+  "Description": "Page content tagging",
+  "Overview and Requirements": "All page content must be within the tag tree. Unmarked content should be remediated using tagging tools. Verify with accessibility checkers and the Order and Tags pane in Acrobat."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.3,
+  "Description": "Association of elements to content items",
+  "Overview and Requirements": "Elements in the structure tree must be associated with content items such as marked content sequences or object references. This ensures that content is tagged and interpretable by assistive technologies. Use Acrobat's Content panel or CommonLook PDF validator to verify proper associations."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.4,
+  "Description": "Artifacts usage in tagged PDF",
+  "Overview and Requirements": "Artifacts must be marked so they are ignored by assistive technologies (e.g., decorative lines, headers). Use tools like PAC 2021 or CommonLook to verify that artifacts are correctly flagged with \/Artifact."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.5,
+  "Description": "Specifying natural language for content",
+  "Overview and Requirements": "All text elements must have a natural language (lang) attribute to aid pronunciation and interpretation. Assign language using the document properties in Acrobat or set lang attributes at the tag level for multilingual documents."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.6,
+  "Description": "Text alternatives for accessibility",
+  "Overview and Requirements": "Non-text content (e.g., images) must include text alternatives. Use tags such as \/Alt to provide descriptions. Tools like CommonLook, axesPDF, or Equidox can assist in identifying missing alt text."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.7,
+  "Description": "Unicode mapping of text content",
+  "Overview and Requirements": "Text must be mappable to Unicode for accurate interpretation. Ensure fonts have valid Unicode maps and verify using callas pdfGoHTML or the PDF Accessibility Checker (PAC 2021)."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.8,
+  "Description": "Fonts and glyph mapping rules",
+  "Overview and Requirements": "Fonts and glyphs must support text extraction. Embedding fonts is required, and mappings must support search and copy functions. Check font embedding and glyph integrity using Adobe Preflight or callas pdfToolbox."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.9,
+  "Description": "ActualText and ExpansionText usage",
+  "Overview and Requirements": "ActualText and ExpansionText attributes provide accessible alternatives for abbreviated or symbolic content. Use tagging tools to include \/ActualText for screen readers. Validate with PAC 2021 or Adobe Acrobat's accessibility checker."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.1,
+  "Description": "Table tagging and relationships",
+  "Overview and Requirements": "Tables must be properly tagged with Table, TR, TH, and TD elements, and relationships between header and data cells must be explicit. Use Acrobat Pro or axesPDF for table tag remediation."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.11,
+  "Description": "Form fields and dynamic XFA handling",
+  "Overview and Requirements": "All form fields must be tagged, have tooltips, and be included in the structure tree. XFA forms are not allowed. Use Acrobat's Prepare Form tool and verify with CommonLook PDF validator."
+ },
+ {
+  "Type": "Tagged PDF",
+  "Standard": "ISO 14289-1:2014",
+  "Clause": 7.12,
+  "Description": "Handling of embedded content",
+  "Overview and Requirements": "Embedded content such as multimedia or file attachments must be tagged appropriately and provide text alternatives. Use structure elements such as \/Figure or \/Object with \/Alt or \/ActualText attributes."
+ }
+],
+"Prompt Taxonomy":[
+ {
+  "Prompt Type": "General Remediation Understanding",
+  "Description": "Prompts that seek high-level clarification or conceptual guidance on ISO clauses, accessibility rules, or terminology."
+ },
+ {
+  "Prompt Type": "Remediation Techniques & How-To Guidance",
+  "Description": "Prompts that ask for specific steps, fixes, or approaches to resolve accessibility issues flagged in tools or audits."
+ },
+ {
+  "Prompt Type": "Testing and Validation",
+  "Description": "Prompts focused on checking compliance, using accessibility testing tools, or validating content against PDF\/UA conformance."
+ },
+ {
+  "Prompt Type": "Tagging Structure and Semantics",
+  "Description": "Prompts that address structural tagging, proper element use, nesting, and semantic mapping."
+ },
+ {
+  "Prompt Type": "Content-Specific Accessibility",
+  "Description": "Prompts about specific types of content—like text, images, forms, media, tables, or links—and how to make them accessible."
+ },
+ {
+  "Prompt Type": "Metadata, Navigation, and Document Settings",
+  "Description": "Prompts that address document-level elements such as metadata, document titles, bookmarks, outlines, and security settings."
+ },
+ {
+  "Prompt Type": "Reading Order and Flow",
+  "Description": "Prompts that deal specifically with logical reading order, tab order, visual vs. semantic structure, and user navigation."
+ },
+ {
+  "Prompt Type": "Standards Crosswalks and Mapping",
+  "Description": "Prompts that request mappings between Aspose errors, ISO clauses, WCAG checkpoints, and remediation actions."
+ },
+ {
+  "Prompt Type": "Tool-Specific Guidance",
+  "Description": "Prompts focused on using popular remediation or testing tools (e.g., Adobe Acrobat, CommonLook, axesPDF, PAC 2021, ABBYY)."
+ },
+ {
+  "Prompt Type": "Training, Checklists, and Best Practices",
+  "Description": "Prompts designed to generate training content, cheat sheets, QA checklists, or job aids for teams and auditors."
+ },
+ {
+  "Prompt Type": "Error Interpretation",
+  "Description": "Prompts to interpret compliance test error messages from tools like Aspose, PAC, Adobe Preflight, and PDF Accessibility Checker."
+ },
+ {
+  "Prompt Type": "Internationalization and Language",
+  "Description": "Prompts concerning multilingual content, language declarations, and international accessibility compliance."
+ }
+]
+}

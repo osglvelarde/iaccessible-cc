@@ -1,5 +1,5 @@
 export type ModuleKey =
-    | "dashboard" | "dataQuery" | "webpageScan" | "pdfScan"
+    | "dashboard" | "dataQuery" | "webpageScan" | "waveScan" | "pdfScan"
     | "sitemap" | "scanMonitor" | "scansScheduler" | "intake" | "manualTesting"
     | "pdfRemediation" | "guidelines" | "supportBot" | "settings" | "usersRoles";
 
@@ -25,6 +25,7 @@ const rows: Row[] = [
 
     // Scanning Tools
     ["webpageScan", "Webpage Scan", "Run instant ad-hoc scans on any webpage for accessibility, readability, SEO, and GEO compliance.", "NEXT_PUBLIC_WEBSCAN_URL", "/scan/ad-hoc", "/scan/ad-hoc"],
+    ["waveScan", "WAVE Webpage Scan", "Run WAVE (Web Accessibility Evaluation) scans on any webpage for comprehensive accessibility analysis.", "NEXT_PUBLIC_WAVESCAN_URL", "/scan/wave", "/scan/wave"],
     ["pdfScan", "PDF Accessibility Scan", "Upload and scan a single PDF against WCAG + PDF/UA standards.", "NEXT_PUBLIC_PDFSCAN_URL", "/scan/pdf", "/scan/pdf"],
     ["sitemap", "Sitemap Generator", "Crawl an entire site, generate a sitemap, visualize structure, and export XML/CSV/JSON.", "NEXT_PUBLIC_SITEMAP_URL", "/scan/sitemap", "/scan/sitemap"],
     ["scanMonitor", "Scans Monitor", "Track scan status: In-progress, Scheduled, Completed, Failed. Shows progress bars, logs, and badge counters.", "NEXT_PUBLIC_SCANMON_URL", "https://apps.example.gov/scans", "/scans"],
@@ -55,7 +56,7 @@ export const MODULE_GROUPS: ModuleGroup[] = [
     },
     {
         title: "Scanning Tools",
-        modules: allModules.filter(m => ["webpageScan", "pdfScan", "sitemap", "scanMonitor", "scansScheduler"].includes(m.key))
+        modules: allModules.filter(m => ["webpageScan", "waveScan", "pdfScan", "sitemap", "scanMonitor", "scansScheduler"].includes(m.key))
     },
     {
         title: "Workflows",

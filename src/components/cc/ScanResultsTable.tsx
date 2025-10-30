@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -128,49 +128,61 @@ export default function ScanResultsTable({ issues, className }: ScanResultsTable
             </thead>
             <tbody>
               {issues.map((issue) => (
-                <tr key={issue.id} className="border-b hover:bg-muted/50 transition-colors">
-                  <td className="py-3 px-4">
-                    <Badge variant="outline" className={getTypeColor(issue.type)}>
-                      {issue.type}
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge className={cn("flex items-center gap-1 w-fit", getSeverityColor(issue.severity))}>
-                      {getSeverityIcon(issue.severity)}
-                      {issue.severity}
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-4 max-w-xs">
-                    <div className="truncate">{issue.description}</div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <code className="text-sm bg-muted px-2 py-1 rounded font-mono">
-                      {issue.location}
-                    </code>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => toggleRow(issue.id)}
-                          >
-                            {expandedRows.has(issue.id) ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{expandedRows.has(issue.id) ? "Hide details" : "Show details"}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </td>
-                </tr>
+                <Fragment key={issue.id}>
+                  <tr className="border-b hover:bg-muted/50 transition-colors">
+                    <td className="py-3 px-4">
+                      <Badge variant="outline" className={getTypeColor(issue.type)}>
+                        {issue.type}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Badge className={cn("flex items-center gap-1 w-fit", getSeverityColor(issue.severity))}>
+                        {getSeverityIcon(issue.severity)}
+                        {issue.severity}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4 max-w-xs">
+                      <div className="truncate">{issue.description}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <code className="text-sm bg-muted px-2 py-1 rounded font-mono">
+                        {issue.location}
+                      </code>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => toggleRow(issue.id)}
+                            >
+                              {expandedRows.has(issue.id) ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{expandedRows.has(issue.id) ? "Hide details" : "Show details"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedRows.has(issue.id) && (
+                    <tr key={`${issue.id}-details`} className="border-b bg-muted/30">
+                      <td colSpan={5} className="py-3 px-4">
+                        <div className="animate-in fade-in-0 slide-in-from-top-2">
+                          <p className="text-sm text-muted-foreground font-medium mb-1">Details:</p>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{issue.details}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>
