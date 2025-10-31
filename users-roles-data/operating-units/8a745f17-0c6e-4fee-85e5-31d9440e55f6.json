@@ -1,0 +1,13 @@
+{
+  "id": "8a745f17-0c6e-4fee-85e5-31d9440e55f6",
+  "organizationId": "org-1",
+  "name": "Test Digital Services",
+  "organization": "Test Department",
+  "domains": [
+    "tech.gov",
+    "digital.gov"
+  ],
+  "description": "Test operating unit for sync",
+  "createdAt": "2025-10-30T16:00:39.048Z",
+  "updatedAt": "2025-10-30T16:00:39.048Z"
+}
