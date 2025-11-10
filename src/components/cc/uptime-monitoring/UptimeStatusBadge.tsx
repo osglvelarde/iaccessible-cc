@@ -18,6 +18,13 @@ export function UptimeStatusBadge({
 }: UptimeStatusBadgeProps) {
   const getStatusConfig = () => {
     switch (status) {
+      case 0: // Down
+        return {
+          label: "Down",
+          icon: XCircle,
+          variant: "destructive" as const,
+          className: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+        };
       case 1: // Up
         return {
           label: "Up",
@@ -25,14 +32,7 @@ export function UptimeStatusBadge({
           variant: "default" as const,
           className: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
         };
-      case 2: // Down
-        return {
-          label: "Down",
-          icon: XCircle,
-          variant: "destructive" as const,
-          className: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
-        };
-      case 0: // Unknown/Pending
+      case 2: // Pending
       default:
         return {
           label: "Pending",
@@ -60,4 +60,7 @@ export function UptimeStatusBadge({
     </Badge>
   );
 }
+
+
+
 

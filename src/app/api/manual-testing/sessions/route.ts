@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       const fileContent = await fs.readFile(filePath, 'utf-8');
       const session: TestSession = JSON.parse(fileContent);
       return NextResponse.json(session);
-    } catch (fileError) {
+    } catch {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
   } catch (error) {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Get all test sessions
-export async function PUT(request: NextRequest) {
+export async function PUT() {
   try {
     await ensureDirectories();
     
@@ -112,12 +112,12 @@ export async function DELETE(request: NextRequest) {
       // Delete evidence directory if it exists
       try {
         await fs.rmdir(evidenceDir, { recursive: true });
-      } catch (evidenceError) {
+      } catch {
         // Evidence directory might not exist, that's okay
       }
       
       return NextResponse.json({ success: true });
-    } catch (fileError) {
+    } catch {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
   } catch (error) {

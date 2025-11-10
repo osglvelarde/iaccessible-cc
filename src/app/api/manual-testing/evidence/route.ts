@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       }));
       
       return NextResponse.json(evidenceFiles);
-    } catch (error) {
+    } catch {
       // Directory doesn't exist, return empty array
       return NextResponse.json([]);
     }
@@ -103,7 +103,7 @@ export async function DELETE(request: NextRequest) {
     try {
       await fs.unlink(filePath);
       return NextResponse.json({ success: true });
-    } catch (fileError) {
+    } catch {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
   } catch (error) {

@@ -13,7 +13,7 @@ const getApiBase = () => {
     : 'http://localhost:3000/api/uptime-kuma';
 };
 
-export type UptimeStatus = 0 | 1 | 2; // 0 = unknown, 1 = up, 2 = down
+export type UptimeStatus = 0 | 1 | 2; // 0 = down, 1 = up, 2 = pending
 
 export interface UptimeKumaHeartbeat {
   monitorID: number;
@@ -45,6 +45,22 @@ export interface UptimeKumaStatusSummary {
   upMonitors?: number;
   downMonitors?: number;
   pendingMonitors?: number;
+}
+
+/**
+ * Monitor heartbeat/beat data from Uptime Kuma
+ * Based on get_monitor_beats() API response
+ */
+export interface MonitorBeat {
+  id: number;
+  monitor_id: number;
+  status: UptimeStatus;
+  ping: number; // Response time in milliseconds
+  msg: string; // Status message
+  time: string; // Timestamp string (e.g., '2022-12-15 12:38:42.661')
+  duration: number; // Duration since last heartbeat in seconds
+  important: boolean; // Whether this is an important heartbeat
+  down_count: number; // Count of consecutive down events
 }
 
 async function handleApiResponse<T>(response: Response): Promise<T> {
@@ -281,7 +297,7 @@ export async function createMonitor(data: {
       name: data.name,
       url: data.url,
       type: data.type as any,
-      status: 0, // Pending
+      status: 2, // Pending
     };
   } catch (error) {
     // Re-throw if it's already an Error
@@ -380,6 +396,88 @@ export async function deleteMonitor(id: number): Promise<void> {
       throw error;
     }
     throw new Error(`Failed to delete monitor: ${String(error)}`);
+  }
+}
+
+/**
+ * Get monitor beats (heartbeat history) for a specific monitor
+ * Uses Python script to fetch data via Socket.io
+ * @param monitorId Monitor ID
+ * @param hours Number of hours of history to fetch (default: 1 for last hour)
+ * @returns Array of MonitorBeat objects
+ */
+export async function getMonitorBeats(monitorId: number, hours: number = 1): Promise<MonitorBeat[]> {
+  try {
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+    let result: any;
+    try {
+      const response = await fetch(`${getApiBase()}/monitor-beats?id=${monitorId}&hours=${hours}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+        throw new Error(errorData.error || `Failed to fetch monitor beats: ${response.statusText}`);
+      }
+
+      result = await response.json();
+      if (result.success === false) {
+        throw new Error(result.error || 'Failed to fetch monitor beats');
+      }
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Request timed out. Please check if Uptime Kuma is running and accessible.');
+      }
+      throw fetchError;
+    }
+
+    // Parse and normalize the beats data
+    // Handle MonitorStatus enum objects from Python (they have .value property)
+    const beats: MonitorBeat[] = (result.beats || []).map((beat: any) => {
+      // Extract status value - handle both enum objects and raw numbers
+      let statusValue: number;
+      if (beat.status && typeof beat.status === 'object' && 'value' in beat.status) {
+        // Python MonitorStatus enum object
+        statusValue = beat.status.value;
+      } else if (typeof beat.status === 'number') {
+        statusValue = beat.status;
+      } else {
+        // Default to pending if unknown
+        statusValue = 2;
+      }
+      
+      // Normalize status: 0 = down, 1 = up, 2 = pending
+      const normalizedStatus = statusValue === 1 ? 1 : statusValue === 0 ? 0 : 2;
+      
+      return {
+        id: beat.id,
+        monitor_id: beat.monitor_id || beat.monitorID,
+        status: normalizedStatus,
+        ping: beat.ping || 0,
+        msg: beat.msg || '',
+        time: beat.time || '',
+        duration: beat.duration || 0,
+        important: beat.important || false,
+        down_count: beat.down_count || 0,
+      };
+    });
+
+    return beats;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(`Failed to get monitor beats: ${String(error)}`);
   }
 }
 

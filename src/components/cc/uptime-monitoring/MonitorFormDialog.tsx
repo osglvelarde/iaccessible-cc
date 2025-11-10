@@ -21,7 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Save, Loader2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Save, Loader2, HelpCircle } from "lucide-react";
 import { UptimeKumaMonitor } from "@/lib/uptime-kuma-api";
 
 export interface MonitorFormData {
@@ -129,7 +134,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               <h3 className="font-semibold text-lg">General</h3>
               
               <div className="space-y-2">
-                <Label htmlFor="type">Monitor Type</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="type">Monitor Type</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Select the protocol type for monitoring: HTTP/HTTPS for websites, TCP for ports, Ping for network connectivity, DNS for domain resolution</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Select
                   value={formData.type}
                   onValueChange={(value: any) =>
@@ -150,7 +165,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name">Friendly Name</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="name">Friendly Name</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>A descriptive name to identify this monitor in the dashboard (e.g., "Production API", "Main Website")</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="name"
                   value={formData.name}
@@ -163,7 +188,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="url">URL</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="url">URL</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The full URL or endpoint to monitor (e.g., https://example.com or https://api.example.com/health)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="url"
                   type="url"
@@ -177,9 +212,19 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="heartbeatInterval">
-                  Heartbeat Interval (Check every {formData.heartbeatInterval} seconds)
-                </Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="heartbeatInterval">
+                    Heartbeat Interval (Check every {formData.heartbeatInterval} seconds)
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>How often to check the monitor status. Minimum 10 seconds. Lower intervals provide more frequent updates but increase server load.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="heartbeatInterval"
                   type="number"
@@ -199,7 +244,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="retries">Retries</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="retries">Retries</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of retry attempts before marking the monitor as down. Helps avoid false positives from temporary network issues.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="retries"
                   type="number"
@@ -218,9 +273,19 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="heartbeatRetryInterval">
-                  Heartbeat Retry Interval (Retry every {formData.heartbeatRetryInterval} seconds)
-                </Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="heartbeatRetryInterval">
+                    Heartbeat Retry Interval (Retry every {formData.heartbeatRetryInterval} seconds)
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Time to wait between retry attempts when a check fails. Used when retries are enabled.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="heartbeatRetryInterval"
                   type="number"
@@ -236,9 +301,19 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="requestTimeout">
-                  Request Timeout (Timeout after {formData.requestTimeout} seconds)
-                </Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="requestTimeout">
+                    Request Timeout (Timeout after {formData.requestTimeout} seconds)
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Maximum time to wait for a response before considering the request failed. Prevents hanging on slow or unresponsive endpoints.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id="requestTimeout"
                   type="number"
@@ -259,7 +334,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               <h3 className="font-semibold text-lg">HTTP Options</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="httpMethod">Method</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="httpMethod">Method</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>HTTP method to use for the request. GET is most common for health checks. POST/PUT/PATCH may require a request body.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Select
                   value={formData.httpMethod}
                   onValueChange={(value) =>
@@ -281,7 +366,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bodyEncoding">Body Encoding</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="bodyEncoding">Body Encoding</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Format of the request body. JSON for API requests, Text for plain text, XML for XML data, Form-Data for multipart forms.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Select
                   value={formData.bodyEncoding}
                   onValueChange={(value) =>
@@ -301,7 +396,17 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="body">Body</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="body">Body</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Request body content for POST/PUT/PATCH requests. Format should match the selected Body Encoding (JSON, Text, XML, or Form-Data).</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Textarea
                   id="body"
                   value={formData.body}

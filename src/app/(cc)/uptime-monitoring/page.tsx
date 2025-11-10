@@ -34,9 +34,13 @@ export default function UptimeMonitoringPage() {
   const [editingMonitor, setEditingMonitor] = useState<UptimeKumaMonitor | null>(null);
 
   // Load monitors
-  const loadMonitors = useCallback(async () => {
+  const loadMonitors = useCallback(async (preserveData = false) => {
     try {
       setError(null);
+      // Don't set loading to true if we're preserving data (e.g., after adding a monitor)
+      if (!preserveData) {
+        setLoading(true);
+      }
       const data = await getMonitors();
       setMonitors(data);
     } catch (err) {
@@ -55,6 +59,15 @@ export default function UptimeMonitoringPage() {
   // Initial load
   useEffect(() => {
     loadMonitors();
+  }, [loadMonitors]);
+
+  // Auto-refresh monitors every 30 seconds to keep data fresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadMonitors(true); // Preserve data during auto-refresh
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
   }, [loadMonitors]);
 
   // Handle refresh
@@ -106,11 +119,12 @@ export default function UptimeMonitoringPage() {
   });
 
   // Calculate stats
+  // Status mapping: 0 = down, 1 = up, 2 = pending
   const stats = {
     total: monitors.length,
     up: monitors.filter((m) => m.status === 1).length,
-    down: monitors.filter((m) => m.status === 2).length,
-    pending: monitors.filter((m) => m.status === 0).length,
+    down: monitors.filter((m) => m.status === 0).length,
+    pending: monitors.filter((m) => m.status === 2).length,
   };
 
   return (
@@ -220,10 +234,29 @@ export default function UptimeMonitoringPage() {
                       } else {
                         await createMonitor(data);
                       }
-                      // Wait a moment for Uptime Kuma to process the change, then refresh
-                      await new Promise(resolve => setTimeout(resolve, 1000));
-                      await loadMonitors();
                       setEditingMonitor(null);
+                      
+                      // Refresh monitors with retries to ensure new monitor appears
+                      // Uptime Kuma may need a moment to process and include in metrics
+                      const maxRetries = 3;
+                      let retryCount = 0;
+                      let success = false;
+                      
+                      while (retryCount < maxRetries && !success) {
+                        await new Promise(resolve => setTimeout(resolve, 1500 * (retryCount + 1)));
+                        try {
+                          await loadMonitors(true); // Preserve existing data during refresh
+                          // Check if we got more monitors (for new monitor) or if update succeeded
+                          success = true;
+                        } catch (err) {
+                          retryCount++;
+                          if (retryCount >= maxRetries) {
+                            console.error("Failed to refresh monitors after retries:", err);
+                            // Still show success message even if refresh failed
+                            // The next manual refresh or auto-refresh will pick it up
+                          }
+                        }
+                      }
                     } catch (error) {
                       console.error("Failed to save monitor:", error);
                       alert(error instanceof Error ? error.message : "Failed to save monitor");
@@ -259,25 +292,37 @@ export default function UptimeMonitoringPage() {
                   variant={statusFilter === 1 ? "default" : "outline"}
                   size="sm"
                   onClick={() => setStatusFilter(1)}
-                  className="text-green-600 hover:text-green-600"
+                  className={
+                    statusFilter === 1
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "text-green-600 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                  }
                 >
                   <CheckCircle2 className="h-4 w-4 mr-1" />
                   Up
                 </Button>
                 <Button
-                  variant={statusFilter === 2 ? "default" : "outline"}
+                  variant={statusFilter === 0 ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter(2)}
-                  className="text-red-600 hover:text-red-600"
+                  onClick={() => setStatusFilter(0)}
+                  className={
+                    statusFilter === 0
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "text-red-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                  }
                 >
                   <XCircle className="h-4 w-4 mr-1" />
                   Down
                 </Button>
                 <Button
-                  variant={statusFilter === 0 ? "default" : "outline"}
+                  variant={statusFilter === 2 ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setStatusFilter(0)}
-                  className="text-yellow-600 hover:text-yellow-600"
+                  onClick={() => setStatusFilter(2)}
+                  className={
+                    statusFilter === 2
+                      ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                      : "text-yellow-600 hover:text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950"
+                  }
                 >
                   <AlertCircle className="h-4 w-4 mr-1" />
                   Pending
@@ -367,10 +412,11 @@ export default function UptimeMonitoringPage() {
             onSave={async (data: MonitorFormData) => {
               try {
                 await updateMonitor(editingMonitor.id, data as any);
-                // Wait a moment for Uptime Kuma to process the change, then refresh
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                await loadMonitors();
                 setEditingMonitor(null);
+                
+                // Refresh monitors after update
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                await loadMonitors(true); // Preserve existing data during refresh
               } catch (error) {
                 console.error("Failed to update monitor:", error);
                 alert(error instanceof Error ? error.message : "Failed to update monitor");

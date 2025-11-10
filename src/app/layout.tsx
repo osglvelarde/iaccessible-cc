@@ -35,6 +35,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Suppress React DevTools message in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (typeof window !== 'undefined') {
+                  const originalConsoleLog = console.log;
+                  console.log = function(...args) {
+                    if (args[0] && typeof args[0] === 'string' && args[0].includes('Download the React DevTools')) {
+                      return; // Suppress React DevTools message
+                    }
+                    originalConsoleLog.apply(console, args);
+                  };
+                }
+              `,
+            }}
+          />
+        )}
+      </head>
       <body
         className={`${plusJakartaSans.variable} ${lora.variable} ${ibmPlexMono.variable} antialiased`}
       >
