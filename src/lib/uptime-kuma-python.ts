@@ -93,17 +93,37 @@ export async function validatePythonEnvironment(): Promise<boolean> {
 
 /**
  * Gets the Python command to use (python or python3)
+ * On Render, Python is typically available as python3
  */
 async function getPythonCommand(): Promise<string> {
   return new Promise((resolve) => {
-    const pythonProcess = spawn('python', ['--version'], { shell: true });
+    // Try python3 first (common on Linux/Render)
+    const python3Process = spawn('python3', ['--version'], { shell: true });
     
-    pythonProcess.on('close', (code) => {
-      resolve(code === 0 ? 'python' : 'python3');
+    python3Process.on('close', (code) => {
+      if (code === 0) {
+        resolve('python3');
+      } else {
+        // Fallback to python
+        const pythonProcess = spawn('python', ['--version'], { shell: true });
+        pythonProcess.on('close', (code2) => {
+          resolve(code2 === 0 ? 'python' : 'python3'); // Default to python3 if both fail
+        });
+        pythonProcess.on('error', () => {
+          resolve('python3');
+        });
+      }
     });
     
-    pythonProcess.on('error', () => {
-      resolve('python3');
+    python3Process.on('error', () => {
+      // Try python as fallback
+      const pythonProcess = spawn('python', ['--version'], { shell: true });
+      pythonProcess.on('close', (code) => {
+        resolve(code === 0 ? 'python' : 'python3');
+      });
+      pythonProcess.on('error', () => {
+        resolve('python3');
+      });
     });
   });
 }

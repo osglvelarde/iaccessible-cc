@@ -1,0 +1,53 @@
+# Render ignore file - files/directories to exclude from deployment
+
+# Development files
+node_modules/
+.next/
+.turbo/
+*.log
+.DS_Store
+
+# Environment files (use Render environment variables instead)
+.env
+.env.local
+.env.*.local
+
+# Test files
+tests/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation (optional - can be included)
+# *.md
+# README*.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Local data (will be on persistent disk)
+# users-roles-data/  # Keep this - data will be on disk
+# scanner-results/   # Keep this - data will be on disk
+
+# Docker (not needed for Render deployment)
+docker/
+docker-compose.yml
+Dockerfile
+
+# Vercel (not needed for Render)
+vercel.json
+.vercel/
+

@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build:standard": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "python3 -m pip install -r requirements.txt 2>/dev/null || pip3 install -r requirements.txt 2>/dev/null || echo 'Python dependencies installation skipped (Python may not be available)'"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",

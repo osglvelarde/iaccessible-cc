@@ -1,0 +1,36 @@
+services:
+  # Main Next.js Web Service
+  - type: web
+    name: iaccessible-cc
+    env: node
+    region: oregon  # Change to your preferred region
+    plan: starter  # $7/month - includes persistent disk
+    buildCommand: |
+      # Install Python dependencies first (Render has Python 3.9+ available)
+      python3 -m pip install --user -r requirements.txt || pip3 install --user -r requirements.txt || echo "Warning: Python dependencies may not have installed"
+      # Install Node.js dependencies
+      pnpm install
+      # Build Next.js app (using standard build for better Render compatibility)
+      npm run build:standard || npm run build
+    startCommand: npm start
+    envVars:
+      # Uptime Kuma Configuration (Render Deployment)
+      - key: UPTIME_KUMA_API_URL
+        value: https://uptime-monitoring-tool.onrender.com
+      - key: UPTIME_KUMA_USERNAME
+        value: iaccessible-admin
+      - key: UPTIME_KUMA_PASSWORD
+        sync: false  # Set this manually in Render dashboard for security
+      - key: UPTIME_KUMA_API_KEY
+        value: uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb
+      # Node Environment
+      - key: NODE_ENV
+        value: production
+      # Next.js Configuration
+      - key: NEXT_PUBLIC_APP_URL
+        generateValue: true  # Will be set to the service URL automatically
+    # Persistent disk for file-based storage (users-roles-data, scanner-results, etc.)
+    # Note: Disk must be created separately in Render Dashboard and linked to this service
+    # Mount path will be configured when linking the disk
+    # Recommended mount path: /opt/render/project/src/users-roles-data
+
