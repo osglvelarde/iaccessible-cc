@@ -3,8 +3,16 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 
-export async function GET(request: NextRequest) {
-  const info: any = {
+interface DebugInfo {
+  timestamp: string;
+  paths: Record<string, string>;
+  python: Record<string, unknown>;
+  filesystem: Record<string, unknown>;
+  error?: string;
+}
+
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  const info: DebugInfo = {
     timestamp: new Date().toISOString(),
     paths: {},
     python: {},
@@ -31,25 +39,28 @@ export async function GET(request: NextRequest) {
       // List contents
       try {
         const contents = await fs.readdir(info.paths.pythonPackagesPath);
-        info.filesystem['.python-packages'].contents = contents.slice(0, 20); // First 20 items
-        info.filesystem['.python-packages'].count = contents.length;
+        const pythonPackagesInfo = info.filesystem['.python-packages'] as Record<string, unknown>;
+        pythonPackagesInfo.contents = contents.slice(0, 20); // First 20 items
+        pythonPackagesInfo.count = contents.length;
         
         // Check for uptime_kuma_api specifically
         const uptimeKumaPath = path.join(info.paths.pythonPackagesPath, 'uptime_kuma_api');
         try {
           const uptimeStats = await fs.stat(uptimeKumaPath);
-          info.filesystem['.python-packages'].hasUptimeKumaApi = true;
-          info.filesystem['.python-packages'].uptimeKumaApiIsDir = uptimeStats.isDirectory();
+          pythonPackagesInfo.hasUptimeKumaApi = true;
+          pythonPackagesInfo.uptimeKumaApiIsDir = uptimeStats.isDirectory();
         } catch {
-          info.filesystem['.python-packages'].hasUptimeKumaApi = false;
+          pythonPackagesInfo.hasUptimeKumaApi = false;
         }
-      } catch (err: any) {
-        info.filesystem['.python-packages'].readError = err.message;
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        (info.filesystem['.python-packages'] as Record<string, unknown>).readError = errorMessage;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       info.filesystem['.python-packages'] = {
         exists: false,
-        error: err.message,
+        error: errorMessage,
       };
     }
 
@@ -61,16 +72,17 @@ export async function GET(request: NextRequest) {
         isDirectory: scriptsStats.isDirectory(),
       };
       const scriptFiles = await fs.readdir(info.paths.scriptsPath);
-      info.filesystem.scripts.files = scriptFiles;
-    } catch (err: any) {
+      (info.filesystem.scripts as Record<string, unknown>).files = scriptFiles;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       info.filesystem.scripts = {
         exists: false,
-        error: err.message,
+        error: errorMessage,
       };
     }
 
     // Check Python availability and version
-    return new Promise((resolve) => {
+    return new Promise<NextResponse>((resolve) => {
       const pythonProcess = spawn('python3', ['--version'], { shell: true });
       let pythonVersion = '';
       let pythonError = '';
@@ -131,8 +143,8 @@ export async function GET(request: NextRequest) {
         resolve(NextResponse.json(info, { status: 200 }));
       });
     });
-  } catch (error: any) {
-    info.error = error.message;
+  } catch (error: unknown) {
+    info.error = error instanceof Error ? error.message : String(error);
     return NextResponse.json(info, { status: 200 });
   }
 }
