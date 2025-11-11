@@ -180,8 +180,12 @@ Monitor the service logs in Render Dashboard:
 - Verify `requirements.txt` is valid
 
 **Issue:** "Module not found" for uptime-kuma-api
-- **Solution:** Check build logs - Python dependencies should install during build
-- May need to add Python installation to build command explicitly
+- **Solution:** 
+  - Check build logs - Python dependencies should install during build (system-wide, without `--user` flag)
+  - A runtime check script (`scripts/check-python-deps.sh`) automatically installs packages if missing at startup
+  - Check service startup logs for Python dependency installation messages
+  - Verify `PYTHONPATH` environment variable is set correctly in Render dashboard
+  - If issue persists, manually trigger a redeploy to ensure packages are installed
 
 ### File Storage Issues
 
