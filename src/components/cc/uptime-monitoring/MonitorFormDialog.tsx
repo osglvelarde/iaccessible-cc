@@ -172,7 +172,7 @@ export function MonitorFormDialog({ monitor, onSave, children }: MonitorFormDial
                       <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>A descriptive name to identify this monitor in the dashboard (e.g., "Production API", "Main Website")</p>
+                      <p>A descriptive name to identify this monitor in the dashboard (e.g., &quot;Production API&quot;, &quot;Main Website&quot;)</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>

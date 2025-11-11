@@ -13,7 +13,9 @@ import { join } from 'path';
 if (typeof process !== 'undefined' && !process.env.UPTIME_KUMA_API_URL) {
   try {
     // Try to load .env.local explicitly (only if not already loaded)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fs = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const path = require('path');
     const envPath = path.join(process.cwd(), '.env.local');
     if (fs.existsSync(envPath)) {
@@ -50,6 +52,8 @@ export interface PythonScriptResult {
   monitorID?: number;
   message?: string;
   error?: string;
+  beats?: any[]; // For get_monitor_beats script
+  [key: string]: any; // Allow additional properties for different script results
 }
 
 /**
