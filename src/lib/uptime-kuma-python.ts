@@ -159,8 +159,17 @@ export async function executePythonScript(
     console.log(`[executePythonScript] Spawning Python process: ${pythonCmd} ${scriptPath}`);
     
     // Ensure Uptime Kuma environment variables are explicitly passed
+    // Also ensure PYTHONPATH includes the .python-packages directory (for Render deployment)
+    const pythonPackagesPath = join(process.cwd(), '.python-packages');
+    const existingPythonPath = process.env.PYTHONPATH || '';
+    const pythonPath = existingPythonPath 
+      ? `${pythonPackagesPath}:${existingPythonPath}`
+      : pythonPackagesPath;
+    
     const env = {
       ...process.env,
+      // Set PYTHONPATH to include project packages directory
+      PYTHONPATH: pythonPath,
       // Explicitly pass Uptime Kuma credentials to ensure they're available
       UPTIME_KUMA_API_URL: process.env.UPTIME_KUMA_API_URL || 'http://localhost:3003',
       UPTIME_KUMA_USERNAME: process.env.UPTIME_KUMA_USERNAME || 'admin',
@@ -175,6 +184,7 @@ export async function executePythonScript(
       UPTIME_KUMA_USERNAME: env.UPTIME_KUMA_USERNAME,
       UPTIME_KUMA_PASSWORD: env.UPTIME_KUMA_PASSWORD ? `*** (${passwordLength} chars)` : '(not set)',
       UPTIME_KUMA_API_KEY: env.UPTIME_KUMA_API_KEY ? `*** (${env.UPTIME_KUMA_API_KEY.length} chars)` : '(not set)',
+      PYTHONPATH: env.PYTHONPATH,
     });
     console.log(`[executePythonScript] Raw process.env check:`, {
       has_UPTIME_KUMA_API_URL: !!process.env.UPTIME_KUMA_API_URL,

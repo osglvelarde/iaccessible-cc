@@ -43,3 +43,6 @@ next-env.d.ts
 # scanner service results
 scanner-results/*.json
 !scanner-results/.gitkeep
+
+# Python packages (installed during build on Render)
+.python-packages/

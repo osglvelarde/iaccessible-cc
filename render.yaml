@@ -6,18 +6,25 @@ services:
     region: oregon  # Change to your preferred region
     plan: starter  # $7/month - includes persistent disk
     buildCommand: |
-      # Install Python dependencies first (Render has Python 3.9+ available)
-      # Install system-wide (without --user) so packages are available at runtime
-      python3 -m pip install -r requirements.txt || pip3 install -r requirements.txt || echo "Warning: Python dependencies may not have installed"
+      # Install Python dependencies to project directory (persists to runtime)
+      mkdir -p .python-packages
+      python3 -m pip install --target .python-packages -r requirements.txt || pip3 install --target .python-packages -r requirements.txt || echo "Warning: Python dependencies may not have installed"
       # Verify installation
-      python3 -m pip list | grep uptime-kuma-api || echo "Warning: uptime-kuma-api not found in pip list"
+      python3 -m pip list --path .python-packages | grep uptime-kuma-api || echo "Warning: uptime-kuma-api not found"
       # Install Node.js dependencies
       pnpm install
       # Build Next.js app (using standard build for better Render compatibility)
       npm run build:standard || npm run build
     startCommand: |
-      # Check and install Python dependencies if needed (runtime fallback)
-      bash scripts/check-python-deps.sh || echo "Python dependency check skipped"
+      # Set PYTHONPATH to include project packages directory
+      export PYTHONPATH="${PYTHONPATH}:$(pwd)/.python-packages"
+      # Verify Python packages are available
+      python3 -c "import sys; sys.path.insert(0, '$(pwd)/.python-packages'); import uptime_kuma_api; print('uptime-kuma-api found')" 2>/dev/null || echo "Warning: uptime-kuma-api not found, attempting install..."
+      # Fallback: install if not found
+      if ! python3 -c "import sys; sys.path.insert(0, '$(pwd)/.python-packages'); import uptime_kuma_api" 2>/dev/null; then
+        echo "Installing Python dependencies at runtime..."
+        python3 -m pip install --target .python-packages -r requirements.txt || pip3 install --target .python-packages -r requirements.txt
+      fi
       # Start Next.js application
       npm start
     envVars:
@@ -36,9 +43,9 @@ services:
       # Next.js Configuration
       - key: NEXT_PUBLIC_APP_URL
         generateValue: true  # Will be set to the service URL automatically
-      # Python Configuration
+      # Python Configuration - will be set in startCommand
       - key: PYTHONPATH
-        value: /opt/render/project/src:/usr/local/lib/python3.9/site-packages:/usr/lib/python3.9/site-packages
+        value: /opt/render/project/src/.python-packages:/opt/render/project/src:/usr/local/lib/python3.9/site-packages:/usr/lib/python3.9/site-packages
     # Persistent disk for file-based storage (users-roles-data, scanner-results, etc.)
     # Note: Disk must be created separately in Render Dashboard and linked to this service
     # Mount path will be configured when linking the disk
