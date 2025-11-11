@@ -68,17 +68,46 @@ export function useHeartbeats({
           } else if (data.type === 'heartbeat') {
             const heartbeat: HeartbeatEvent = data.data;
             
+            console.log(`[useHeartbeats] Received heartbeat for monitor ${monitorId}:`, {
+              monitorID: heartbeat.monitorID,
+              status: heartbeat.status,
+              ping: heartbeat.ping,
+              time: heartbeat.time,
+            });
+            
             // Update latest heartbeat
             setLatestHeartbeat(heartbeat);
+
+            // Parse time - handle different formats
+            let parsedTime: string;
+            try {
+              // Try parsing the time string
+              const timeStr = heartbeat.time || new Date().toISOString();
+              // Handle format like '2025-11-10 17:35:46.179' by converting to ISO format
+              if (typeof timeStr === 'string' && timeStr.includes(' ') && !timeStr.includes('T')) {
+                // Convert 'YYYY-MM-DD HH:mm:ss.SSS' to ISO format
+                parsedTime = timeStr.replace(' ', 'T') + 'Z';
+              } else {
+                parsedTime = timeStr;
+              }
+              // Validate the date
+              const testDate = new Date(parsedTime);
+              if (isNaN(testDate.getTime())) {
+                // If parsing failed, use current time
+                parsedTime = new Date().toISOString();
+              }
+            } catch {
+              parsedTime = new Date().toISOString();
+            }
 
             // Convert to MonitorBeat format and add to array
             const beat: MonitorBeat = {
               id: heartbeat.monitorID * 1000000 + Date.now(), // Generate unique ID
               monitor_id: heartbeat.monitorID,
               status: heartbeat.status as 0 | 1 | 2,
-              ping: heartbeat.ping || 0,
+              ping: heartbeat.ping !== undefined && heartbeat.ping !== null ? heartbeat.ping : 0,
               msg: heartbeat.msg || '',
-              time: heartbeat.time || new Date().toISOString(),
+              time: parsedTime,
               duration: heartbeat.duration || 0,
               important: heartbeat.important || false,
               down_count: heartbeat.down_count || 0,
@@ -91,12 +120,35 @@ export function useHeartbeats({
               
               // Filter out old heartbeats and add new one
               const filtered = prev.filter((h) => {
-                const beatTime = new Date(h.time).getTime();
-                return beatTime > oneHourAgo;
+                try {
+                  const beatTime = new Date(h.time).getTime();
+                  return beatTime > oneHourAgo && !isNaN(beatTime);
+                } catch {
+                  return false;
+                }
               });
 
+              // Check if this heartbeat already exists (deduplicate by time)
+              const beatTime = new Date(beat.time).getTime();
+              const isDuplicate = filtered.some((h) => {
+                try {
+                  const hTime = new Date(h.time).getTime();
+                  // Consider it a duplicate if within 1 second
+                  return Math.abs(hTime - beatTime) < 1000;
+                } catch {
+                  return false;
+                }
+              });
+
+              if (isDuplicate) {
+                console.log(`[useHeartbeats] Skipping duplicate heartbeat for monitor ${monitorId} at ${beat.time}`);
+                return filtered;
+              }
+
               // Add new heartbeat at the beginning
-              return [beat, ...filtered].slice(0, 100); // Keep max 100 beats
+              const updated = [beat, ...filtered].slice(0, 100); // Keep max 100 beats
+              console.log(`[useHeartbeats] Monitor ${monitorId} now has ${updated.length} heartbeats in array (added new, filtered ${prev.length - filtered.length} old)`);
+              return updated;
             });
 
             // Call optional callback
@@ -104,7 +156,10 @@ export function useHeartbeats({
               onHeartbeat(heartbeat);
             }
           } else if (data.type === 'status') {
-            setIsConnected(data.status?.connected || false);
+            // Handle status update - data.status is an object with connected/authenticated
+            if (data.status && typeof data.status === 'object') {
+              setIsConnected(data.status.connected || false);
+            }
           } else if (data.type === 'error') {
             setError(data.error || 'Unknown error');
             setIsConnected(false);
@@ -117,15 +172,19 @@ export function useHeartbeats({
       };
 
       eventSource.onerror = (error) => {
-        console.error(`[useHeartbeats] SSE error for monitor ${monitorId}:`, error);
-        setIsConnected(false);
-        
-        // Attempt to reconnect after a delay
+        // Only log if it's a real error (not just connection state changes)
+        // EventSource fires onerror for various reasons, including normal reconnections
         if (eventSource.readyState === EventSource.CLOSED) {
+          // Connection is closed - attempt to reconnect
+          setIsConnected(false);
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, 5000);
+        } else if (eventSource.readyState === EventSource.CONNECTING) {
+          // Still connecting - this is normal, don't log as error
+          setIsConnected(false);
         }
+        // EventSource.CONNECTED state doesn't trigger onerror, so we don't need to handle it
       };
 
       eventSourceRef.current = eventSource;

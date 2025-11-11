@@ -409,11 +409,18 @@ export async function deleteMonitor(id: number): Promise<void> {
 export async function getMonitorBeats(monitorId: number, hours: number = 1): Promise<MonitorBeat[]> {
   try {
     // Create an AbortController for timeout
+    // Python script has 60s timeout, so we need at least 65s to allow for processing overhead
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      console.warn(`[getMonitorBeats] Request timeout for monitor ${monitorId} after 65 seconds`);
+    }, 65000); // 65 second timeout (5s buffer after Python's 60s timeout)
 
     let result: any;
     try {
+      console.log(`[getMonitorBeats] Fetching beats for monitor ${monitorId} (${hours} hour(s))`);
+      const startTime = Date.now();
+      
       const response = await fetch(`${getApiBase()}/monitor-beats?id=${monitorId}&hours=${hours}`, {
         method: 'GET',
         headers: {
@@ -422,22 +429,33 @@ export async function getMonitorBeats(monitorId: number, hours: number = 1): Pro
         signal: controller.signal,
       });
 
+      const duration = Date.now() - startTime;
       clearTimeout(timeoutId);
+      console.log(`[getMonitorBeats] Received response for monitor ${monitorId} in ${duration}ms`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: response.statusText }));
-        throw new Error(errorData.error || `Failed to fetch monitor beats: ${response.statusText}`);
+        const errorMsg = errorData.error || `Failed to fetch monitor beats: ${response.statusText}`;
+        console.error(`[getMonitorBeats] Error response for monitor ${monitorId}:`, errorMsg);
+        throw new Error(errorMsg);
       }
 
       result = await response.json();
       if (result.success === false) {
-        throw new Error(result.error || 'Failed to fetch monitor beats');
+        const errorMsg = result.error || 'Failed to fetch monitor beats';
+        console.error(`[getMonitorBeats] Script returned error for monitor ${monitorId}:`, errorMsg);
+        throw new Error(errorMsg);
       }
+      
+      console.log(`[getMonitorBeats] Successfully fetched ${result.beats?.length || 0} beats for monitor ${monitorId}`);
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
       if (fetchError.name === 'AbortError') {
-        throw new Error('Request timed out. Please check if Uptime Kuma is running and accessible.');
+        const errorMsg = `Request timed out after 65 seconds. The Python script may be taking longer than expected to connect to Uptime Kuma. This is normal if Uptime Kuma is slow to respond. Real-time heartbeats will still work. Please check if Uptime Kuma is running and accessible at ${process.env.UPTIME_KUMA_API_URL || 'http://localhost:3003'}`;
+        console.error(`[getMonitorBeats] Timeout for monitor ${monitorId}:`, errorMsg);
+        throw new Error(errorMsg);
       }
+      console.error(`[getMonitorBeats] Fetch error for monitor ${monitorId}:`, fetchError);
       throw fetchError;
     }
 

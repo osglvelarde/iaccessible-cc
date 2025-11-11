@@ -23,8 +23,14 @@ export async function GET(request: NextRequest) {
       hours: parseInt(hours),
     };
 
+    console.log(`[monitor-beats] Executing Python script for monitor ${monitorId}, hours: ${hours}`);
+    const startTime = Date.now();
+    
     // Execute Python script to get monitor beats
     const result = await executePythonScript('get_monitor_beats', scriptData);
+    
+    const duration = Date.now() - startTime;
+    console.log(`[monitor-beats] Python script completed for monitor ${monitorId} in ${duration}ms`);
 
     if (result.success) {
       return NextResponse.json({

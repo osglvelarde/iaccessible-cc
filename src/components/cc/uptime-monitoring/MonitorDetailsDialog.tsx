@@ -124,6 +124,16 @@ export function MonitorDetailsDialog({
     return index === self.findIndex((b) => b.id === beat.id || (b.time === beat.time && b.monitor_id === beat.monitor_id));
   });
 
+  // Debug logging
+  useEffect(() => {
+    if (open && monitor) {
+      console.log(`[MonitorDetailsDialog] Monitor ${monitor.id} - Initial beats: ${initialBeats.length}, Real-time heartbeats: ${heartbeats.length}, All beats: ${allBeats.length}`);
+      if (allBeats.length > 0) {
+        console.log(`[MonitorDetailsDialog] Sample beat:`, allBeats[0]);
+      }
+    }
+  }, [open, monitor, initialBeats.length, heartbeats.length, allBeats.length]);
+
   if (!monitor) return null;
 
   const formatResponseTime = (ms?: number) => {
@@ -377,23 +387,43 @@ export function MonitorDetailsDialog({
 
           {/* Heartbeat History Chart */}
           <div>
+            {/* Connection Status Indicator - Only show when connected */}
+            {isConnected && (
+              <div className="mb-4 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span>
+                    Connected to Uptime Kuma ({heartbeats.length} real-time heartbeats)
+                  </span>
+                </div>
+                {latestHeartbeat && (
+                  <span className="text-xs text-muted-foreground">
+                    Last heartbeat: {format(new Date(latestHeartbeat.time), "HH:mm:ss")}
+                  </span>
+                )}
+              </div>
+            )}
+
             {loadingBeats && (
               <Card>
                 <CardContent className="flex items-center justify-center py-12">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <span className="ml-2 text-sm text-muted-foreground">Loading heartbeat data...</span>
+                  <span className="ml-2 text-sm text-muted-foreground">Loading historical heartbeat data...</span>
                 </CardContent>
               </Card>
             )}
             {beatsError && (
               <Card>
-                <CardContent className="flex items-center gap-2 py-4 text-red-600 dark:text-red-400">
+                <CardContent className="flex items-center gap-2 py-4 text-yellow-600 dark:text-yellow-400">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="text-sm">{beatsError}</span>
+                  <span className="text-sm">
+                    Historical data unavailable: {beatsError}. 
+                    {isConnected && heartbeats.length > 0 && ' Real-time heartbeats are working.'}
+                  </span>
                 </CardContent>
               </Card>
             )}
-            {!loadingBeats && !beatsError && (
+            {!loadingBeats && (
               <>
                 <HeartbeatChart beats={allBeats} />
                 {allBeats.length > 0 && (
@@ -409,19 +439,35 @@ export function MonitorDetailsDialog({
                       {allBeats.length > 0 && (
                         <Badge variant="secondary" className="ml-2">
                           {allBeats.length} beats
+                          {initialBeats.length > 0 && (
+                            <span className="ml-1 text-xs">({initialBeats.length} historical, {heartbeats.length} real-time)</span>
+                          )}
                         </Badge>
                       )}
                     </Button>
                   </div>
                 )}
+                {allBeats.length === 0 && !beatsError && (
+                  <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-12 gap-2">
+                      <AlertCircle className="h-8 w-8 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">No heartbeat data available</p>
+                      {!isConnected && (
+                        <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                          Waiting for connection to Uptime Kuma...
+                        </p>
+                      )}
+                      {isConnected && heartbeats.length === 0 && (
+                        <p className="text-xs text-muted-foreground">
+                          Waiting for heartbeat events from Uptime Kuma...
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </>
             )}
-            {heartbeatError && (
-              <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-2 flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" />
-                Real-time updates unavailable: {heartbeatError}
-              </div>
-            )}
+            {/* Removed heartbeat error display - errors are handled silently */}
           </div>
 
           {/* Detailed Heartbeat History Table */}

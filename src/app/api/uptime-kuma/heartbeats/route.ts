@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
         });
 
         // Send initial connection status
-        const status = uptimeKumaSocket.getConnectionStatus();
         sendMessage({
           type: 'status',
           monitorId,

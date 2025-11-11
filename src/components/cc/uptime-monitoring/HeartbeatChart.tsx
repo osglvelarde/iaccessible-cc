@@ -36,26 +36,65 @@ export function HeartbeatChart({ beats, className }: HeartbeatChartProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Debug logging
+  useEffect(() => {
+    console.log(`[HeartbeatChart] Received ${beats?.length || 0} beats`);
+    if (beats && beats.length > 0) {
+      console.log(`[HeartbeatChart] Sample beat:`, beats[0]);
+    }
+  }, [beats]);
+
   // Transform beats data for chart
   const chartData = useMemo(() => {
     if (!beats || beats.length === 0) {
+      console.log('[HeartbeatChart] No beats provided');
       return [];
     }
 
-    // Sort by time (oldest first)
-    const sortedBeats = [...beats].sort((a, b) => {
-      const timeA = new Date(a.time).getTime();
-      const timeB = new Date(b.time).getTime();
-      return timeA - timeB;
-    });
+    console.log(`[HeartbeatChart] Processing ${beats.length} beats`);
+
+    // Sort by time (oldest first) with proper error handling
+    const sortedBeats = [...beats]
+      .map((beat) => {
+        // Parse time - handle different formats
+        let parsedTime: Date;
+        try {
+          const timeStr = beat.time || new Date().toISOString();
+          // Handle format like '2025-11-10 17:35:46.179' by converting to ISO format
+          let isoTime = timeStr;
+          if (typeof timeStr === 'string' && timeStr.includes(' ') && !timeStr.includes('T')) {
+            // Convert 'YYYY-MM-DD HH:mm:ss.SSS' to ISO format
+            isoTime = timeStr.replace(' ', 'T') + 'Z';
+          }
+          parsedTime = new Date(isoTime);
+          if (isNaN(parsedTime.getTime())) {
+            console.warn(`[HeartbeatChart] Invalid date parsed, using current time. Original: ${timeStr}, ISO: ${isoTime}`);
+            parsedTime = new Date();
+          }
+        } catch (error) {
+          console.error(`[HeartbeatChart] Error parsing time: ${beat.time}`, error);
+          parsedTime = new Date();
+        }
+        return { ...beat, parsedTime };
+      })
+      .filter((beat) => {
+        const isValid = !isNaN(beat.parsedTime.getTime());
+        if (!isValid) {
+          console.warn(`[HeartbeatChart] Filtered out invalid beat:`, beat);
+        }
+        return isValid;
+      })
+      .sort((a, b) => a.parsedTime.getTime() - b.parsedTime.getTime());
+
+    console.log(`[HeartbeatChart] After processing: ${sortedBeats.length} valid beats`);
 
     // Transform to chart format
     return sortedBeats.map((beat) => {
-      const timestamp = new Date(beat.time);
+      const timestamp = beat.parsedTime;
       return {
         time: format(timestamp, "HH:mm:ss"),
         timestamp: timestamp.getTime(),
-        responseTime: beat.ping,
+        responseTime: beat.ping !== undefined && beat.ping !== null ? beat.ping : 0,
         status: beat.status,
         statusLabel: beat.status === 1 ? "Up" : beat.status === 0 ? "Down" : "Pending",
         message: beat.msg || "",

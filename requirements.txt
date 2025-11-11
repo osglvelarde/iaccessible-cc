@@ -1,6 +1,7 @@
 # Uptime Kuma API Python Wrapper
 # Used for reliable Socket.io integration with Uptime Kuma
-uptime-kuma-api>=1.0.0
+# Updated to latest version to support conditions field
+uptime-kuma-api>=1.23.0
 
 
 

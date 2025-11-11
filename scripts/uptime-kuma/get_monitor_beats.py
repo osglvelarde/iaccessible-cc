@@ -50,6 +50,11 @@ def main():
         username = os.getenv('UPTIME_KUMA_USERNAME', 'admin')
         password = os.getenv('UPTIME_KUMA_PASSWORD', 'admin123')
         
+        # Debug logging (mask password)
+        print(f"[get_monitor_beats] Connecting to: {api_url}", file=sys.stderr)
+        print(f"[get_monitor_beats] Username: {username}", file=sys.stderr)
+        print(f"[get_monitor_beats] Password: {'***' if password else '(not set)'}", file=sys.stderr)
+        
         # Connect to Uptime Kuma
         with UptimeKumaApi(api_url) as api:
             # Authenticate using username/password

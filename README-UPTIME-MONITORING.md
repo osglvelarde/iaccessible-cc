@@ -15,10 +15,25 @@ The Uptime Monitoring Tool integrates Uptime Kuma (a self-hosted monitoring solu
 
 ### Prerequisites
 
-- Docker installed and running
 - Node.js and npm installed
 - Python 3.7+ installed (required for uptime-kuma-api wrapper)
-- Uptime Kuma running on port 3003 (configurable)
+- Uptime Kuma deployed on Render (or locally with Docker)
+
+### Production Setup (Render Deployment)
+
+Uptime Kuma is deployed on Render at: **https://uptime-monitoring-tool.onrender.com/**
+
+**Credentials:**
+- Username: `iaccessible-admin`
+- Password: `iAccessible-Granite-Field-47*`
+- API Key: `uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb`
+
+**Internal Network Address (for Render services in same region):**
+- `uptime-monitoring-tool:3001` (for internal communication)
+
+### Local Development Setup (Docker)
+
+If you need to run Uptime Kuma locally for development:
 
 ### 1. Start Uptime Kuma with Docker
 
@@ -78,10 +93,27 @@ pip install uptime-kuma-api
 
 ### 4. Configure Environment Variables
 
-Add the following to your `.env.local` file:
+#### Production (Render Deployment)
+
+Add the following to your `.env.local` file (or Render environment variables):
 
 ```env
-# Uptime Kuma Configuration
+# Uptime Kuma Configuration (Render Deployment)
+UPTIME_KUMA_API_URL=https://uptime-monitoring-tool.onrender.com
+UPTIME_KUMA_USERNAME=iaccessible-admin
+UPTIME_KUMA_PASSWORD=iAccessible-Granite-Field-47*
+UPTIME_KUMA_API_KEY=uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb
+
+# Optional: For production deployments
+NEXT_PUBLIC_APP_URL=https://your-app-url.com
+```
+
+#### Local Development (Docker)
+
+For local development with Docker:
+
+```env
+# Uptime Kuma Configuration (Local Docker)
 UPTIME_KUMA_API_URL=http://localhost:3003
 UPTIME_KUMA_USERNAME=admin
 UPTIME_KUMA_PASSWORD=admin123
@@ -89,11 +121,13 @@ UPTIME_KUMA_PASSWORD=admin123
 # Optional: API Key authentication (alternative to username/password)
 UPTIME_KUMA_API_KEY=uk1_your_api_key_here
 
-# Optional: For production deployments
+# Optional: For local development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-**Note:** The Python scripts will use either `UPTIME_KUMA_USERNAME`/`UPTIME_KUMA_PASSWORD` or `UPTIME_KUMA_API_KEY` for authentication. If both are provided, username/password takes precedence.
+**Note:** 
+- The Python scripts will use either `UPTIME_KUMA_USERNAME`/`UPTIME_KUMA_PASSWORD` or `UPTIME_KUMA_API_KEY` for authentication. If both are provided, username/password takes precedence.
+- For Render services in the same region, you can use the internal address `uptime-monitoring-tool:3001` instead of the public URL for better performance (but HTTPS is required for Socket.io, so use the public URL).
 
 ### 5. Start the Next.js Application
 
@@ -225,6 +259,14 @@ interface SyncResult {
 
 ### Uptime Kuma Settings
 
+#### Production (Render)
+- **URL**: https://uptime-monitoring-tool.onrender.com
+- **Internal Address**: `uptime-monitoring-tool:3001` (for Render services in same region)
+- **Authentication**: API Key-based (Basic Auth for `/metrics`, Bearer for others)
+- **Data Storage**: Render persistent disk mounted at `/app/data`
+- **Metrics Format**: Prometheus-compatible
+
+#### Local Development (Docker)
 - **Port**: 3003 (configurable via `UPTIME_KUMA_API_URL`)
 - **Authentication**: API Key-based (Basic Auth for `/metrics`, Bearer for others)
 - **Data Storage**: Docker volume `uptime-kuma` (persists across restarts)
@@ -242,8 +284,18 @@ interface SyncResult {
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `UPTIME_KUMA_API_URL` | Uptime Kuma API base URL | `http://localhost:3003` | Yes |
-| `UPTIME_KUMA_API_KEY` | API key for authentication | - | Yes |
+| `UPTIME_KUMA_USERNAME` | Username for authentication | `admin` | Yes* |
+| `UPTIME_KUMA_PASSWORD` | Password for authentication | `admin123` | Yes* |
+| `UPTIME_KUMA_API_KEY` | API key for authentication | - | Yes* |
 | `NEXT_PUBLIC_APP_URL` | App URL for server-side requests | `http://localhost:3000` | No |
+
+\* Either username/password OR API key is required. Username/password takes precedence if both are provided.
+
+**Production Values (Render):**
+- `UPTIME_KUMA_API_URL=https://uptime-monitoring-tool.onrender.com`
+- `UPTIME_KUMA_USERNAME=iaccessible-admin`
+- `UPTIME_KUMA_PASSWORD=iAccessible-Granite-Field-47*`
+- `UPTIME_KUMA_API_KEY=uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb`
 
 ## Usage
 
@@ -283,6 +335,24 @@ The dashboard displays:
 
 ### Testing the Integration
 
+#### Production (Render)
+
+```bash
+# 1. Test Uptime Kuma metrics endpoint
+curl -u ":uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb" https://uptime-monitoring-tool.onrender.com/metrics
+
+# 2. Test Next.js API proxy
+curl https://your-app-url.com/api/uptime-kuma/metrics
+
+# 3. Test sync endpoint
+curl -X POST https://your-app-url.com/api/uptime-kuma/sync
+
+# 4. Test sync status (what would be synced)
+curl https://your-app-url.com/api/uptime-kuma/sync
+```
+
+#### Local Development
+
 ```bash
 # 1. Test Uptime Kuma metrics endpoint
 curl -u ":YOUR_API_KEY" http://localhost:3003/metrics
@@ -301,6 +371,20 @@ curl http://localhost:3000/api/uptime-kuma/sync
 
 For testing purposes, create monitors manually in Uptime Kuma:
 
+#### Production (Render)
+1. Access Uptime Kuma UI: https://uptime-monitoring-tool.onrender.com
+2. Login with:
+   - Username: `iaccessible-admin`
+   - Password: `iAccessible-Granite-Field-47*`
+3. Click **"Add New Monitor"**
+4. Fill in:
+   - **Name**: Test Monitor
+   - **Type**: HTTP(s) - Keyword
+   - **URL**: `https://example.com`
+   - **Keyword**: (optional)
+5. Click **"Save"**
+
+#### Local Development
 1. Access Uptime Kuma UI: `http://localhost:3003`
 2. Click **"Add New Monitor"**
 3. Fill in:
@@ -312,6 +396,13 @@ For testing purposes, create monitors manually in Uptime Kuma:
 
 ### Viewing Metrics
 
+#### Production (Render)
+Metrics are available in Prometheus format at:
+```
+https://uptime-monitoring-tool.onrender.com/metrics
+```
+
+#### Local Development
 Metrics are available in Prometheus format at:
 ```
 http://localhost:3003/metrics
@@ -351,10 +442,15 @@ monitor_response_time{monitor_id="1"} 234.5
 **Symptoms:** Dashboard shows error message
 
 **Solutions:**
-- Verify Uptime Kuma is running: `docker ps | grep uptime-kuma`
-- Check API URL in `.env.local` matches Uptime Kuma port
-- Test direct connection: `curl http://localhost:3003/metrics`
-- Verify API key is correct in `.env.local`
+- **Production (Render):** 
+  - Verify Uptime Kuma is accessible: `curl https://uptime-monitoring-tool.onrender.com/metrics`
+  - Check API URL in `.env.local` is set to `https://uptime-monitoring-tool.onrender.com`
+  - Verify API key is correct: `uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb`
+- **Local Development:**
+  - Verify Uptime Kuma is running: `docker ps | grep uptime-kuma`
+  - Check API URL in `.env.local` matches Uptime Kuma port
+  - Test direct connection: `curl http://localhost:3003/metrics`
+  - Verify API key is correct in `.env.local`
 
 #### 2. **401 Unauthorized Errors**
 
@@ -461,14 +557,55 @@ monitor_response_time{monitor_id="1"} 234.5
 - [Uptime Kuma API Reference](https://github.com/louislam/uptime-kuma/blob/master/extra/api-docs.md)
 - [Prometheus Metrics Format](https://prometheus.io/docs/instrumenting/exposition_formats/)
 
+## Render Deployment
+
+### Production Configuration
+
+Uptime Kuma is deployed on Render as a Web Service:
+- **Service URL**: https://uptime-monitoring-tool.onrender.com
+- **Internal Address**: `uptime-monitoring-tool:3001` (for Render services in same region)
+- **Instance Type**: Starter ($7/month) - includes persistent disk
+- **Data Persistence**: Disk mounted at `/app/data`
+
+### Environment Variables for Render
+
+When deploying your Next.js app on Render, set these environment variables:
+
+```env
+UPTIME_KUMA_API_URL=https://uptime-monitoring-tool.onrender.com
+UPTIME_KUMA_USERNAME=iaccessible-admin
+UPTIME_KUMA_PASSWORD=iAccessible-Granite-Field-47*
+UPTIME_KUMA_API_KEY=uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb
+```
+
+### Internal vs External URLs
+
+- **External URL** (HTTPS): Use for Socket.io connections and client-side requests
+  - `https://uptime-monitoring-tool.onrender.com`
+- **Internal URL**: Use for server-to-server communication within Render (faster, no egress)
+  - `uptime-monitoring-tool:3001` (only works for services in same region)
+
+**Note:** Socket.io requires HTTPS, so always use the external URL for Socket.io connections.
+
+### Setting Up Environment Variables on Render
+
+1. Go to your Next.js service on Render Dashboard
+2. Navigate to **Environment** tab
+3. Add the following environment variables:
+   - `UPTIME_KUMA_API_URL` = `https://uptime-monitoring-tool.onrender.com`
+   - `UPTIME_KUMA_USERNAME` = `iaccessible-admin`
+   - `UPTIME_KUMA_PASSWORD` = `iAccessible-Uptime-Field-47*`
+   - `UPTIME_KUMA_API_KEY` = `uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb`
+4. Save and redeploy your service
+
 ## Support
 
 For issues or questions:
 1. Check this documentation first
-2. Review Uptime Kuma logs
+2. Review Uptime Kuma logs (on Render Dashboard)
 3. Check Next.js console and browser DevTools
 4. Verify environment configuration
 
 ---
 
-**Last Updated:** Integration completed with full dashboard, sync service, and API proxy functionality.
+**Last Updated:** Integration completed with full dashboard, sync service, API proxy functionality, and Render deployment configuration.
