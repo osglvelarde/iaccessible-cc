@@ -40,6 +40,24 @@ python_packages_path = project_root / '.python-packages'
 if python_packages_path.exists():
     sys.path.insert(0, str(python_packages_path))
     print(f"[get_monitor_beats] Added .python-packages to sys.path: {python_packages_path}", file=sys.stderr)
+    # Debug: List contents of .python-packages
+    try:
+        contents = list(python_packages_path.iterdir())
+        print(f"[get_monitor_beats] Contents of .python-packages: {[str(c.name) for c in contents[:10]]}", file=sys.stderr)
+        # Check for uptime_kuma_api specifically
+        uptime_kuma_path = python_packages_path / 'uptime_kuma_api'
+        if uptime_kuma_path.exists():
+            print(f"[get_monitor_beats] Found uptime_kuma_api directory", file=sys.stderr)
+        else:
+            print(f"[get_monitor_beats] WARNING: uptime_kuma_api directory not found in .python-packages", file=sys.stderr)
+            # Try to find it
+            for item in python_packages_path.iterdir():
+                if 'uptime' in item.name.lower() or 'kuma' in item.name.lower():
+                    print(f"[get_monitor_beats] Found related item: {item.name}", file=sys.stderr)
+    except Exception as e:
+        print(f"[get_monitor_beats] Error listing .python-packages: {e}", file=sys.stderr)
+    # Debug: Show sys.path
+    print(f"[get_monitor_beats] sys.path: {sys.path[:3]}", file=sys.stderr)
 else:
     print(f"[get_monitor_beats] WARNING: .python-packages directory not found at {python_packages_path}", file=sys.stderr)
     print(f"[get_monitor_beats] Current working directory: {os.getcwd()}", file=sys.stderr)

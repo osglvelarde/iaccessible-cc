@@ -22,14 +22,41 @@ services:
       # Build Next.js app (using standard build for better Render compatibility)
       npm run build:standard || npm run build
     startCommand: |
+      # Debug: Show current paths
+      echo "=== RENDER PATH DEBUG ==="
+      echo "Current directory (pwd): $(pwd)"
+      echo "HOME: $HOME"
+      echo "PYTHONPATH: $PYTHONPATH"
+      echo "PYTHON_VERSION: $PYTHON_VERSION"
+      echo "Python version: $(python3 --version 2>&1 || echo 'not found')"
+      echo "========================="
+      # Ensure .python-packages directory exists
+      mkdir -p .python-packages
+      echo "Created/verified .python-packages at: $(pwd)/.python-packages"
       # Set PYTHONPATH to include project packages directory
       export PYTHONPATH="${PYTHONPATH}:$(pwd)/.python-packages"
-      # Verify Python packages are available
-      python3 -c "import sys; sys.path.insert(0, '$(pwd)/.python-packages'); import uptime_kuma_api; print('uptime-kuma-api found')" 2>/dev/null || echo "Warning: uptime-kuma-api not found, attempting install..."
-      # Fallback: install if not found
+      echo "Updated PYTHONPATH: $PYTHONPATH"
+      # Verify Python packages are available, install if missing
+      echo "Checking for Python dependencies..."
       if ! python3 -c "import sys; sys.path.insert(0, '$(pwd)/.python-packages'); import uptime_kuma_api" 2>/dev/null; then
-        echo "Installing Python dependencies at runtime..."
-        python3 -m pip install --target .python-packages -r requirements.txt || pip3 install --target .python-packages -r requirements.txt
+        echo "Python dependencies not found. Installing at runtime..."
+        echo "Install location: $(pwd)/.python-packages"
+        python3.11 -m pip install --target .python-packages -r requirements.txt 2>&1 || \
+        python3 -m pip install --target .python-packages -r requirements.txt 2>&1 || \
+        pip3 install --target .python-packages -r requirements.txt 2>&1
+        # List what was installed
+        echo "Contents of .python-packages after install:"
+        ls -la .python-packages/ | head -20 || echo "Could not list directory"
+        # Verify installation
+        if python3 -c "import sys; sys.path.insert(0, '$(pwd)/.python-packages'); import uptime_kuma_api" 2>/dev/null; then
+          echo "✓ Python dependencies installed successfully"
+        else
+          echo "✗ WARNING: Python dependencies installation may have failed"
+          echo "Attempting to diagnose..."
+          python3 -c "import sys; print('sys.path:', sys.path[:5])" 2>&1
+        fi
+      else
+        echo "✓ Python dependencies already available"
       fi
       # Start Next.js application
       npm start
