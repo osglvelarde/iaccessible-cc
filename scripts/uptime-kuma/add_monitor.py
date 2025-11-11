@@ -10,6 +10,18 @@ import json
 import os
 import time
 import urllib.request
+from pathlib import Path
+
+# Add .python-packages directory to Python path (for Render deployment)
+# This ensures uptime-kuma-api is found even if PYTHONPATH isn't set correctly
+project_root = Path(__file__).parent.parent.parent
+python_packages_path = project_root / '.python-packages'
+if python_packages_path.exists():
+    sys.path.insert(0, str(python_packages_path))
+    print(f"[add_monitor] Added .python-packages to sys.path: {python_packages_path}", file=sys.stderr)
+else:
+    print(f"[add_monitor] WARNING: .python-packages directory not found at {python_packages_path}", file=sys.stderr)
+
 from uptime_kuma_api import UptimeKumaApi, MonitorType, AuthMethod
 
 def main():

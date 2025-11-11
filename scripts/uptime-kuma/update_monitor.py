@@ -8,6 +8,15 @@ Reads JSON from stdin and outputs JSON to stdout.
 import sys
 import json
 import os
+from pathlib import Path
+
+# Add .python-packages directory to Python path (for Render deployment)
+# This ensures uptime-kuma-api is found even if PYTHONPATH isn't set correctly
+project_root = Path(__file__).parent.parent.parent
+python_packages_path = project_root / '.python-packages'
+if python_packages_path.exists():
+    sys.path.insert(0, str(python_packages_path))
+
 from uptime_kuma_api import UptimeKumaApi, MonitorType, AuthMethod
 
 def main():
