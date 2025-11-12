@@ -1,7 +1,14 @@
 # Uptime Kuma API Python Wrapper
 # Used for reliable Socket.io integration with Uptime Kuma
-# Updated to latest version to support conditions field
-uptime-kuma-api>=1.23.0
+# 
+# Version Information:
+# - Latest available: 1.2.1 (released Sep 26, 2023)
+# - Compatible with: Uptime Kuma 1.x (officially)
+# - Used with: Uptime Kuma 2.0.2 (with monkey-patch for 'conditions' field)
+# 
+# Note: Version 1.23.0 does not exist - that was a typo
+# The library works with Uptime Kuma 2.0.2 but requires patching for the 'conditions' field
+uptime-kuma-api>=1.2.1
 
 
 
