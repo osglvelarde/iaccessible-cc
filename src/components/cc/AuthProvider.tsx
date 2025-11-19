@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { UserWithDetails, User, OperatingUnit, UserGroup, Organization, RoleType, DataAccessScope } from '@/lib/types/users-roles';
 import { MOCK_USERS, DEFAULT_OPERATING_UNITS, DEFAULT_ORGANIZATIONS, PREDEFINED_ROLES } from '@/lib/users-roles-defaults';
 import { checkModuleAccess, checkFeatureAccess, getEffectiveModulePermissions, getUserDataScope, isOrganizationAdmin, canAccessOrganization } from '@/lib/users-roles-api';
+import { setCurrentUserId } from '@/lib/favorites';
 
 interface AuthContextType {
   user: UserWithDetails | null;
@@ -130,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
           setOrganization(userData.organization || null);
           setDataScope(getUserDataScope(userData));
+          setCurrentUserId(userData.id);
         }
       } catch (error) {
         console.error('Error loading user from localStorage:', error);
@@ -172,11 +174,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Update last login
       userWithDetails.lastLogin = new Date().toISOString();
       
-      // Store in localStorage
+      // Store in localStorage (for session only)
       localStorage.setItem('cc.currentUser', JSON.stringify(userWithDetails));
       setUser(userWithDetails);
       setOrganization(userWithDetails.organization);
       setDataScope(getUserDataScope(userWithDetails));
+      
+      // Set current user ID for API calls
+      setCurrentUserId(userWithDetails.id);
       
       setIsLoading(false);
       return true;
@@ -192,6 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setOrganization(null);
     setDataScope(null);
+    setCurrentUserId(null);
   };
 
   const hasPermission = (moduleKey: string, featureKey?: string): boolean => {

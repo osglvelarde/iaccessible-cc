@@ -20,19 +20,25 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/cc/AuthProvider";
 
 export default function RecentModulesDropdown() {
   const router = useRouter();
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [items, setItems] = useState<typeof getRecent extends () => infer T ? T : never[]>([]);
+  const [items, setItems] = useState<{ title: string; href: string; ts: number }[]>([]);
   const recentItems = items.slice(0, 8); // Show up to 8 recent items
 
-  // Load items on client side to prevent hydration mismatch
+  // Load items from MongoDB
   useEffect(() => {
-    setItems(getRecent());
-  }, []);
+    if (user) {
+      getRecent().then(recent => {
+        setItems(recent);
+      });
+    }
+  }, [user]);
 
-  const formatTimeAgo = (timestamp: string) => {
+  const formatTimeAgo = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -52,10 +58,23 @@ export default function RecentModulesDropdown() {
     setIsOpen(false);
   };
 
-  const clearHistory = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("cc.recent");
-      window.location.reload(); // Simple way to refresh the component
+  const clearHistory = async () => {
+    if (!user) return;
+    // Clear recent modules by updating profile (set to empty array)
+    try {
+      await fetch('/api/user-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.id
+        },
+        body: JSON.stringify({
+          recentModules: []
+        })
+      });
+      setItems([]);
+    } catch (error) {
+      console.error('Error clearing history:', error);
     }
   };
 
@@ -126,7 +145,7 @@ export default function RecentModulesDropdown() {
                       {item.title}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {formatTimeAgo(item.ts.toString())}
+                      {formatTimeAgo(item.ts)}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 ml-2">

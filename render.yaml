@@ -81,6 +81,11 @@ services:
         value: "3.11.11"  # Explicit Python version for consistency
       - key: PYTHONPATH
         value: /opt/render/project/src/.python-packages:/opt/render/project/src:/usr/local/lib/python3.11/site-packages:/usr/lib/python3.11/site-packages
+      # MongoDB Configuration
+      - key: MONGODB_URI
+        sync: false  # Set this manually in Render dashboard for security
+      - key: MONGODB_DB_NAME
+        value: iaccessible-cc
     # Persistent disk for file-based storage (users-roles-data, scanner-results, etc.)
     # Note: Disk must be created separately in Render Dashboard and linked to this service
     # Mount path will be configured when linking the disk

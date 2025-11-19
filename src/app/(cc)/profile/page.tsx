@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/cc/AuthProvider";
 import UtilityBar from "@/components/cc/UtilityBar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +11,54 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { User, Settings, Bell, Shield, ArrowLeft, Users, Building2, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { UserProfile } from "@/lib/types/user-profile";
 
 export default function ProfilePage() {
   const { user, getModulePermissions } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [sessionWarnings, setSessionWarnings] = useState(true);
+  const [moduleUpdates, setModuleUpdates] = useState(false);
+  const [autoSaveRecentModules, setAutoSaveRecentModules] = useState(true);
+
+  // Initialize form fields from user
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`/api/user-profile?userId=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+        setEmailNotifications(data.preferences?.notifications?.email ?? true);
+        setSessionWarnings(data.preferences?.notifications?.sessionWarnings ?? true);
+        setModuleUpdates(data.preferences?.notifications?.moduleUpdates ?? false);
+        setAutoSaveRecentModules(data.preferences?.autoSaveRecentModules ?? true);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
+
+  // Load profile on mount
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   if (!user) {
     return (
@@ -34,6 +80,55 @@ export default function ProfilePage() {
   }
 
   const modulePermissions = getModulePermissions();
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/user-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.id
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          preferences: {
+            ...profile?.preferences,
+            notifications: {
+              ...profile?.preferences?.notifications,
+              email: emailNotifications,
+              sessionWarnings: sessionWarnings,
+              moduleUpdates: moduleUpdates
+            },
+            autoSaveRecentModules: autoSaveRecentModules
+          }
+        })
+      });
+      
+      if (response.ok) {
+        const updated = await response.json();
+        setProfile(updated);
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been saved successfully.",
+        });
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -68,22 +163,32 @@ export default function ProfilePage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue={user.firstName} />
+                    <Input 
+                      id="firstName" 
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue={user.lastName} />
+                    <Input 
+                      id="lastName" 
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue={user.email} />
+                  <Input id="email" type="email" defaultValue={user.email} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="operatingUnit">Operating Unit</Label>
                   <Input id="operatingUnit" defaultValue={user.operatingUnit.name} disabled />
                 </div>
-                <Button>Save Changes</Button>
+                <Button onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
+                </Button>
               </CardContent>
             </Card>
 
@@ -105,7 +210,10 @@ export default function ProfilePage() {
                       Receive updates about scan results and system changes
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={emailNotifications}
+                    onCheckedChange={setEmailNotifications}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
@@ -115,7 +223,10 @@ export default function ProfilePage() {
                       Get notified before your session expires
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={sessionWarnings}
+                    onCheckedChange={setSessionWarnings}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
@@ -125,8 +236,14 @@ export default function ProfilePage() {
                       Notifications about new features and module changes
                     </p>
                   </div>
-                  <Switch />
+                  <Switch 
+                    checked={moduleUpdates}
+                    onCheckedChange={setModuleUpdates}
+                  />
                 </div>
+                <Button onClick={handleSave} disabled={isLoading} variant="outline" className="mt-4">
+                  {isLoading ? 'Saving...' : 'Save Preferences'}
+                </Button>
               </CardContent>
             </Card>
 
@@ -246,8 +363,14 @@ export default function ProfilePage() {
                       Automatically track recently accessed modules
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={autoSaveRecentModules}
+                    onCheckedChange={setAutoSaveRecentModules}
+                  />
                 </div>
+                <Button onClick={handleSave} disabled={isLoading} variant="outline" className="mt-4">
+                  {isLoading ? 'Saving...' : 'Save Preferences'}
+                </Button>
               </CardContent>
             </Card>
           </div>

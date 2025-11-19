@@ -6,18 +6,27 @@
   "wcagVersion": "2.2",
   "level": "AAA",
   "startedAt": "2025-10-23T16:35:19.693Z",
-  "lastUpdatedAt": "2025-10-23T16:41:17.809Z",
+  "lastUpdatedAt": "2025-11-19T14:37:19.521Z",
   "criteria": [
     {
       "wcagId": "1.2.2",
-      "status": "Pass",
-      "evidence": [],
-      "lastUpdated": "2025-10-23T16:37:47.423Z"
+      "status": "Fail",
+      "note": "Audio-only clip has no transcript or text alternative available on the page.",
+      "evidence": [
+        {
+          "id": "4aaeba18-7430-4d16-81a1-54a03502e067",
+          "type": "Photo",
+          "filename": "2025-10-09_08h18_34.png",
+          "uploadedAt": "2025-11-19T14:16:18.548Z",
+          "caption": "Uploaded evidence for 2025-10-09_08h18_34.png"
+        }
+      ],
+      "lastUpdated": "2025-11-19T14:16:18.548Z"
     },
     {
       "wcagId": "1.1.1",
       "status": "Fail",
-      "note": "Yes",
+      "note": "Reviewed all non-text images on the page. Each decorative image has alt=\"\", but the all  the informative images do not include appropriate alt text that accurately describes the content",
       "evidence": [
         {
           "id": "bcc4cf02-883e-4b16-b705-daec4f2609aa",
@@ -27,13 +36,38 @@
           "caption": "Uploaded evidence for 2025-10-09_06h14_11.png"
         }
       ],
-      "lastUpdated": "2025-10-23T16:41:13.525Z"
+      "lastUpdated": "2025-11-19T14:37:19.521Z"
     },
     {
       "wcagId": "1.2.1",
       "status": "Fail",
       "evidence": [],
-      "lastUpdated": "2025-10-23T16:41:17.809Z"
+      "lastUpdated": "2025-11-19T14:15:50.572Z",
+      "note": "The prerecorded video does not include captions. Verified through manual playback."
+    },
+    {
+      "wcagId": "1.2.4",
+      "status": "Pass",
+      "evidence": [],
+      "lastUpdated": "2025-11-19T14:35:51.571Z"
+    },
+    {
+      "wcagId": "1.2.5",
+      "status": "Pass",
+      "evidence": [],
+      "lastUpdated": "2025-11-19T14:35:54.114Z"
+    },
+    {
+      "wcagId": "1.3.3",
+      "status": "Fail",
+      "evidence": [],
+      "lastUpdated": "2025-11-19T14:35:55.903Z"
+    },
+    {
+      "wcagId": "1.2.3",
+      "status": "Pass",
+      "evidence": [],
+      "lastUpdated": "2025-11-19T14:36:01.287Z"
     }
   ]
 }

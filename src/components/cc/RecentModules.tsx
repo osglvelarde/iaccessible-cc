@@ -1,5 +1,7 @@
 "use client";
 import { getRecent } from "@/lib/recent-modules";
+import { useAuth } from "@/components/cc/AuthProvider";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, ExternalLink, ArrowRight } from "lucide-react";
@@ -8,11 +10,20 @@ import { cn } from "@/lib/utils";
 
 export default function RecentModules({ className="" }:{ className?:string }) {
   const router = useRouter();
-  const items = typeof window !== "undefined" ? getRecent() : [];
+  const { user } = useAuth();
+  const [items, setItems] = useState<{ title: string; href: string; ts: number }[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      getRecent().then(recent => {
+        setItems(recent);
+      });
+    }
+  }, [user]);
   
   if (!items.length) return null;
 
-  const formatTimeAgo = (timestamp: string) => {
+  const formatTimeAgo = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -61,7 +72,7 @@ export default function RecentModules({ className="" }:{ className?:string }) {
                     {item.title}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatTimeAgo(item.ts.toString())}
+                    {formatTimeAgo(item.ts)}
                   </div>
                 </div>
                 <div className="flex-shrink-0 ml-2">

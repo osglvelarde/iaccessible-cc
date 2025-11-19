@@ -60,8 +60,11 @@ export default function Home() {
       // Simulate loading time for better UX
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const favoriteModules = getFavorites();
-      setFavorites(favoriteModules.map(f => f.moduleKey));
+      // Load favorites from MongoDB (only if user is logged in)
+      if (user) {
+        const favoriteModules = await getFavorites();
+        setFavorites(favoriteModules.map(f => f.moduleKey));
+      }
       
       // Load scan history for activity feed
       try {
@@ -85,7 +88,36 @@ export default function Home() {
     };
     
     loadData();
-  }, []);
+  }, [user]);
+
+  // State for module usage data from MongoDB
+  const [moduleUsage, setModuleUsage] = useState<Record<string, { lastUsed?: string; usageCount: number }>>({});
+
+  // Load module usage data from profile
+  useEffect(() => {
+    if (!user) return;
+    
+    const loadModuleUsage = async () => {
+      try {
+        const response = await fetch(`/api/user-profile?userId=${user.id}`);
+        if (response.ok) {
+          const profile = await response.json();
+          const usageMap: Record<string, { lastUsed?: string; usageCount: number }> = {};
+          profile.moduleUsage?.forEach((usage: { moduleKey: string; lastUsed?: string; usageCount: number }) => {
+            usageMap[usage.moduleKey] = {
+              lastUsed: usage.lastUsed,
+              usageCount: usage.usageCount
+            };
+          });
+          setModuleUsage(usageMap);
+        }
+      } catch (error) {
+        console.error('Error loading module usage:', error);
+      }
+    };
+    
+    loadModuleUsage();
+  }, [user]);
 
   // Create enhanced modules with favorites and usage data (client-side only)
   const enhancedModules = useMemo(() => {
@@ -104,10 +136,10 @@ export default function Home() {
       ...module,
       group: MODULE_GROUPS.find(g => g.modules.some(m => m.key === module.key))?.title || "Other",
       isFavorite: favorites.includes(module.key),
-      lastUsed: localStorage.getItem(`cc.lastUsed.${module.key}`) || undefined,
-      usageCount: parseInt(localStorage.getItem(`cc.usage.${module.key}`) || "0")
+      lastUsed: moduleUsage[module.key]?.lastUsed,
+      usageCount: moduleUsage[module.key]?.usageCount || 0
     }));
-  }, [favorites]);
+  }, [favorites, moduleUsage]);
 
   // Memoize the favorite toggle handler with optimistic updates
   const handleToggleFavorite = useCallback((moduleKey: string, isFavorite: boolean) => {
@@ -129,21 +161,30 @@ export default function Home() {
 
   // Memoize the module usage tracking with debouncing
   const trackModuleUsage = useCallback((moduleKey: string) => {
-    if (typeof window !== "undefined") {
-      // Use requestIdleCallback for non-critical updates
-      const updateUsage = () => {
-        localStorage.setItem(`cc.lastUsed.${moduleKey}`, new Date().toISOString());
-        const currentCount = parseInt(localStorage.getItem(`cc.usage.${moduleKey}`) || "0");
-        localStorage.setItem(`cc.usage.${moduleKey}`, (currentCount + 1).toString());
-      };
+    if (!user) return;
+    
+    // Track usage in MongoDB (non-blocking)
+    const updateUsage = () => {
+      fetch('/api/user-profile/module-usage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.id
+        },
+        body: JSON.stringify({ moduleKey })
+      }).catch(error => {
+        console.error('Error tracking module usage:', error);
+      });
+    };
 
+    if (typeof window !== "undefined") {
       if ('requestIdleCallback' in window) {
         requestIdleCallback(updateUsage);
       } else {
         setTimeout(updateUsage, 0);
       }
     }
-  }, []);
+  }, [user]);
 
   // Create widgets for customizable layout
   const widgets = [

@@ -69,7 +69,11 @@ This guide will help you deploy the iaccessible-cc Next.js application to Render
    UPTIME_KUMA_PASSWORD=iAccessible-Granite-Field-47*
    UPTIME_KUMA_API_KEY=uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb
    NODE_ENV=production
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/iaccessible-cc?retryWrites=true&w=majority
+   MONGODB_DB_NAME=iaccessible-cc
    ```
+   
+   **Important:** Replace `<username>`, `<password>`, and `<cluster>` in `MONGODB_URI` with your actual MongoDB Atlas credentials.
 
 5. **Persistent Disk (Required for File Storage):**
    - Go to **Disks** tab
@@ -109,6 +113,8 @@ Render automatically provides Python 3.9+ in the build environment. The build sc
 | `UPTIME_KUMA_PASSWORD` | `iAccessible-Granite-Field-47*` | Password (set manually for security) |
 | `UPTIME_KUMA_API_KEY` | `uk1_ovykShADuMK42QsCudzJ_S2IjPl9AKAnHrDGEMzb` | API key for metrics endpoint |
 | `NODE_ENV` | `production` | Node.js environment |
+| `MONGODB_URI` | `mongodb+srv://...` | MongoDB Atlas connection string (set manually for security) |
+| `MONGODB_DB_NAME` | `iaccessible-cc` | MongoDB database name |
 
 ### Optional Variables
 

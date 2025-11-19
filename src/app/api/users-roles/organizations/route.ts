@@ -3,56 +3,14 @@ import {
   Organization, 
   CreateOrganizationRequest, 
   UpdateOrganizationRequest,
-  OrganizationsResponse,
-  OrganizationFilters 
+  OrganizationsResponse
 } from '@/lib/types/users-roles';
-import { DEFAULT_ORGANIZATIONS } from '@/lib/users-roles-defaults';
-
-// Mock data store - in production, this would be a database
-// eslint-disable-next-line prefer-const
-let organizations: Organization[] = [
-  {
-    id: 'org-1',
-    name: 'Federal Agency Alpha',
-    slug: 'federal-agency-alpha',
-    domains: ['alpha.gov'],
-    status: 'active',
-    settings: {
-      allowCustomGroups: true,
-      maxUsers: 1000,
-      maxOperatingUnits: 50,
-      features: ['web_scan', 'pdf_scan', 'manual_testing', 'remediation']
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: 'system'
-  },
-  {
-    id: 'org-2',
-    name: 'State Department Beta',
-    slug: 'state-dept-beta',
-    domains: ['beta.state.gov'],
-    status: 'active',
-    settings: {
-      allowCustomGroups: true,
-      maxUsers: 500,
-      maxOperatingUnits: 20,
-      features: ['web_scan', 'pdf_scan']
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: 'system'
-  }
-];
+import { v4 as uuidv4 } from 'uuid';
+import * as OrganizationModel from '@/lib/models/Organization';
 
 // Helper function to check if user is global admin
 function isGlobalAdmin(user: any): boolean {
   return user?.groups?.some((group: any) => group.roleType === 'global_admin') || false;
-}
-
-// Helper function to check if user is organization admin
-function isOrganizationAdmin(user: any): boolean {
-  return user?.groups?.some((group: any) => group.roleType === 'organization_admin') || false;
 }
 
 // GET /api/users-roles/organizations
@@ -67,34 +25,36 @@ export async function GET(request: NextRequest) {
     // TODO: In production, get user from session/auth
     const user = { groups: [{ roleType: 'global_admin' }] }; // Mock user
 
-    let filteredOrganizations = organizations;
-
-    // Apply filters
+    // Build MongoDB query
+    const query: any = {};
+    
     if (status) {
-      filteredOrganizations = filteredOrganizations.filter(org => org.status === status);
+      query.status = status;
+    }
+    
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { slug: { $regex: search, $options: 'i' } },
+        { domains: { $in: [new RegExp(search, 'i')] } }
+      ];
     }
 
-    if (search) {
-      filteredOrganizations = filteredOrganizations.filter(org => 
-        org.name.toLowerCase().includes(search.toLowerCase()) ||
-        org.slug.toLowerCase().includes(search.toLowerCase()) ||
-        org.domains.some(domain => domain.toLowerCase().includes(search.toLowerCase()))
-      );
-    }
+    let allOrganizations = await OrganizationModel.findOrganizations(query);
 
     // Access control
     if (!isGlobalAdmin(user)) {
       // Non-global admins can only see their own organization
       // For now, return empty - in production, get user's organization
-      filteredOrganizations = [];
+      allOrganizations = [];
     }
 
     // Pagination
-    const total = filteredOrganizations.length;
+    const total = allOrganizations.length;
     const totalPages = Math.ceil(total / pageSize);
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const paginatedOrganizations = filteredOrganizations.slice(startIndex, endIndex);
+    const paginatedOrganizations = allOrganizations.slice(startIndex, endIndex);
 
     const response: OrganizationsResponse = {
       organizations: paginatedOrganizations,
@@ -139,7 +99,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slug is unique
-    const existingOrg = organizations.find(org => org.slug === body.slug);
+    const existingOrg = await OrganizationModel.getOrganizationBySlug(body.slug);
     if (existingOrg) {
       return NextResponse.json(
         { error: 'Organization slug already exists' },
@@ -150,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Create new organization
     const now = new Date().toISOString();
     const newOrganization: Organization = {
-      id: `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: uuidv4(),
       name: body.name,
       slug: body.slug,
       domains: body.domains,
@@ -168,7 +128,7 @@ export async function POST(request: NextRequest) {
       createdBy: 'system' // TODO: Get from user session
     };
 
-    organizations.push(newOrganization);
+    await OrganizationModel.createOrganization(newOrganization);
 
     return NextResponse.json(newOrganization, { status: 201 });
   } catch (error) {
@@ -207,8 +167,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Find organization
-    const orgIndex = organizations.findIndex(org => org.id === orgId);
-    if (orgIndex === -1) {
+    const existingOrg = await OrganizationModel.getOrganizationById(orgId);
+    if (!existingOrg) {
       return NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
@@ -216,9 +176,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if slug is unique (if being updated)
-    if (body.slug && body.slug !== organizations[orgIndex].slug) {
-      const existingOrg = organizations.find(org => org.slug === body.slug && org.id !== orgId);
-      if (existingOrg) {
+    if (body.slug && body.slug !== existingOrg.slug) {
+      const slugOrg = await OrganizationModel.getOrganizationBySlug(body.slug);
+      if (slugOrg) {
         return NextResponse.json(
           { error: 'Organization slug already exists' },
           { status: 409 }
@@ -227,17 +187,22 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update organization
-    const updatedOrganization: Organization = {
-      ...organizations[orgIndex],
+    const updateData: Partial<Organization> = {
       ...body,
       settings: {
-        ...organizations[orgIndex].settings,
+        ...existingOrg.settings,
         ...body.settings
-      },
-      updatedAt: new Date().toISOString()
+      }
     };
 
-    organizations[orgIndex] = updatedOrganization;
+    const updatedOrganization = await OrganizationModel.updateOrganization(orgId, updateData);
+    
+    if (!updatedOrganization) {
+      return NextResponse.json(
+        { error: 'Organization not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(updatedOrganization);
   } catch (error) {
@@ -274,8 +239,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Find organization
-    const orgIndex = organizations.findIndex(org => org.id === orgId);
-    if (orgIndex === -1) {
+    const existingOrg = await OrganizationModel.getOrganizationById(orgId);
+    if (!existingOrg) {
       return NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
@@ -284,11 +249,14 @@ export async function DELETE(request: NextRequest) {
 
     // TODO: Check for dependent data (users, operating units, etc.)
     // For now, just deactivate instead of delete
-    organizations[orgIndex] = {
-      ...organizations[orgIndex],
-      status: 'inactive',
-      updatedAt: new Date().toISOString()
-    };
+    const updatedOrg = await OrganizationModel.updateOrganization(orgId, { status: 'inactive' });
+    
+    if (!updatedOrg) {
+      return NextResponse.json(
+        { error: 'Organization not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

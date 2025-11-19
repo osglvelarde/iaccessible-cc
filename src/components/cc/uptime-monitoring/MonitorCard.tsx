@@ -174,17 +174,19 @@ export function MonitorCard({ monitor, className, onViewDetails }: MonitorCardPr
   return (
     <Card className={cn("hover:shadow-md transition-shadow", className)}>
       <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0 pr-2">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <span className="truncate">{monitor.name}</span>
-              <UptimeStatusBadge status={currentStatus} />
-              {isConnected && (
-                <span 
-                  className="h-2 w-2 rounded-full bg-green-500 animate-pulse shrink-0" 
-                  title="Real-time monitoring active"
-                />
-              )}
+              <span className="truncate block min-w-0 flex-1">{monitor.name}</span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <UptimeStatusBadge status={currentStatus} />
+                {isConnected && (
+                  <span 
+                    className="h-2 w-2 rounded-full bg-green-500 animate-pulse" 
+                    title="Real-time monitoring active"
+                  />
+                )}
+              </div>
             </CardTitle>
           </div>
           {onViewDetails && (
@@ -192,7 +194,7 @@ export function MonitorCard({ monitor, className, onViewDetails }: MonitorCardPr
               variant="outline"
               size="sm"
               onClick={() => onViewDetails(monitor)}
-              className="shrink-0"
+              className="shrink-0 whitespace-nowrap"
             >
               View Details
             </Button>

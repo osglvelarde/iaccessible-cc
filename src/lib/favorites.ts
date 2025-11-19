@@ -1,61 +1,107 @@
-// Favorites management utilities
-export interface FavoriteModule {
-    moduleKey: string;
-    title: string;
-    addedAt: string;
+// Favorites management utilities - MongoDB-based
+import { FavoriteModule } from './types/user-profile';
+
+let currentUserId: string | null = null;
+
+// Set the current user ID (called from AuthProvider)
+export function setCurrentUserId(userId: string | null) {
+  currentUserId = userId;
 }
 
-const FAVORITES_KEY = "cc.favorites";
+export function getCurrentUserId(): string | null {
+  return currentUserId;
+}
 
-export function getFavorites(): FavoriteModule[] {
-    if (typeof window === "undefined") return [];
+// Get favorites from MongoDB
+export async function getFavorites(): Promise<FavoriteModule[]> {
+  if (!currentUserId) {
+    return [];
+  }
 
-    try {
-        const stored = localStorage.getItem(FAVORITES_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch {
-        return [];
+  try {
+    const response = await fetch(`/api/user-profile/favorites?userId=${currentUserId}`);
+    if (!response.ok) {
+      console.error('Failed to fetch favorites');
+      return [];
     }
+    const data = await response.json();
+    return data.favorites || [];
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    return [];
+  }
 }
 
-export function addFavorite(moduleKey: string, title: string): void {
-    if (typeof window === "undefined") return;
+// Add favorite to MongoDB
+export async function addFavorite(moduleKey: string, title: string): Promise<void> {
+  if (!currentUserId) {
+    return;
+  }
 
-    const favorites = getFavorites();
-    if (!favorites.find(f => f.moduleKey === moduleKey)) {
-        const newFavorite: FavoriteModule = {
-            moduleKey,
-            title,
-            addedAt: new Date().toISOString()
-        };
+  try {
+    await fetch('/api/user-profile/favorites', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': currentUserId
+      },
+      body: JSON.stringify({ moduleKey, title, action: 'add' })
+    });
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+  }
+}
 
-        const updatedFavorites = [...favorites, newFavorite];
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
+// Remove favorite from MongoDB
+export async function removeFavorite(moduleKey: string): Promise<void> {
+  if (!currentUserId) {
+    return;
+  }
+
+  try {
+    await fetch('/api/user-profile/favorites', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': currentUserId
+      },
+      body: JSON.stringify({ moduleKey, action: 'remove' })
+    });
+  } catch (error) {
+    console.error('Error removing favorite:', error);
+  }
+}
+
+// Toggle favorite in MongoDB
+export async function toggleFavorite(moduleKey: string, title: string): Promise<boolean> {
+  if (!currentUserId) {
+    return false;
+  }
+
+  try {
+    const response = await fetch('/api/user-profile/favorites', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': currentUserId
+      },
+      body: JSON.stringify({ moduleKey, title, action: 'toggle' })
+    });
+    
+    if (!response.ok) {
+      return false;
     }
+    
+    const data = await response.json();
+    return data.favorites?.some((f: FavoriteModule) => f.moduleKey === moduleKey) || false;
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    return false;
+  }
 }
 
-export function removeFavorite(moduleKey: string): void {
-    if (typeof window === "undefined") return;
-
-    const favorites = getFavorites();
-    const updatedFavorites = favorites.filter(f => f.moduleKey !== moduleKey);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updatedFavorites));
-}
-
-export function toggleFavorite(moduleKey: string, title: string): boolean {
-    const favorites = getFavorites();
-    const isFavorited = favorites.some(f => f.moduleKey === moduleKey);
-
-    if (isFavorited) {
-        removeFavorite(moduleKey);
-        return false;
-    } else {
-        addFavorite(moduleKey, title);
-        return true;
-    }
-}
-
-export function isFavorited(moduleKey: string): boolean {
-    const favorites = getFavorites();
-    return favorites.some(f => f.moduleKey === moduleKey);
+// Check if module is favorited
+export async function isFavorited(moduleKey: string): Promise<boolean> {
+  const favorites = await getFavorites();
+  return favorites.some(f => f.moduleKey === moduleKey);
 }

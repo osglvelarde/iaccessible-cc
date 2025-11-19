@@ -1,102 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { 
   UserGroup, 
   CreateGroupRequest, 
   UpdateGroupRequest, 
-  GroupFilters,
   GroupsResponse 
 } from '@/lib/types/users-roles';
 import { v4 as uuidv4 } from 'uuid';
-
-const DATA_DIR = path.join(process.cwd(), 'users-roles-data');
-const GROUPS_DIR = path.join(DATA_DIR, 'groups');
-
-// Ensure directories exist
-async function ensureDirectories() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.mkdir(GROUPS_DIR, { recursive: true });
-  } catch (error) {
-    console.error('Error creating directories:', error);
-  }
-}
-
-// Helper function to load all groups
-async function loadAllGroups(): Promise<UserGroup[]> {
-  try {
-    const files = await fs.readdir(GROUPS_DIR);
-    const groupFiles = files.filter(file => file.endsWith('.json'));
-    
-    const groups: UserGroup[] = [];
-    for (const file of groupFiles) {
-      try {
-        const filePath = path.join(GROUPS_DIR, file);
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const group: UserGroup = JSON.parse(fileContent);
-        groups.push(group);
-      } catch (error) {
-        console.error(`Error reading group file ${file}:`, error);
-      }
-    }
-    
-    return groups;
-  } catch (error) {
-    console.error('Error loading groups:', error);
-    return [];
-  }
-}
+import * as GroupModel from '@/lib/models/Group';
 
 // GET /api/users-roles/groups - List groups with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
-    await ensureDirectories();
-    
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const operatingUnitId = searchParams.get('operatingUnitId');
-    const organizationId = searchParams.get('organizationId'); // NEW
-    const scope = searchParams.get('scope') as 'organization' | 'operating_unit' | null; // NEW
+    const organizationId = searchParams.get('organizationId');
+    const scope = searchParams.get('scope') as 'organization' | 'operating_unit' | null;
     const type = searchParams.get('type') as string | null;
     const search = searchParams.get('search');
 
-    const allGroups = await loadAllGroups();
-    
-    // Apply filters
-    let filteredGroups = allGroups;
+    // Build MongoDB query
+    const query: any = {};
     
     if (operatingUnitId) {
-      filteredGroups = filteredGroups.filter(group => group.operatingUnitId === operatingUnitId);
+      query.operatingUnitId = operatingUnitId;
     }
     
     if (organizationId) {
-      filteredGroups = filteredGroups.filter(group => group.organizationId === organizationId);
+      query.organizationId = organizationId;
     }
     
     if (scope) {
-      filteredGroups = filteredGroups.filter(group => group.scope === scope);
+      query.scope = scope;
     }
     
     if (type) {
-      filteredGroups = filteredGroups.filter(group => group.type === type);
+      query.type = type;
     }
     
     if (search) {
-      const searchLower = search.toLowerCase();
-      filteredGroups = filteredGroups.filter(group => 
-        group.name.toLowerCase().includes(searchLower) ||
-        (group.description && group.description.toLowerCase().includes(searchLower))
-      );
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
     }
 
+    const allGroups = await GroupModel.findGroups(query);
+    
     // Pagination
-    const total = filteredGroups.length;
+    const total = allGroups.length;
     const totalPages = Math.ceil(total / pageSize);
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const paginatedGroups = filteredGroups.slice(startIndex, endIndex);
+    const paginatedGroups = allGroups.slice(startIndex, endIndex);
 
     const response: GroupsResponse = {
       groups: paginatedGroups,
@@ -116,8 +73,6 @@ export async function GET(request: NextRequest) {
 // POST /api/users-roles/groups - Create new group
 export async function POST(request: NextRequest) {
   try {
-    await ensureDirectories();
-    
     const groupData: CreateGroupRequest = await request.json();
     
     // Validate required fields
@@ -138,12 +93,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if group already exists in the same scope
-    const existingGroups = await loadAllGroups();
-    if (existingGroups.some(group => 
-      group.name === groupData.name && 
-      group.organizationId === groupData.organizationId &&
-      group.scope === scope
-    )) {
+    const existingGroups = await GroupModel.findGroups({
+      name: groupData.name,
+      organizationId: groupData.organizationId,
+      scope: scope
+    });
+    
+    if (existingGroups.length > 0) {
       return NextResponse.json({ 
         error: `Group with this name already exists in the ${scope === 'organization' ? 'organization' : 'operating unit'}` 
       }, { status: 409 });
@@ -156,7 +112,7 @@ export async function POST(request: NextRequest) {
       id: groupId,
       name: groupData.name,
       type: 'custom',
-      organizationId: groupData.organizationId || 'org-1', // Default to org-1 if not provided
+      organizationId: groupData.organizationId || 'org-1',
       operatingUnitId: isOrgLevelGroup ? null : (groupData.operatingUnitId || null),
       scope: scope,
       permissions: groupData.permissions,
@@ -167,8 +123,7 @@ export async function POST(request: NextRequest) {
       createdBy: 'system' // TODO: Get from auth context
     };
 
-    const filePath = path.join(GROUPS_DIR, `${groupId}.json`);
-    await fs.writeFile(filePath, JSON.stringify(newGroup, null, 2));
+    await GroupModel.createGroup(newGroup);
 
     return NextResponse.json(newGroup, { status: 201 });
   } catch (error) {
@@ -180,8 +135,6 @@ export async function POST(request: NextRequest) {
 // PUT /api/users-roles/groups - Update group
 export async function PUT(request: NextRequest) {
   try {
-    await ensureDirectories();
-    
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('groupId');
     
@@ -189,31 +142,25 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'groupId is required' }, { status: 400 });
     }
 
-    const updateData: UpdateGroupRequest = await request.json();
+    const existingGroup = await GroupModel.getGroupById(groupId);
     
-    const filePath = path.join(GROUPS_DIR, `${groupId}.json`);
-    
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      const existingGroup: UserGroup = JSON.parse(fileContent);
-      
-      // Prevent updating system groups
-      if (existingGroup.isSystemGroup) {
-        return NextResponse.json({ error: 'Cannot update system groups' }, { status: 403 });
-      }
-      
-      const updatedGroup: UserGroup = {
-        ...existingGroup,
-        ...updateData,
-        updatedAt: new Date().toISOString()
-      };
-      
-      await fs.writeFile(filePath, JSON.stringify(updatedGroup, null, 2));
-      
-      return NextResponse.json(updatedGroup);
-    } catch (fileError) {
+    if (!existingGroup) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
+    
+    // Prevent updating system groups
+    if (existingGroup.isSystemGroup) {
+      return NextResponse.json({ error: 'Cannot update system groups' }, { status: 403 });
+    }
+
+    const updateData: UpdateGroupRequest = await request.json();
+    const updatedGroup = await GroupModel.updateGroup(groupId, updateData);
+    
+    if (!updatedGroup) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json(updatedGroup);
   } catch (error) {
     console.error('Error updating group:', error);
     return NextResponse.json({ error: 'Failed to update group' }, { status: 500 });
@@ -223,8 +170,6 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/users-roles/groups - Delete group
 export async function DELETE(request: NextRequest) {
   try {
-    await ensureDirectories();
-    
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('groupId');
     
@@ -232,26 +177,27 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'groupId is required' }, { status: 400 });
     }
 
-    const filePath = path.join(GROUPS_DIR, `${groupId}.json`);
+    const existingGroup = await GroupModel.getGroupById(groupId);
     
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      const existingGroup: UserGroup = JSON.parse(fileContent);
-      
-      // Prevent deleting system groups
-      if (existingGroup.isSystemGroup) {
-        return NextResponse.json({ error: 'Cannot delete system groups' }, { status: 403 });
-      }
-      
-      // TODO: Check if group is in use by any users
-      // For now, we'll allow deletion
-      
-      await fs.unlink(filePath);
-      
-      return NextResponse.json({ success: true });
-    } catch (fileError) {
+    if (!existingGroup) {
       return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
+    
+    // Prevent deleting system groups
+    if (existingGroup.isSystemGroup) {
+      return NextResponse.json({ error: 'Cannot delete system groups' }, { status: 403 });
+    }
+    
+    // TODO: Check if group is in use by any users
+    // For now, we'll allow deletion
+    
+    const deleted = await GroupModel.deleteGroup(groupId);
+    
+    if (!deleted) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
+    }
+    
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting group:', error);
     return NextResponse.json({ error: 'Failed to delete group' }, { status: 500 });
