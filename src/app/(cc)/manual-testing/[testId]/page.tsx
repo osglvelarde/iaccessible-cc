@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronLeft, Save, AlertCircle, Settings, ExternalLink, Copy, CheckCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Save, AlertCircle, Settings, ExternalLink, Copy, CheckCircle, RefreshCw, FileText, Download, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -30,6 +30,7 @@ import {
 import { getCriteriaForVersionAndLevel } from '@/lib/wcag-complete';
 import { parseCrawledPages, CrawledPage } from '@/lib/csv-parser';
 import WCAGManualChecklist from '@/components/cc/WCAGManualChecklist';
+import ManualTestingReport from '@/components/cc/ManualTestingReport';
 
 interface ManualTestingWorkspaceProps {
   params: Promise<{
@@ -58,9 +59,10 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   const [error, setError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [externalTab, setExternalTab] = useState<Window | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
-  const [showTabPanel, setShowTabPanel] = useState(true);
+  const [showTabPanel, setShowTabPanel] = useState(false); // Default to collapsed to give more space
+  const [viewMode, setViewMode] = useState<'checklist' | 'report'>('checklist');
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const initializeSession = useCallback(async () => {
     try {
@@ -116,6 +118,14 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
       initializeSession();
     }
   }, [testId, pageUrl, initializeSession]);
+
+  // Check URL for view parameter
+  useEffect(() => {
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'report') {
+      setViewMode('report');
+    }
+  }, [searchParams]);
 
   // Auto-open page in new tab when session is ready
   useEffect(() => {
@@ -353,9 +363,9 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
   const summary = calculateSessionSummary(session, criteria.length);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-3">
+      <header className="border-b bg-card px-6 py-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
@@ -396,6 +406,43 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
               <ExternalLink className="h-4 w-4 mr-2" />
               Re-open Page
             </Button>
+
+            {session.criteria && session.criteria.length > 0 && (
+              <>
+                <Button
+                  variant={viewMode === 'report' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode(viewMode === 'report' ? 'checklist' : 'report')}
+                >
+                  {viewMode === 'report' ? (
+                    <>
+                      <List className="h-4 w-4 mr-2" />
+                      View Checklist
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Report
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = `/api/manual-testing/export?testId=${testId}`;
+                    link.download = `manual-test-${testId}-${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </>
+            )}
 
             <Sheet open={showSettings} onOpenChange={setShowSettings}>
               <SheetTrigger asChild>
@@ -488,7 +535,7 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
         </div>
 
         {/* Compact External Tab Panel */}
-        <Collapsible open={showTabPanel} onOpenChange={setShowTabPanel} className="mt-4">
+        <Collapsible open={showTabPanel} onOpenChange={setShowTabPanel} className="mt-2">
           <CollapsibleTrigger asChild>
             <Card className="bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors">
               <CardContent className="p-3">
@@ -523,15 +570,26 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
             <Card className="mt-2 border-blue-200">
               <CardContent className="p-4">
                 <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium text-sm mb-2">How to Test</h4>
-                    <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                      <li>Click &quot;Open Page&quot; to open the page in a new tab</li>
-                      <li>Use the checklist below to test each WCAG criterion</li>
-                      <li>Test keyboard navigation, screen reader compatibility, and visual accessibility</li>
-                      <li>Mark criteria as &quot;Pass&quot;, &quot;Fail&quot;, or &quot;Not Applicable&quot; as you test</li>
-                    </ol>
-                  </div>
+                  <Collapsible open={showInstructions} onOpenChange={setShowInstructions}>
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-between p-2 h-auto text-left hover:bg-blue-50"
+                      >
+                        <span className="font-medium text-sm">How to Test</span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${showInstructions ? 'rotate-180' : ''}`} />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-2">
+                      <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground pl-2">
+                        <li>Click &quot;Open Page&quot; to open the page in a new tab</li>
+                        <li>Use the checklist below to test each WCAG criterion</li>
+                        <li>Test keyboard navigation, screen reader compatibility, and visual accessibility</li>
+                        <li>Mark criteria as &quot;Pass&quot;, &quot;Fail&quot;, or &quot;Not Applicable&quot; as you test</li>
+                      </ol>
+                    </CollapsibleContent>
+                  </Collapsible>
                   {pageData && (
                     <>
                       <Separator />
@@ -560,40 +618,52 @@ export default function ManualTestingWorkspace({ params }: ManualTestingWorkspac
 
       </header>
 
-      {/* Main Workspace - Full Height Checklist */}
-      <div className="flex-1 flex flex-col">
-        {/* WCAG Checklist - Hero Section */}
-        <div className="flex-1 flex flex-col">
-          <div className="p-4 border-b bg-muted/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  WCAG {session.wcagVersion} Level {session.level} Checklist
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Test each criterion against the page opened in the external tab
-                </p>
+      {/* Main Workspace - Checklist or Report */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {viewMode === 'report' ? (
+          <div className="flex-1 overflow-y-auto p-6">
+            <ManualTestingReport
+              session={session}
+              criteria={criteria}
+              testId={testId}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* WCAG Checklist - Hero Section */}
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="p-3 border-b bg-muted/30 flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">
+                      WCAG {session.wcagVersion} Level {session.level} Checklist
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Test each criterion against the page opened in the external tab
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {summary.completedCriteria} of {summary.totalCriteria} completed
+                    </Badge>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {summary.completedCriteria} of {summary.totalCriteria} completed
-                </Badge>
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-4">
+                  <WCAGManualChecklist
+                    session={session}
+                    criteria={criteria}
+                    onStatusChange={handleCriterionStatusChange}
+                    onEvidenceUpload={handleEvidenceUpload}
+                    onNoteUpdate={handleNoteUpdate}
+                    gridLayout={true}
+                  />
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4">
-              <WCAGManualChecklist
-                session={session}
-                criteria={criteria}
-                onStatusChange={handleCriterionStatusChange}
-                onEvidenceUpload={handleEvidenceUpload}
-                onNoteUpdate={handleNoteUpdate}
-                gridLayout={true}
-              />
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

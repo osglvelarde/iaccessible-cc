@@ -33,7 +33,7 @@ export default function WCAGManualChecklist({
   gridLayout = false
 }: WCAGManualChecklistProps) {
   const [expandedPrinciples, setExpandedPrinciples] = useState<Set<string>>(
-    new Set(['1']) // Expand first principle (Perceivable) by default
+    new Set(['1', '2', '3', '4']) // Expand all principles by default to show all cards
   );
   const [uploadModalOpen, setUploadModalOpen] = useState<string | null>(null);
   const [noteModalOpen, setNoteModalOpen] = useState<string | null>(null);

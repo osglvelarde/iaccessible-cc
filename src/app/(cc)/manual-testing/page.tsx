@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, Filter, Plus, ExternalLink, Calendar, Building2, Users, CheckCircle, Clock, AlertCircle, Grid3X3, Table2, Settings, Eye, Copy, Check } from 'lucide-react';
+import { Search, Filter, Plus, ExternalLink, Calendar, Building2, Users, CheckCircle, Clock, AlertCircle, Grid3X3, Table2, Settings, Eye, Copy, Check, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -858,6 +858,22 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                                 {session ? 'Continue' : 'Start'}
                               </Link>
                             </Button>
+                            {session && session.completedCriteria > 0 && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link href={`/manual-testing/${session.testId}?url=${encodeURIComponent(page.webpage)}&view=report`}>
+                                        <FileText className="h-3 w-3" />
+                                      </Link>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View Report</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1091,6 +1107,13 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                       {session ? 'Continue Test' : 'Start New Test'}
                     </Link>
                   </Button>
+                  {session && session.completedCriteria > 0 && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/manual-testing/${session.testId}?url=${encodeURIComponent(page.webpage)}&view=report`}>
+                        <FileText className="h-3 w-3" />
+                      </Link>
+                    </Button>
+                  )}
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">
@@ -1156,6 +1179,14 @@ export default function ManualTestingDashboard({}: ManualTestingDashboardProps) 
                                 {session ? 'Continue Test' : 'Start New Test'}
                               </Link>
                             </Button>
+                            {session && session.completedCriteria > 0 && (
+                              <Button variant="outline" asChild>
+                                <Link href={`/manual-testing/${session.testId}?url=${encodeURIComponent(page.webpage)}&view=report`}>
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  View Report
+                                </Link>
+                              </Button>
+                            )}
                             <Button variant="outline" asChild>
                               <a href={page.webpage} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-4 w-4 mr-2" />

@@ -318,3 +318,95 @@ export function getTestStatusFromSessionSummary(session: TestSessionSummary): 'N
   const totalEvaluated = session.passCount + session.failCount + session.naCount + session.needsReviewCount;
   return totalEvaluated === session.totalCriteria ? 'Completed' : 'In Progress';
 }
+
+// CSV export function
+export function exportSessionToCSV(session: TestSession, criteria: Array<{ wcagId: string; title: string; principle: string; level: string }>): string {
+  // Helper function to escape CSV fields
+  const escapeCSVField = (field: string | number | boolean | undefined | null): string => {
+    if (field === null || field === undefined) {
+      return '';
+    }
+    const str = String(field);
+    // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  // Build CSV rows
+  const rows: string[] = [];
+
+  // Metadata section
+  rows.push('Manual Testing Report');
+  rows.push('');
+  rows.push('Test Information');
+  rows.push(`Test ID,${escapeCSVField(session.testId)}`);
+  rows.push(`Page URL,${escapeCSVField(session.pageUrl)}`);
+  rows.push(`Organization,${escapeCSVField(session.organization)}`);
+  rows.push(`Department/Operating Unit,${escapeCSVField(session.department)}`);
+  rows.push(`WCAG Version,${escapeCSVField(session.wcagVersion)}`);
+  rows.push(`Test Level,${escapeCSVField(session.level)}`);
+  rows.push(`Started At,${escapeCSVField(formatDate(session.startedAt))}`);
+  rows.push(`Last Updated,${escapeCSVField(formatDate(session.lastUpdatedAt))}`);
+  if (session.testerName) {
+    rows.push(`Tester Name,${escapeCSVField(session.testerName)}`);
+  }
+  if (session.testerEmail) {
+    rows.push(`Tester Email,${escapeCSVField(session.testerEmail)}`);
+  }
+  rows.push('');
+
+  // Summary section
+  const summary = calculateSessionSummary(session, criteria.length);
+  rows.push('Summary Statistics');
+  rows.push(`Total Criteria,${summary.totalCriteria}`);
+  rows.push(`Completed Criteria,${summary.completedCriteria}`);
+  rows.push(`Passed,${summary.passCount}`);
+  rows.push(`Failed,${summary.failCount}`);
+  rows.push(`Not Applicable,${summary.naCount}`);
+  rows.push(`Needs Senior Review,${summary.needsReviewCount}`);
+  rows.push(`Progress,${summary.progressPercent}%`);
+  rows.push('');
+
+  // Criteria results section
+  rows.push('Criteria Results');
+  rows.push('WCAG ID,Criterion Title,Principle,Level,Status,Note,Evidence Count,Evidence Files,Last Updated');
+
+  // Sort criteria by WCAG ID for consistent ordering
+  const sortedCriteria = [...criteria].sort((a, b) => {
+    const aParts = a.wcagId.split('.').map(Number);
+    const bParts = b.wcagId.split('.').map(Number);
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+      const aVal = aParts[i] || 0;
+      const bVal = bParts[i] || 0;
+      if (aVal !== bVal) {
+        return aVal - bVal;
+      }
+    }
+    return 0;
+  });
+
+  sortedCriteria.forEach((criterion) => {
+    const result = session.criteria.find(c => c.wcagId === criterion.wcagId);
+    const status = result?.status || 'Not Tested';
+    const note = result?.note || '';
+    const evidenceCount = result?.evidence.length || 0;
+    const evidenceFiles = result?.evidence.map(e => e.filename).join('; ') || '';
+    const lastUpdated = result?.lastUpdated ? formatDate(result.lastUpdated) : '';
+
+    rows.push([
+      escapeCSVField(criterion.wcagId),
+      escapeCSVField(criterion.title),
+      escapeCSVField(criterion.principle),
+      escapeCSVField(criterion.level),
+      escapeCSVField(status),
+      escapeCSVField(note),
+      escapeCSVField(evidenceCount),
+      escapeCSVField(evidenceFiles),
+      escapeCSVField(lastUpdated)
+    ].join(','));
+  });
+
+  return rows.join('\n');
+}
