@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, Shield, Mail } from "lucide-react";
@@ -45,7 +45,7 @@ export default function LoginForm() {
       } else {
         setError("Invalid credentials. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("Invalid credentials. Please try again.");
     } finally {
       setIsLoading(false);
@@ -231,7 +231,7 @@ export default function LoginForm() {
                         <li>At least 8 characters (15+ for administrative accounts)</li>
                         <li>Up to 64 characters allowed</li>
                         <li>All printable characters accepted</li>
-                        <li>Use memorable passphrases (e.g., "blue sky mountain trail")</li>
+                        <li>Use memorable passphrases (e.g., &quot;blue sky mountain trail&quot;)</li>
                         <li>Do not reuse or share passwords</li>
                       </ul>
                     </div>
