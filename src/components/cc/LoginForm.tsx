@@ -93,12 +93,18 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sso" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+            <TabsTrigger 
+              value="sso" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-semibold data-[state=active]:shadow-md text-foreground/70 hover:text-foreground transition-all"
+            >
               <Shield className="h-4 w-4" aria-hidden />
               Government SSO
             </TabsTrigger>
-            <TabsTrigger value="email" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="email" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-semibold data-[state=active]:shadow-md text-foreground/70 hover:text-foreground transition-all"
+            >
               <Mail className="h-4 w-4" aria-hidden />
               Email & Password
             </TabsTrigger>
@@ -219,9 +225,16 @@ export default function LoginForm() {
                         )}
                       </Button>
                     </div>
-                    <p id="password-help" className="text-sm text-muted-foreground">
-                      Minimum 8 characters with letters and numbers
-                    </p>
+                    <div id="password-help" className="text-sm text-muted-foreground space-y-1">
+                      <p className="font-semibold text-foreground">Password Requirements (NIST SP 800-63B-Aligned):</p>
+                      <ul className="list-disc list-inside space-y-0.5 ml-2 text-xs">
+                        <li>At least 8 characters (15+ for administrative accounts)</li>
+                        <li>Up to 64 characters allowed</li>
+                        <li>All printable characters accepted</li>
+                        <li>Use memorable passphrases (e.g., "blue sky mountain trail")</li>
+                        <li>Do not reuse or share passwords</li>
+                      </ul>
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -252,11 +265,30 @@ export default function LoginForm() {
 
         </Tabs>
 
-        <div className="mt-6 pt-6 border-t">
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground justify-center">
-            <a href="#" className="hover:underline">Privacy/PII Notice</a>
-            <a href="#" className="hover:underline">Rules of Behavior</a>
-            <a href="#" className="hover:underline">Security & Compliance</a>
+        <div className="mt-6 pt-6 border-t space-y-4">
+          <div className="text-xs text-muted-foreground space-y-2">
+            <p className="font-semibold text-foreground">Multi-Factor Authentication (MFA):</p>
+            <ul className="list-disc list-inside space-y-0.5 ml-2">
+              <li>Required for administrative and privileged accounts</li>
+              <li>Supported: PIV/CAC, Login.gov, Authenticator apps, Hardware security keys (YubiKey, FIDO2/WebAuthn)</li>
+            </ul>
+          </div>
+          
+          <div className="text-xs text-muted-foreground space-y-2">
+            <p className="font-semibold text-foreground">Account Security:</p>
+            <ul className="list-disc list-inside space-y-0.5 ml-2">
+              <li>Accounts locked after repeated failed login attempts</li>
+              <li>Passwords do not expire unless compromise detected</li>
+              <li>Access subject to monitoring, auditing, and compliance logging (FISMA/FedRAMP)</li>
+              <li>By signing in, you agree to authorized use, system monitoring, and applicable security policies</li>
+            </ul>
+          </div>
+
+          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground justify-center pt-2">
+            <a href="#" className="hover:underline hover:text-foreground">Privacy / PII Notice</a>
+            <a href="#" className="hover:underline hover:text-foreground">Rules of Behavior</a>
+            <a href="#" className="hover:underline hover:text-foreground">Security & Compliance Information</a>
+            <a href="#" className="hover:underline hover:text-foreground">Accessibility Statement (Section 508 Compliant)</a>
           </div>
         </div>
       </CardContent>
