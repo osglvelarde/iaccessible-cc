@@ -7,23 +7,26 @@ import {
 } from '@/lib/types/users-roles';
 import { v4 as uuidv4 } from 'uuid';
 import * as OrganizationModel from '@/lib/models/Organization';
-
-// Helper function to check if user is global admin
-function isGlobalAdmin(user: any): boolean {
-  return user?.groups?.some((group: any) => group.roleType === 'global_admin') || false;
-}
+import { validateOrganizationCreation, sanitizeString, sanitizeEmail } from '@/lib/validation/users-roles';
+import { mongoDBAuditLogger, getRequestMetadata } from '@/lib/mongodb-audit-logger';
+import { getDatabase } from '@/lib/mongodb';
+import { requireAdminAuth, isGlobalAdmin } from '@/lib/auth-helpers';
 
 // GET /api/users-roles/organizations
 export async function GET(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const status = searchParams.get('status') as 'active' | 'inactive' | 'trial' | null;
     const search = searchParams.get('search') || '';
-
-    // TODO: In production, get user from session/auth
-    const user = { groups: [{ roleType: 'global_admin' }] }; // Mock user
 
     // Build MongoDB query
     const query: any = {};
@@ -40,35 +43,79 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    let allOrganizations = await OrganizationModel.findOrganizations(query);
-
-    // Access control
-    if (!isGlobalAdmin(user)) {
-      // Non-global admins can only see their own organization
-      // For now, return empty - in production, get user's organization
-      allOrganizations = [];
+    // Access control - only global admins can see all organizations
+    if (!isGlobalAdmin(adminUser)) {
+      // Organization admins can only see their own organization
+      if (adminUser.organization) {
+        query.id = adminUser.organization.id;
+      } else {
+        return NextResponse.json({
+          organizations: [],
+          total: 0,
+          page,
+          pageSize,
+          totalPages: 0
+        });
+      }
     }
 
-    // Pagination
-    const total = allOrganizations.length;
-    const totalPages = Math.ceil(total / pageSize);
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedOrganizations = allOrganizations.slice(startIndex, endIndex);
+    // Try MongoDB-native pagination, fallback to model if it fails
+    try {
+      const db = await getDatabase();
+      const collection = db.collection<Organization>('organizations');
+      
+      // Get total count
+      const total = await collection.countDocuments(query);
+      const totalPages = Math.ceil(total / pageSize);
+      const skip = (page - 1) * pageSize;
 
-    const response: OrganizationsResponse = {
-      organizations: paginatedOrganizations,
-      total,
-      page,
-      pageSize,
-      totalPages
-    };
+      // Fetch paginated organizations
+      const paginatedOrganizations = await collection
+        .find(query)
+        .sort({ createdAt: -1 }) // Newest first
+        .skip(skip)
+        .limit(pageSize)
+        .toArray();
 
-    return NextResponse.json(response);
-  } catch (error) {
+      const response: OrganizationsResponse = {
+        organizations: paginatedOrganizations,
+        total,
+        page,
+        pageSize,
+        totalPages
+      };
+
+      return NextResponse.json(response);
+    } catch (dbError: any) {
+      // Fallback to model-based approach if direct MongoDB access fails
+      console.warn('Direct MongoDB access failed, using model fallback:', dbError?.message);
+      
+      const allOrganizations = await OrganizationModel.findOrganizations(query);
+      
+      // Pagination
+      const total = allOrganizations.length;
+      const totalPages = Math.ceil(total / pageSize);
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginatedOrganizations = allOrganizations.slice(startIndex, endIndex);
+
+      const response: OrganizationsResponse = {
+        organizations: paginatedOrganizations,
+        total,
+        page,
+        pageSize,
+        totalPages
+      };
+
+      return NextResponse.json(response);
+    }
+  } catch (error: any) {
     console.error('Error fetching organizations:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch organizations' },
+      { 
+        error: 'Failed to fetch organizations',
+        details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+      },
       { status: 500 }
     );
   }
@@ -77,29 +124,51 @@ export async function GET(request: NextRequest) {
 // POST /api/users-roles/organizations
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateOrganizationRequest = await request.json();
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
 
-    // TODO: In production, get user from session/auth
-    const user = { groups: [{ roleType: 'global_admin' }] }; // Mock user
+    const body: CreateOrganizationRequest = await request.json();
+    const metadata = getRequestMetadata(request);
 
     // Check permissions - only global admins can create organizations
-    if (!isGlobalAdmin(user)) {
+    if (!isGlobalAdmin(adminUser)) {
       return NextResponse.json(
-        { error: 'Insufficient permissions to create organizations' },
+        { error: 'Insufficient permissions to create organizations. Only global administrators can create organizations.' },
         { status: 403 }
       );
     }
 
-    // Validate required fields
-    if (!body.name || !body.slug || !body.domains || body.domains.length === 0) {
+    // Remove status from create request (only for updates)
+    const { status, ...createData } = body as any;
+    
+    // Auto-convert slug to lowercase and replace spaces with hyphens
+    if (createData.slug) {
+      createData.slug = createData.slug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    // Validate input
+    const validation = validateOrganizationCreation(createData);
+    if (!validation.isValid) {
       return NextResponse.json(
-        { error: 'Name, slug, and domains are required' },
+        { 
+          error: 'Validation failed', 
+          details: validation.errors,
+          message: validation.errors.join('; ')
+        },
         { status: 400 }
       );
     }
 
+    // Sanitize inputs
+    const sanitizedName = sanitizeString(createData.name);
+    const sanitizedSlug = createData.slug.toLowerCase().trim();
+
     // Check if slug is unique
-    const existingOrg = await OrganizationModel.getOrganizationBySlug(body.slug);
+    const existingOrg = await OrganizationModel.getOrganizationBySlug(sanitizedSlug);
     if (existingOrg) {
       return NextResponse.json(
         { error: 'Organization slug already exists' },
@@ -107,13 +176,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize domains - extract domain from URLs if needed
+    const { extractDomain } = await import('@/lib/validation/users-roles');
+    const sanitizedDomains = body.domains.map(d => extractDomain(d.trim()));
+
     // Create new organization
     const now = new Date().toISOString();
+    const orgId = uuidv4();
     const newOrganization: Organization = {
-      id: uuidv4(),
-      name: body.name,
-      slug: body.slug,
-      domains: body.domains,
+      id: orgId,
+      name: sanitizedName,
+      slug: sanitizedSlug,
+      domains: sanitizedDomains,
       settings: {
         allowCustomGroups: true,
         maxUsers: 100,
@@ -122,19 +196,47 @@ export async function POST(request: NextRequest) {
         ...body.settings
       },
       status: 'active',
-      billingEmail: body.billingEmail,
+      billingEmail: body.billingEmail ? sanitizeEmail(body.billingEmail) : undefined,
       createdAt: now,
       updatedAt: now,
-      createdBy: 'system' // TODO: Get from user session
+      createdBy: adminUser.id // Use authenticated admin user's ID
     };
 
     await OrganizationModel.createOrganization(newOrganization);
 
+    // Log audit entry (don't fail if audit logging fails)
+    try {
+      await mongoDBAuditLogger.logOrganizationAction(
+        'organization_created',
+        orgId,
+        adminUser.id, // Use authenticated admin user's ID
+        adminUser.email, // Use authenticated admin user's email
+        { organizationData: { from: null, to: { name: sanitizedName, slug: sanitizedSlug } } },
+        metadata.ipAddress,
+        metadata.userAgent
+      );
+    } catch (auditError) {
+      console.warn('Failed to log audit entry:', auditError);
+      // Continue - audit logging failure shouldn't break the operation
+    }
+
     return NextResponse.json(newOrganization, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating organization:', error);
+    
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { error: 'Organization with this slug already exists' },
+        { status: 409 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create organization' },
+      { 
+        error: 'Failed to create organization',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }
@@ -155,13 +257,17 @@ export async function PUT(request: NextRequest) {
 
     const body: UpdateOrganizationRequest = await request.json();
 
-    // TODO: In production, get user from session/auth
-    const user = { groups: [{ roleType: 'global_admin' }] }; // Mock user
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
 
-    // Check permissions
-    if (!isGlobalAdmin(user)) {
+    // Check permissions - only global admins can update organizations
+    if (!isGlobalAdmin(adminUser)) {
       return NextResponse.json(
-        { error: 'Insufficient permissions to update organizations' },
+        { error: 'Insufficient permissions to update organizations. Only global administrators can update organizations.' },
         { status: 403 }
       );
     }
@@ -227,13 +333,17 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // TODO: In production, get user from session/auth
-    const user = { groups: [{ roleType: 'global_admin' }] }; // Mock user
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
 
     // Check permissions - only global admins can delete organizations
-    if (!isGlobalAdmin(user)) {
+    if (!isGlobalAdmin(adminUser)) {
       return NextResponse.json(
-        { error: 'Insufficient permissions to delete organizations' },
+        { error: 'Insufficient permissions to delete organizations. Only global administrators can delete organizations.' },
         { status: 403 }
       );
     }

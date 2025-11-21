@@ -23,15 +23,80 @@ import {
   AccessLevel,
   DataAccessScope
 } from './types/users-roles';
+import { getCurrentUserId, setCurrentUserId } from './favorites';
 
 // Base API URL
 const API_BASE = '/api/users-roles';
+
+// Helper to get headers with user ID
+function getHeaders(additionalHeaders: Record<string, string> = {}): HeadersInit {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...additionalHeaders
+  };
+  
+  // Try multiple methods to get user ID - always check localStorage first for reliability
+  let userId: string | null = null;
+  
+  // Method 1: Try localStorage first (most reliable)
+  if (typeof window !== 'undefined') {
+    try {
+      const storedUser = localStorage.getItem('cc.currentUser');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        if (userData?.id) {
+          userId = userData.id;
+          // Also set it for future calls
+          setCurrentUserId(userData.id);
+        }
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+      console.warn('Error reading user from localStorage:', e);
+    }
+  }
+  
+  // Method 2: Fallback to getCurrentUserId() if localStorage didn't work
+  if (!userId) {
+    userId = getCurrentUserId();
+  }
+  
+  if (userId) {
+    headers['x-user-id'] = userId;
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API] Sending request with user ID:', userId);
+    }
+  } else {
+    console.error('[API] No user ID found for API request. User may not be authenticated.');
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('cc.currentUser');
+      console.error('[API] localStorage check:', storedUser ? 'User data exists' : 'No user data');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          console.error('[API] User data:', { id: userData?.id, email: userData?.email });
+        } catch (e) {
+          console.error('[API] Error parsing user data:', e);
+        }
+      }
+    }
+    console.error('[API] getCurrentUserId():', getCurrentUserId());
+  }
+  
+  return headers;
+}
 
 // Helper function to handle API responses
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+    // Include validation details if available
+    const errorMessage = error.message || error.error || `HTTP ${response.status}`;
+    const errorWithDetails = error.details 
+      ? `${errorMessage}: ${Array.isArray(error.details) ? error.details.join(', ') : error.details}`
+      : errorMessage;
+    throw new Error(errorWithDetails);
   }
   return response.json();
 }
@@ -44,7 +109,16 @@ export async function getUsers(filters?: UserFilters): Promise<UsersResponse> {
   if (filters?.groupId) params.append('groupId', filters.groupId);
   if (filters?.search) params.append('search', filters.search);
   
-  const response = await fetch(`${API_BASE}/users?${params.toString()}`);
+  const headers = getHeaders();
+  // Debug: Log the actual headers being sent
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[API getUsers] Headers:', headers);
+    console.log('[API getUsers] URL:', `${API_BASE}/users?${params.toString()}`);
+  }
+  
+  const response = await fetch(`${API_BASE}/users?${params.toString()}`, {
+    headers
+  });
   return handleApiResponse<UsersResponse>(response);
 }
 
@@ -56,7 +130,7 @@ export async function getUserById(userId: string): Promise<UserWithDetails> {
 export async function createUser(userData: CreateUserRequest): Promise<UserWithDetails> {
   const response = await fetch(`${API_BASE}/users`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(userData)
   });
   return handleApiResponse<UserWithDetails>(response);
@@ -65,7 +139,7 @@ export async function createUser(userData: CreateUserRequest): Promise<UserWithD
 export async function updateUser(userId: string, userData: UpdateUserRequest): Promise<UserWithDetails> {
   const response = await fetch(`${API_BASE}/users?userId=${userId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(userData)
   });
   return handleApiResponse<UserWithDetails>(response);
@@ -73,7 +147,8 @@ export async function updateUser(userId: string, userData: UpdateUserRequest): P
 
 export async function deactivateUser(userId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/users?userId=${userId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getHeaders()
   });
   await handleApiResponse<{ success: boolean }>(response);
 }
@@ -85,7 +160,9 @@ export async function getGroups(filters?: GroupFilters): Promise<GroupsResponse>
   if (filters?.type) params.append('type', filters.type);
   if (filters?.search) params.append('search', filters.search);
   
-  const response = await fetch(`${API_BASE}/groups?${params.toString()}`);
+  const response = await fetch(`${API_BASE}/groups?${params.toString()}`, {
+    headers: getHeaders()
+  });
   return handleApiResponse<GroupsResponse>(response);
 }
 
@@ -97,7 +174,7 @@ export async function getGroupById(groupId: string): Promise<UserGroup> {
 export async function createGroup(groupData: CreateGroupRequest): Promise<UserGroup> {
   const response = await fetch(`${API_BASE}/groups`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(groupData)
   });
   return handleApiResponse<UserGroup>(response);
@@ -106,7 +183,7 @@ export async function createGroup(groupData: CreateGroupRequest): Promise<UserGr
 export async function updateGroup(groupId: string, groupData: UpdateGroupRequest): Promise<UserGroup> {
   const response = await fetch(`${API_BASE}/groups?groupId=${groupId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(groupData)
   });
   return handleApiResponse<UserGroup>(response);
@@ -114,7 +191,8 @@ export async function updateGroup(groupId: string, groupData: UpdateGroupRequest
 
 export async function deleteGroup(groupId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/groups?groupId=${groupId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getHeaders()
   });
   await handleApiResponse<{ success: boolean }>(response);
 }
@@ -125,7 +203,9 @@ export async function getOperatingUnits(filters?: OperatingUnitFilters): Promise
   if (filters?.organization) params.append('organization', filters.organization);
   if (filters?.search) params.append('search', filters.search);
   
-  const response = await fetch(`${API_BASE}/operating-units?${params.toString()}`);
+  const response = await fetch(`${API_BASE}/operating-units?${params.toString()}`, {
+    headers: getHeaders()
+  });
   return handleApiResponse<OperatingUnitsResponse>(response);
 }
 
@@ -137,7 +217,7 @@ export async function getOperatingUnitById(ouId: string): Promise<OperatingUnit>
 export async function createOperatingUnit(ouData: CreateOperatingUnitRequest): Promise<OperatingUnit> {
   const response = await fetch(`${API_BASE}/operating-units`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(ouData)
   });
   return handleApiResponse<OperatingUnit>(response);
@@ -146,7 +226,7 @@ export async function createOperatingUnit(ouData: CreateOperatingUnitRequest): P
 export async function updateOperatingUnit(ouId: string, ouData: UpdateOperatingUnitRequest): Promise<OperatingUnit> {
   const response = await fetch(`${API_BASE}/operating-units?ouId=${ouId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(ouData)
   });
   return handleApiResponse<OperatingUnit>(response);
@@ -154,7 +234,8 @@ export async function updateOperatingUnit(ouId: string, ouData: UpdateOperatingU
 
 export async function deleteOperatingUnit(ouId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/operating-units?ouId=${ouId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getHeaders()
   });
   await handleApiResponse<{ success: boolean }>(response);
 }
@@ -165,7 +246,9 @@ export async function getOrganizations(filters?: OrganizationFilters): Promise<O
   if (filters?.status) params.append('status', filters.status);
   if (filters?.search) params.append('search', filters.search);
   
-  const response = await fetch(`${API_BASE}/organizations?${params.toString()}`);
+  const response = await fetch(`${API_BASE}/organizations?${params.toString()}`, {
+    headers: getHeaders()
+  });
   return handleApiResponse<OrganizationsResponse>(response);
 }
 
@@ -177,7 +260,7 @@ export async function getOrganizationById(orgId: string): Promise<Organization> 
 export async function createOrganization(orgData: CreateOrganizationRequest): Promise<Organization> {
   const response = await fetch(`${API_BASE}/organizations`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(orgData)
   });
   return handleApiResponse<Organization>(response);
@@ -186,7 +269,7 @@ export async function createOrganization(orgData: CreateOrganizationRequest): Pr
 export async function updateOrganization(orgId: string, orgData: UpdateOrganizationRequest): Promise<Organization> {
   const response = await fetch(`${API_BASE}/organizations?orgId=${orgId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(orgData)
   });
   return handleApiResponse<Organization>(response);
@@ -194,7 +277,8 @@ export async function updateOrganization(orgId: string, orgData: UpdateOrganizat
 
 export async function deleteOrganization(orgId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/organizations?orgId=${orgId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getHeaders()
   });
   await handleApiResponse<{ success: boolean }>(response);
 }

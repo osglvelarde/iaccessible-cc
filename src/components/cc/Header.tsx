@@ -64,8 +64,10 @@ export default function Header() {
             <RecentModulesDropdown />
             <HelpDrawer />
             
-            {/* Admin Menu */}
-            {(canManageUsers() || canManageGroups()) && (
+            {/* Admin Menu - Only visible to global_admin and organization_admin */}
+            {user && (user.groups.some(group => 
+              group.roleType === 'global_admin' || group.roleType === 'organization_admin'
+            )) && (
               <DropdownMenu>
                 <Tooltip>
                   <TooltipTrigger asChild>

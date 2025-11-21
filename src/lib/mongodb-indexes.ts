@@ -28,6 +28,18 @@ export async function createIndexes() {
     await db.collection('userProfiles').createIndex({ userId: 1 }, { unique: true });
     await db.collection('userProfiles').createIndex({ id: 1 }, { unique: true });
     
+    // Audit Logs collection indexes
+    await db.collection('auditLogs').createIndex({ id: 1 }, { unique: true });
+    await db.collection('auditLogs').createIndex({ organizationId: 1 });
+    await db.collection('auditLogs').createIndex({ resourceType: 1 });
+    await db.collection('auditLogs').createIndex({ resourceId: 1 });
+    await db.collection('auditLogs').createIndex({ actorId: 1 });
+    await db.collection('auditLogs').createIndex({ timestamp: -1 }); // For sorting by newest first
+    await db.collection('auditLogs').createIndex({ action: 1 });
+    // Compound index for common queries
+    await db.collection('auditLogs').createIndex({ organizationId: 1, timestamp: -1 });
+    await db.collection('auditLogs').createIndex({ resourceType: 1, resourceId: 1 });
+    
     console.log('MongoDB indexes created successfully');
   } catch (error) {
     console.error('Error creating indexes:', error);

@@ -32,8 +32,13 @@ export default function UsersRolesAdminPage() {
     activeOrganizations: 0
   });
 
-  // Load data on mount
+  // Load data on mount - wait for user to be available
   useEffect(() => {
+    // Don't load data if user is not available yet
+    if (!user) {
+      return;
+    }
+
     const loadData = async () => {
       setIsLoading(true);
       try {
@@ -65,7 +70,7 @@ export default function UsersRolesAdminPage() {
     };
 
     loadData();
-  }, []);
+  }, [user]);
 
   const handleUserCreated = (newUser: UserWithDetails) => {
     setUsers(prev => [newUser, ...prev]);
@@ -77,7 +82,12 @@ export default function UsersRolesAdminPage() {
   };
 
   // Check if user has permission to access this page
-  if (!user || (!canManageUsers() && !canManageGroups())) {
+  // Only global_admin and organization_admin can access users & roles
+  const isAdmin = user?.groups.some(group => 
+    group.roleType === 'global_admin' || group.roleType === 'organization_admin'
+  );
+
+  if (!user || !isAdmin) {
     return (
       <div className="container mx-auto px-4 py-6">
         <Card>
@@ -86,6 +96,8 @@ export default function UsersRolesAdminPage() {
             <h2 className="text-2xl font-semibold mb-2">Access Denied</h2>
             <p className="text-muted-foreground text-center mb-4">
               You don&apos;t have permission to access the Users & Roles administration.
+              <br />
+              Only administrators can access this page.
             </p>
             <Button asChild>
               <Link href="/">Return to Command Center</Link>

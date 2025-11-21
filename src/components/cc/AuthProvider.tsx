@@ -234,11 +234,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const canManageUsers = (): boolean => {
-    return hasPermission('usersRoles', 'create_users');
+    if (!user) return false;
+    // Only global_admin and organization_admin can manage users
+    return user.groups.some(group => 
+      group.roleType === 'global_admin' || group.roleType === 'organization_admin'
+    );
   };
 
   const canManageGroups = (): boolean => {
-    return hasPermission('usersRoles', 'manage_groups');
+    if (!user) return false;
+    // Only global_admin and organization_admin can manage groups
+    return user.groups.some(group => 
+      group.roleType === 'global_admin' || group.roleType === 'organization_admin'
+    );
   };
 
   const isOrganizationAdminUser = (): boolean => {

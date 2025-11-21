@@ -20,7 +20,7 @@ type Row = [ModuleKey, string, string, string, string, string?];
 
 const rows: Row[] = [
     // Reports & Dashboards
-    ["dashboard", "Dashboards and KPIs", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://apps.example.gov/dashboard", "/dashboard"],
+    ["dashboard", "Dashboards and KPIs", "View accessibility metrics, recent scans, compliance status, and alerts.", "NEXT_PUBLIC_DASHBOARD_URL", "https://dashboard.revelosolutions.com/", "/dashboard"],
     ["dataQuery", "Data Query Module", "Query scan results and accessibility data using filters, search, and exports.", "NEXT_PUBLIC_DATAQUERY_URL", "https://apps.example.gov/data-query", "/data-query"],
     ["uptimeMonitoring", "Uptime Monitoring Tool", "Monitor website uptime, availability, and response times for accessibility compliance.", "NEXT_PUBLIC_UPTIME_MONITORING_URL", "/uptime-monitoring", "/uptime-monitoring"],
 
@@ -32,7 +32,7 @@ const rows: Row[] = [
     ["scansScheduler", "Scans Scheduler", "Schedule and manage bulk accessibility scans across multiple URLs or domains. Set recurring scan intervals and view results.", "NEXT_PUBLIC_SCANSCHED_URL", "/scans/scheduler", "/scans/scheduler"],
 
     // Workflows
-    ["intake", "Intake Form", "Collect accessibility requirements, department URLs, authentication details, and points of contact.", "NEXT_PUBLIC_INTAKE_URL", "https://apps.example.gov/intake", "/intake"],
+    ["intake", "Intake Form", "Collect accessibility requirements, department URLs, authentication details, and points of contact.", "NEXT_PUBLIC_INTAKE_URL", "https://iaccessible-intake-form.onrender.com", "/intake"],
     ["manualTesting", "Manual Testing Tool", "Conduct structured manual tests (screen readers, keyboard navigation, color contrast). Upload evidence and apply scoring.", "NEXT_PUBLIC_MANUALTEST_URL", "/manual-testing", "/manual-testing"],
 
     // Knowledge & Guides

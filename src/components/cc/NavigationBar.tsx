@@ -43,9 +43,11 @@ export default function NavigationBar() {
 
   // Filter categories based on user permissions
   const accessibleCategories = MODULE_GROUPS.filter(group => {
-    // For Admin category, check specific admin permissions
+    // For Admin category, only show to global_admin and organization_admin
     if (group.title === "Admin") {
-      return canManageUsers() || canManageGroups();
+      return user.groups.some(g => 
+        g.roleType === 'global_admin' || g.roleType === 'organization_admin'
+      );
     }
     
     // For other categories, check if at least one module is accessible

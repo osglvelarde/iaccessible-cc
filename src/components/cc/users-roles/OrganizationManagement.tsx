@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,10 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Building2, Users, Settings } from 'lucide-react';
+import { Plus, Edit, Trash2, Building2, Users, Settings, HelpCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Organization, CreateOrganizationRequest, UpdateOrganizationRequest } from '@/lib/types/users-roles';
 import { getOrganizations, createOrganization, updateOrganization, deleteOrganization } from '@/lib/users-roles-api';
 import { useAuth } from '@/components/cc/AuthProvider';
+import FeatureSelector from './FeatureSelector';
 
 interface OrganizationManagementProps {
   organizations: Organization[];
@@ -128,7 +130,7 @@ export default function OrganizationManagement({
                 Create Organization
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create New Organization</DialogTitle>
               </DialogHeader>
@@ -261,7 +263,7 @@ export default function OrganizationManagement({
       {/* Edit Dialog */}
       {editingOrg && (
         <Dialog open={!!editingOrg} onOpenChange={() => setEditingOrg(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Organization</DialogTitle>
             </DialogHeader>
@@ -287,6 +289,22 @@ interface OrganizationFormProps {
 }
 
 function OrganizationForm({ organization, onSubmit, onCancel, isLoading }: OrganizationFormProps) {
+  return (
+    <TooltipProvider>
+      <OrganizationFormContent 
+        organization={organization}
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        isLoading={isLoading}
+      />
+    </TooltipProvider>
+  );
+}
+
+function OrganizationFormContent({ organization, onSubmit, onCancel, isLoading }: OrganizationFormProps) {
+  // Initialize features as an array to avoid string conversion issues
+  const initialFeatures = organization?.settings.features || ['web_scan', 'pdf_scan'];
+  
   const [formData, setFormData] = useState({
     name: organization?.name || '',
     slug: organization?.slug || '',
@@ -296,127 +314,296 @@ function OrganizationForm({ organization, onSubmit, onCancel, isLoading }: Organ
     maxUsers: organization?.settings.maxUsers || 100,
     maxOperatingUnits: organization?.settings.maxOperatingUnits || 10,
     allowCustomGroups: organization?.settings.allowCustomGroups ?? true,
-    features: organization?.settings.features.join(', ') || 'web_scan,pdf_scan'
+    features: initialFeatures
   });
+  
+  // Ref to track previous features to prevent unnecessary updates
+  const prevFeaturesRef = useRef<string[]>(initialFeatures);
+  const isUpdatingRef = useRef(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const submitData = {
-      name: formData.name,
-      slug: formData.slug,
-      domains: formData.domains.split(',').map(d => d.trim()).filter(Boolean),
-      status: formData.status as 'active' | 'inactive' | 'trial',
-      billingEmail: formData.billingEmail || undefined,
+    // Extract domains from URLs if needed
+    const extractDomainFromInput = (input: string): string => {
+      const trimmed = input.trim();
+      if (!trimmed) return '';
+      
+      try {
+        // If it's a URL, extract the domain
+        if (trimmed.match(/^https?:\/\//i)) {
+          const url = new URL(trimmed);
+          return url.hostname;
+        }
+        // If it has a path, try to parse as URL
+        if (trimmed.includes('/')) {
+          const url = new URL('http://' + trimmed);
+          return url.hostname;
+        }
+      } catch (e) {
+        // Not a valid URL, treat as domain
+      }
+      
+      return trimmed.toLowerCase();
+    };
+
+    // Prepare submit data - only include status for updates
+    const submitData: any = {
+      name: formData.name.trim(),
+      slug: formData.slug.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      domains: formData.domains.split(',').map(d => extractDomainFromInput(d)).filter(Boolean),
+      billingEmail: formData.billingEmail.trim() || undefined,
       settings: {
         maxUsers: formData.maxUsers,
         maxOperatingUnits: formData.maxOperatingUnits,
         allowCustomGroups: formData.allowCustomGroups,
-        features: formData.features.split(',').map(f => f.trim()).filter(Boolean)
+        features: formData.features
       }
     };
+
+    // Only include status for updates
+    if (organization) {
+      submitData.status = formData.status;
+    }
 
     onSubmit(submitData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="name">Organization Name</Label>
+    <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="name">Organization Name</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>The official name of the organization. This will be displayed throughout the system.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="slug">Slug</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>A URL-friendly identifier for the organization. Used in URLs and must be unique. Auto-formatted to lowercase with hyphens.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="slug"
+              value={formData.slug}
+              onChange={(e) => {
+                // Auto-format slug: lowercase, replace spaces with hyphens, remove invalid chars
+                const formatted = e.target.value
+                  .toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace(/[^a-z0-9-]/g, '');
+                setFormData(prev => ({ ...prev, slug: formatted }));
+              }}
+              placeholder="my-organization"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Lowercase letters, numbers, and hyphens only
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="domains">Domains (comma-separated)</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>List of domains associated with this organization. You can enter domain names (example.gov) or full URLs (https://www.example.com). URLs will be automatically converted to domains.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            required
+            id="domains"
+            value={formData.domains}
+            onChange={(e) => setFormData(prev => ({ ...prev, domains: e.target.value }))}
+            placeholder="example.gov, subdomain.example.gov, https://www.example.com"
+          />
+          <p className="text-xs text-muted-foreground">
+            Enter domain names (e.g., example.gov) or full URLs (e.g., https://www.example.com). URLs will be automatically converted to domains.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Organization status: Active (fully operational), Inactive (disabled), or Trial (temporary access for evaluation).</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as 'active' | 'inactive' | 'trial' }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="trial">Trial</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="billingEmail">Billing Email</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Email address for billing and administrative communications. Optional but recommended for account management.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="billingEmail"
+              type="email"
+              value={formData.billingEmail}
+              onChange={(e) => setFormData(prev => ({ ...prev, billingEmail: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="maxUsers">Max Users</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Maximum number of users allowed in this organization. This helps manage licensing and resource allocation.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="maxUsers"
+              type="number"
+              value={formData.maxUsers}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || 0 }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="maxOperatingUnits">Max Operating Units</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Maximum number of operating units that can be created under this organization. Operating units are sub-divisions within an organization.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="maxOperatingUnits"
+              type="number"
+              value={formData.maxOperatingUnits}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxOperatingUnits: parseInt(e.target.value) || 0 }))}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Label>Features</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select the features to enable for this organization. These features control which capabilities are available to users in this organization.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          
+          <FeatureSelector
+            selectedFeatures={formData.features}
+            onFeaturesChange={useCallback((features: string[]) => {
+              // Prevent recursive updates
+              if (isUpdatingRef.current) {
+                return;
+              }
+              
+              // Sort features for consistency
+              const sortedFeatures = [...features].sort();
+              const newStr = sortedFeatures.join(',');
+              const prevStr = [...prevFeaturesRef.current].sort().join(',');
+              
+              // Only update if actually different
+              if (prevStr !== newStr) {
+                isUpdatingRef.current = true;
+                prevFeaturesRef.current = [...sortedFeatures]; // Store a copy
+                
+                // Use a microtask to defer the state update
+                Promise.resolve().then(() => {
+                  setFormData(prev => {
+                    // Double-check we still need to update
+                    const currentStr = [...prev.features].sort().join(',');
+                    if (currentStr !== newStr) {
+                      return { ...prev, features: sortedFeatures };
+                    }
+                    return prev;
+                  });
+                  
+                  // Reset flag after state update
+                  setTimeout(() => {
+                    isUpdatingRef.current = false;
+                  }, 0);
+                });
+              }
+            }, [])}
           />
         </div>
-        <div>
-          <Label htmlFor="slug">Slug</Label>
-          <Input
-            id="slug"
-            value={formData.slug}
-            onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-            required
+
+        <div className="flex items-center space-x-2 pt-2">
+          <input
+            type="checkbox"
+            id="allowCustomGroups"
+            checked={formData.allowCustomGroups}
+            onChange={(e) => setFormData(prev => ({ ...prev, allowCustomGroups: e.target.checked }))}
+            className="h-4 w-4"
           />
+          <div className="flex items-center gap-2">
+            <Label htmlFor="allowCustomGroups" className="cursor-pointer">Allow Custom Groups</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>When enabled, administrators can create custom user groups with specific permissions beyond the predefined roles.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-      </div>
-
-      <div>
-        <Label htmlFor="domains">Domains (comma-separated)</Label>
-        <Input
-          id="domains"
-          value={formData.domains}
-          onChange={(e) => setFormData(prev => ({ ...prev, domains: e.target.value }))}
-          placeholder="example.gov, subdomain.example.gov"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="status">Status</Label>
-           <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as 'active' | 'inactive' | 'trial' }))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="trial">Trial</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="billingEmail">Billing Email</Label>
-          <Input
-            id="billingEmail"
-            type="email"
-            value={formData.billingEmail}
-            onChange={(e) => setFormData(prev => ({ ...prev, billingEmail: e.target.value }))}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="maxUsers">Max Users</Label>
-          <Input
-            id="maxUsers"
-            type="number"
-            value={formData.maxUsers}
-            onChange={(e) => setFormData(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || 0 }))}
-          />
-        </div>
-        <div>
-          <Label htmlFor="maxOperatingUnits">Max Operating Units</Label>
-          <Input
-            id="maxOperatingUnits"
-            type="number"
-            value={formData.maxOperatingUnits}
-            onChange={(e) => setFormData(prev => ({ ...prev, maxOperatingUnits: parseInt(e.target.value) || 0 }))}
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="features">Features (comma-separated)</Label>
-        <Input
-          id="features"
-          value={formData.features}
-          onChange={(e) => setFormData(prev => ({ ...prev, features: e.target.value }))}
-          placeholder="web_scan, pdf_scan, manual_testing"
-        />
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          id="allowCustomGroups"
-          checked={formData.allowCustomGroups}
-          onChange={(e) => setFormData(prev => ({ ...prev, allowCustomGroups: e.target.checked }))}
-        />
-        <Label htmlFor="allowCustomGroups">Allow Custom Groups</Label>
-      </div>
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>

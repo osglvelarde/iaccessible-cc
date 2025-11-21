@@ -7,10 +7,22 @@ import {
 } from '@/lib/types/users-roles';
 import { v4 as uuidv4 } from 'uuid';
 import * as OperatingUnitModel from '@/lib/models/OperatingUnit';
+import * as OrganizationModel from '@/lib/models/Organization';
+import { validateOperatingUnitCreation, sanitizeString } from '@/lib/validation/users-roles';
+import { mongoDBAuditLogger, getRequestMetadata } from '@/lib/mongodb-audit-logger';
+import { getDatabase } from '@/lib/mongodb';
+import { requireAdminAuth } from '@/lib/auth-helpers';
 
 // GET /api/users-roles/operating-units - List operating units with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
@@ -37,47 +49,112 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const allOperatingUnits = await OperatingUnitModel.findOperatingUnits(query);
-    
-    // Pagination
-    const total = allOperatingUnits.length;
-    const totalPages = Math.ceil(total / pageSize);
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedOperatingUnits = allOperatingUnits.slice(startIndex, endIndex);
+    // Try MongoDB-native pagination, fallback to model if it fails
+    try {
+      const db = await getDatabase();
+      const collection = db.collection<OperatingUnit>('operatingUnits');
+      
+      // Get total count
+      const total = await collection.countDocuments(query);
+      const totalPages = Math.ceil(total / pageSize);
+      const skip = (page - 1) * pageSize;
 
-    const response: OperatingUnitsResponse = {
-      operatingUnits: paginatedOperatingUnits,
-      total,
-      page,
-      pageSize,
-      totalPages
-    };
+      // Fetch paginated operating units
+      const paginatedOperatingUnits = await collection
+        .find(query)
+        .sort({ createdAt: -1 }) // Newest first
+        .skip(skip)
+        .limit(pageSize)
+        .toArray();
 
-    return NextResponse.json(response);
-  } catch (error) {
+      const response: OperatingUnitsResponse = {
+        operatingUnits: paginatedOperatingUnits,
+        total,
+        page,
+        pageSize,
+        totalPages
+      };
+
+      return NextResponse.json(response);
+    } catch (dbError: any) {
+      // Fallback to model-based approach if direct MongoDB access fails
+      console.warn('Direct MongoDB access failed, using model fallback:', dbError?.message);
+      
+      const allOperatingUnits = await OperatingUnitModel.findOperatingUnits(query);
+      
+      // Pagination
+      const total = allOperatingUnits.length;
+      const totalPages = Math.ceil(total / pageSize);
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginatedOperatingUnits = allOperatingUnits.slice(startIndex, endIndex);
+
+      const response: OperatingUnitsResponse = {
+        operatingUnits: paginatedOperatingUnits,
+        total,
+        page,
+        pageSize,
+        totalPages
+      };
+
+      return NextResponse.json(response);
+    }
+  } catch (error: any) {
     console.error('Error fetching operating units:', error);
-    return NextResponse.json({ error: 'Failed to fetch operating units' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to fetch operating units',
+      details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    }, { status: 500 });
   }
 }
 
 // POST /api/users-roles/operating-units - Create new operating unit
 export async function POST(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
+
     const ouData: CreateOperatingUnitRequest = await request.json();
+    const metadata = getRequestMetadata(request);
     
-    // Validate required fields
-    if (!ouData.name || !ouData.organization || !ouData.domains || ouData.domains.length === 0) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // Validate input
+    const validation = validateOperatingUnitCreation(ouData);
+    if (!validation.isValid) {
+      return NextResponse.json({ 
+        error: 'Validation failed', 
+        details: validation.errors 
+      }, { status: 400 });
     }
 
-    // TODO: Validate organizationId exists (in production, check against organizations table)
-    // For now, we'll assume organizationId is provided and valid
+    // Validate organization exists
+    if (!ouData.organizationId) {
+      return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 });
+    }
 
-    // Check if operating unit already exists
-    const existingOperatingUnits = await OperatingUnitModel.findOperatingUnits({ name: ouData.name });
+    const organization = await OrganizationModel.getOrganizationById(ouData.organizationId);
+    if (!organization) {
+      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    }
+
+    // Sanitize inputs
+    const sanitizedName = sanitizeString(ouData.name);
+    // Extract domains from URLs if needed
+    const { extractDomain } = await import('@/lib/validation/users-roles');
+    const sanitizedDomains = ouData.domains.map(d => extractDomain(d.trim()));
+
+    // Check if operating unit with same name already exists in this organization
+    const existingOperatingUnits = await OperatingUnitModel.findOperatingUnits({ 
+      name: sanitizedName,
+      organizationId: ouData.organizationId
+    });
     if (existingOperatingUnits.length > 0) {
-      return NextResponse.json({ error: 'Operating unit with this name already exists' }, { status: 409 });
+      return NextResponse.json({ 
+        error: 'Operating unit with this name already exists in this organization' 
+      }, { status: 409 });
     }
 
     const now = new Date().toISOString();
@@ -85,27 +162,62 @@ export async function POST(request: NextRequest) {
     
     const newOperatingUnit: OperatingUnit = {
       id: ouId,
-      organizationId: ouData.organizationId || 'org-1',
-      name: ouData.name,
-      organization: ouData.organization,
-      domains: ouData.domains,
-      description: ouData.description,
+      organizationId: ouData.organizationId,
+      name: sanitizedName,
+      organization: sanitizeString(ouData.organization),
+      domains: sanitizedDomains,
+      description: ouData.description ? sanitizeString(ouData.description) : undefined,
       createdAt: now,
       updatedAt: now
     };
 
     await OperatingUnitModel.createOperatingUnit(newOperatingUnit);
 
+    // Log audit entry (don't fail if audit logging fails)
+    try {
+      await mongoDBAuditLogger.logOperatingUnitAction(
+        'operating_unit_created',
+        ouId,
+        ouData.organizationId,
+        adminUser.id, // Use authenticated admin user's ID
+        adminUser.email, // Use authenticated admin user's email
+        { operatingUnitData: { from: null, to: { name: sanitizedName, organizationId: ouData.organizationId } } },
+        metadata.ipAddress,
+        metadata.userAgent
+      );
+    } catch (auditError) {
+      console.warn('Failed to log audit entry:', auditError);
+      // Continue - audit logging failure shouldn't break the operation
+    }
+
     return NextResponse.json(newOperatingUnit, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating operating unit:', error);
-    return NextResponse.json({ error: 'Failed to create operating unit' }, { status: 500 });
+    
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      return NextResponse.json({ 
+        error: 'Operating unit with this name already exists' 
+      }, { status: 409 });
+    }
+    
+    return NextResponse.json({ 
+      error: 'Failed to create operating unit',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    }, { status: 500 });
   }
 }
 
 // PUT /api/users-roles/operating-units - Update operating unit
 export async function PUT(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
+
     const { searchParams } = new URL(request.url);
     const ouId = searchParams.get('ouId');
     
@@ -131,6 +243,13 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/users-roles/operating-units - Delete operating unit
 export async function DELETE(request: NextRequest) {
   try {
+    // Require admin authentication
+    const authResult = await requireAdminAuth(request);
+    if (authResult.response) {
+      return authResult.response;
+    }
+    const adminUser = authResult.user;
+
     const { searchParams } = new URL(request.url);
     const ouId = searchParams.get('ouId');
     
