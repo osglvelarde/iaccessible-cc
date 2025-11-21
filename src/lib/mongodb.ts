@@ -3,9 +3,14 @@ import { MongoClient, Db } from 'mongodb';
 // Allow MONGODB_URI to be undefined during module load - it will be checked when getDatabase is called
 function getMongoUri(): string {
   if (!process.env.MONGODB_URI) {
-    throw new Error('Please add your Mongo URI to .env.local');
+    throw new Error('MongoDB URI is not configured. Please set MONGODB_URI environment variable.');
   }
   return process.env.MONGODB_URI;
+}
+
+// Check if MongoDB is configured
+export function isMongoConfigured(): boolean {
+  return !!process.env.MONGODB_URI;
 }
 
 const options = {};

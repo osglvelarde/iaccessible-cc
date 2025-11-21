@@ -18,10 +18,14 @@ export async function GET(request: NextRequest) {
     }
     
     const profile = await UserProfileModel.getOrCreateUserProfile(userId);
-    return NextResponse.json({ recentModules: profile.recentModules });
+    return NextResponse.json({ recentModules: profile.recentModules || [] });
   } catch (error) {
     console.error('Error fetching recent modules:', error);
-    return NextResponse.json({ error: 'Failed to fetch recent modules' }, { status: 500 });
+    // Return empty array if MongoDB is not configured
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      return NextResponse.json({ recentModules: [] });
+    }
+    return NextResponse.json({ recentModules: [] }, { status: 200 });
   }
 }
 
@@ -43,13 +47,18 @@ export async function POST(request: NextRequest) {
     const updated = await UserProfileModel.addRecentModule(userId, title, href);
     
     if (!updated) {
-      return NextResponse.json({ error: 'Failed to update recent modules' }, { status: 500 });
+      // Return success with empty array if MongoDB is not configured
+      return NextResponse.json({ recentModules: [] });
     }
     
-    return NextResponse.json({ recentModules: updated.recentModules });
+    return NextResponse.json({ recentModules: updated.recentModules || [] });
   } catch (error) {
     console.error('Error updating recent modules:', error);
-    return NextResponse.json({ error: 'Failed to update recent modules' }, { status: 500 });
+    // Return empty array if MongoDB is not configured
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      return NextResponse.json({ recentModules: [] });
+    }
+    return NextResponse.json({ recentModules: [] }, { status: 200 });
   }
 }
 

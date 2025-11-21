@@ -25,6 +25,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(profile);
   } catch (error) {
     console.error('Error fetching user profile:', error);
+    // Return default profile if MongoDB is not configured
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      const now = new Date().toISOString();
+      return NextResponse.json({
+        id: '',
+        userId: getUserId(request) || '',
+        preferences: {
+          theme: 'system',
+          notifications: {
+            email: true,
+            sessionWarnings: true,
+            moduleUpdates: false
+          },
+          autoSaveRecentModules: true
+        },
+        favorites: [],
+        recentModules: [],
+        moduleUsage: [],
+        customSettings: {},
+        createdAt: now,
+        updatedAt: now
+      });
+    }
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
   }
 }

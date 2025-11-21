@@ -5,76 +5,155 @@ import { v4 as uuidv4 } from 'uuid';
 const COLLECTION_NAME = 'userProfiles';
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
-  const db = await getDatabase();
-  const collection = db.collection<UserProfile>(COLLECTION_NAME);
-  return collection.findOne({ userId });
+  try {
+    const db = await getDatabase();
+    const collection = db.collection<UserProfile>(COLLECTION_NAME);
+    return collection.findOne({ userId });
+  } catch (error) {
+    // MongoDB not configured - return null
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function getOrCreateUserProfile(userId: string): Promise<UserProfile> {
-  const existing = await getUserProfile(userId);
-  if (existing) {
-    return existing;
-  }
-  
-  // Create default profile
-  const now = new Date().toISOString();
-  const defaultProfile: UserProfile = {
-    id: uuidv4(),
-    userId,
-    preferences: {
-      theme: 'system',
-      notifications: {
-        email: true,
-        sessionWarnings: true,
-        moduleUpdates: false
+  try {
+    const existing = await getUserProfile(userId);
+    if (existing) {
+      return existing;
+    }
+    
+    // Create default profile
+    const now = new Date().toISOString();
+    const defaultProfile: UserProfile = {
+      id: uuidv4(),
+      userId,
+      preferences: {
+        theme: 'system',
+        notifications: {
+          email: true,
+          sessionWarnings: true,
+          moduleUpdates: false
+        },
+        autoSaveRecentModules: true
       },
-      autoSaveRecentModules: true
-    },
-    favorites: [],
-    recentModules: [],
-    moduleUsage: [],
-    customSettings: {},
-    createdAt: now,
-    updatedAt: now
-  };
-  
-  return await createUserProfile(defaultProfile);
+      favorites: [],
+      recentModules: [],
+      moduleUsage: [],
+      customSettings: {},
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    return await createUserProfile(defaultProfile);
+  } catch (error) {
+    // MongoDB not configured - return default profile
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      const now = new Date().toISOString();
+      return {
+        id: uuidv4(),
+        userId,
+        preferences: {
+          theme: 'system',
+          notifications: {
+            email: true,
+            sessionWarnings: true,
+            moduleUpdates: false
+          },
+          autoSaveRecentModules: true
+        },
+        favorites: [],
+        recentModules: [],
+        moduleUsage: [],
+        customSettings: {},
+        createdAt: now,
+        updatedAt: now
+      };
+    }
+    throw error;
+  }
 }
 
 export async function createUserProfile(profile: UserProfile): Promise<UserProfile> {
-  const db = await getDatabase();
-  const collection = db.collection<UserProfile>(COLLECTION_NAME);
-  await collection.insertOne(profile);
-  return profile;
+  try {
+    const db = await getDatabase();
+    const collection = db.collection<UserProfile>(COLLECTION_NAME);
+    await collection.insertOne(profile);
+    return profile;
+  } catch (error) {
+    // MongoDB not configured - return profile without saving
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      return profile;
+    }
+    throw error;
+  }
 }
 
 export async function updateUserProfile(
   userId: string, 
   updates: Partial<UserProfile>
 ): Promise<UserProfile | null> {
-  const db = await getDatabase();
-  const collection = db.collection<UserProfile>(COLLECTION_NAME);
-  const result = await collection.findOneAndUpdate(
-    { userId },
-    { 
-      $set: { 
-        ...updates, 
-        updatedAt: new Date().toISOString() 
-      } 
-    },
-    { 
-      returnDocument: 'after',
-      upsert: true // Create if doesn't exist
+  try {
+    const db = await getDatabase();
+    const collection = db.collection<UserProfile>(COLLECTION_NAME);
+    const result = await collection.findOneAndUpdate(
+      { userId },
+      { 
+        $set: { 
+          ...updates, 
+          updatedAt: new Date().toISOString() 
+        } 
+      },
+      { 
+        returnDocument: 'after',
+        upsert: true // Create if doesn't exist
+      }
+    );
+    return result || null;
+  } catch (error) {
+    // MongoDB not configured - return default profile with updates
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      const now = new Date().toISOString();
+      return {
+        id: uuidv4(),
+        userId,
+        preferences: {
+          theme: 'system',
+          notifications: {
+            email: true,
+            sessionWarnings: true,
+            moduleUpdates: false
+          },
+          autoSaveRecentModules: true
+        },
+        favorites: [],
+        recentModules: [],
+        moduleUsage: [],
+        customSettings: {},
+        createdAt: now,
+        updatedAt: now,
+        ...updates
+      };
     }
-  );
-  return result || null;
+    throw error;
+  }
 }
 
 export async function deleteUserProfile(userId: string): Promise<boolean> {
-  const db = await getDatabase();
-  const collection = db.collection<UserProfile>(COLLECTION_NAME);
-  const result = await collection.deleteOne({ userId });
-  return result.deletedCount > 0;
+  try {
+    const db = await getDatabase();
+    const collection = db.collection<UserProfile>(COLLECTION_NAME);
+    const result = await collection.deleteOne({ userId });
+    return result.deletedCount > 0;
+  } catch (error) {
+    // MongoDB not configured - return false
+    if (error instanceof Error && error.message.includes('MongoDB')) {
+      return false;
+    }
+    throw error;
+  }
 }
 
 // Favorites operations
